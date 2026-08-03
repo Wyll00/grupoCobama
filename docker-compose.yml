@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: cobama-db
+    restart: unless-stopped
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-time-zone=+00:00
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cobama}
+      MYSQL_USER: ${MYSQL_USER:-cobama}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-cobama}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - cobama_db_data:/var/lib/mysql
+      # docker-entrypoint-initdb.d NO recorre subdirectorios: se montan los
+      # ficheros uno a uno y el prefijo numerico fija el orden de ejecucion.
+      - ./db/migrations/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./db/seeds/001_base.sql:/docker-entrypoint-initdb.d/002_base.sql:ro
+      - ./db/seeds/002_carta.sql:/docker-entrypoint-initdb.d/003_carta.sql:ro
+      - ./db/seeds/003_usuarios.sql:/docker-entrypoint-initdb.d/004_usuarios.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: cobama-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+
+volumes:
+  cobama_db_data:

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Subidas en desarrollo (en produccion van a R2/S3)
+api/uploads/
+
+# QR generados
+qr/
