@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
+import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
@@ -15,6 +16,11 @@ export default function Restaurante() {
     (opts) => api.restaurante(slug, opts),
     [slug]
   );
+
+  useMetadatos({
+    titulo: local ? `${local.nombre} · ${local.municipio} · Grupo Cobama` : undefined,
+    descripcion: local?.reclamo ?? undefined,
+  });
 
   if (error) return <Error error={error} />;
   if (cargando) return <Cargando texto="Cargando el local..." />;

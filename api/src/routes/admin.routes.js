@@ -17,11 +17,16 @@ import {
   actualizarCategoriaSchema,
 } from '../esquemas/catalogo.js';
 import { crearUsuarioSchema, actualizarUsuarioSchema } from '../esquemas/usuarios.js';
+import {
+  registrarOcupacionSchema,
+  consultaOcupacionSchema,
+} from '../esquemas/ocupacion.js';
 
 import * as platosCtrl from '../controllers/admin.platos.controller.js';
 import * as cartaCtrl from '../controllers/admin.carta.controller.js';
 import * as usuariosCtrl from '../controllers/admin.usuarios.controller.js';
 import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
+import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 
 export const adminRouter = Router();
 
@@ -111,6 +116,36 @@ adminRouter.patch(
 );
 adminRouter.delete('/carta-items/:id', ambitoCartaItem, asyncHandler(cartaCtrl.deleteItem));
 adminRouter.get('/carta-items/:id/historico', ambitoCartaItem, asyncHandler(cartaCtrl.getHistorico));
+
+// ---------------------------------------------------------------------------
+// Ocupacion del local
+//
+// Lo responde sala desde el comandero, asi que va por ambito de local: cada
+// casa registra la suya y el admin ve las cuatro.
+// ---------------------------------------------------------------------------
+adminRouter.get(
+  '/restaurantes/:restauranteId/ocupacion/pendiente',
+  ambitoLocal(),
+  asyncHandler(ocupacionCtrl.getPendiente)
+);
+adminRouter.post(
+  '/restaurantes/:restauranteId/ocupacion',
+  ambitoLocal(),
+  validarCuerpo(registrarOcupacionSchema),
+  asyncHandler(ocupacionCtrl.postOcupacion)
+);
+adminRouter.get(
+  '/restaurantes/:restauranteId/ocupacion',
+  ambitoLocal(),
+  validarConsulta(consultaOcupacionSchema),
+  asyncHandler(ocupacionCtrl.getHistorico)
+);
+adminRouter.get(
+  '/restaurantes/:restauranteId/ocupacion/patron',
+  ambitoLocal(),
+  validarConsulta(consultaOcupacionSchema),
+  asyncHandler(ocupacionCtrl.getPatron)
+);
 
 // ---------------------------------------------------------------------------
 // Categorias - las lee cualquiera, las toca el admin

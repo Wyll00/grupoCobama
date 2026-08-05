@@ -139,6 +139,16 @@ export const adminApi = {
   crearPlatoEnCarta: (restauranteId, datos) =>
     enviar('POST', `/admin/restaurantes/${restauranteId}/carta/nuevo-plato`, { cuerpo: datos }),
   qr: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/qr`),
+
+  // --- ocupacion ----------------------------------------------------------
+  ocupacionPendiente: (restauranteId) =>
+    get(`/admin/restaurantes/${restauranteId}/ocupacion/pendiente`),
+  registrarOcupacion: (restauranteId, datos) =>
+    enviar('POST', `/admin/restaurantes/${restauranteId}/ocupacion`, { cuerpo: datos }),
+  ocupacionHistorico: (restauranteId, dias = 14) =>
+    get(`/admin/restaurantes/${restauranteId}/ocupacion?dias=${dias}`),
+  ocupacionPatron: (restauranteId, dias = 90) =>
+    get(`/admin/restaurantes/${restauranteId}/ocupacion/patron?dias=${dias}`),
   editarItem: (id, datos) => enviar('PATCH', `/admin/carta-items/${id}`, { cuerpo: datos }),
   quitarItem: (id) => enviar('DELETE', `/admin/carta-items/${id}`),
   reordenar: (restauranteId, orden) =>

@@ -93,7 +93,7 @@ Para empezar de cero: `docker compose down -v && docker compose up -d` y
 npm run humo --prefix api
 ```
 
-76 comprobaciones end-to-end contra una API levantada: login, rotación de
+89 comprobaciones end-to-end contra una API levantada: login, rotación de
 refresh tokens, límites por rol y por local, CRUD de catálogo, alta de platos
 desde la carta, generación de QR, secciones, procesado de imágenes, histórico de
 precios, reordenación y gestión de usuarios. Deja la base de datos como estaba,
@@ -147,6 +147,10 @@ Todo bajo `/api/admin` exige `Authorization: Bearer <access token>`.
 | PUT | `/api/admin/restaurantes/:id/carta/orden` | Su local |
 | POST | `/api/admin/restaurantes/:id/carta/nuevo-plato` | Solo `admin_grupo` |
 | GET | `/api/admin/restaurantes/:id/qr` | Su local |
+| GET | `/api/admin/restaurantes/:id/ocupacion/pendiente` | Su local |
+| POST | `/api/admin/restaurantes/:id/ocupacion` | Su local |
+| GET | `/api/admin/restaurantes/:id/ocupacion` | Su local |
+| GET | `/api/admin/restaurantes/:id/ocupacion/patron` | Su local |
 | PATCH · DELETE | `/api/admin/carta-items/:id` | Su local |
 | GET | `/api/admin/carta-items/:id/historico` | Su local |
 | GET | `/api/admin/categorias` | Cualquier usuario |
@@ -258,7 +262,8 @@ estés haciendo:
 | Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
 | Cambiar alérgenos o foto | **Catálogo** → el plato |
 | Crear, renombrar u ordenar las secciones | **Catálogo** → *Secciones* |
-| Sacar el QR para imprimir o publicar | **Cartas** → *QR de la carta* |
+| Sacar el enlace o el QR para publicar | **Cartas** → *Compartir carta* |
+| Ver a qué horas se llena el local | **Ocupación** |
 
 > El nombre, la descripción, los alérgenos y la foto son **del catálogo del
 > grupo**: corregirlos desde la carta de un local los cambia en los cuatro. Lo
@@ -276,16 +281,64 @@ que ese camino solo lo ve el admin de grupo; un encargado añade de lo que ya
 existe. Un encargado tampoco ve editable la fila de otro local en *Precio por
 local*: no le aparece.
 
-### QR de la carta
+### Compartir la carta
 
-**Cartas** → *QR de la carta* da el código de la carta pública del local, en SVG
-y en PNG. Para imprimir hay que usar el SVG: escala desde un adhesivo de mesa
-hasta un cartel sin pixelarse. El PNG va bien para redes o WhatsApp.
+**Cartas** → *Compartir carta* da el enlace público del local y su QR.
+
+El enlace es **fijo y no caduca**: apunta a la carta, que se lee de la base de
+datos en cada visita. Cambiar un precio se ve al momento en el enlace que ya
+está publicado en redes, sin volver a compartir nada. Hay botones para copiarlo,
+copiarlo con un texto ya redactado, abrirlo, mandarlo por WhatsApp y —en móvil—
+la hoja de compartir del sistema.
+
+El QR baja en SVG y PNG. Para imprimir hay que usar el SVG: escala desde un
+adhesivo de mesa hasta un cartel sin pixelarse.
 
 El destino sale de `WEB_BASE_URL` en `api/.env`. Mientras eso apunte a
-`localhost` el panel avisa de que ese QR **no sirve para imprimir**, porque solo
-funcionaría en el ordenador que lo generó. Hay un script equivalente para
-generar los cuatro de golpe: `npm run qr --prefix api`.
+`localhost` el panel avisa de que ese enlace **no sirve fuera de ese ordenador**.
+Hay un script para generar los cuatro QR de golpe: `npm run qr --prefix api`.
+
+> **Pendiente para la fase 4: la vista previa del enlace en redes.** Al pegarlo
+> en WhatsApp o Instagram sale el título genérico del grupo, no el del local. El
+> título y la descripción sí cambian por local, pero lo hace JavaScript en el
+> navegador, y los rastreadores de las redes no ejecutan JavaScript: leen el HTML
+> tal cual sale del servidor. Arreglarlo pide prerenderizado en el despliegue
+> —una función de Cloudflare Pages que sirva las etiquetas Open Graph según la
+> ruta—, así que va con el dominio ya decidido.
+
+---
+
+## Ocupación del local
+
+Cada hora, mientras el local está abierto, aparece una barra fija abajo del
+panel preguntando cómo está la sala: **Vacío · Flojo · Normal · Lleno · A tope**,
+con botones grandes porque se pulsan de pie y con prisa desde el comandero.
+Opcionalmente se apunta el número de comensales.
+
+Con eso salen las horas punta reales de cada casa, que hoy solo están en la
+cabeza del encargado. **Ocupación** enseña un mapa de calor por día de la semana
+y hora, más las últimas lecturas.
+
+Detalles que condicionan el diseño:
+
+- **Solo se pregunta con el local abierto.** Preguntar a las cinco de la mañana
+  no da ningún dato y consigue que en sala dejen de hacer caso al aviso.
+- **Una lectura por tramo.** Responder dos veces corrige la anterior en lugar de
+  duplicarla: en sala se falla el botón y lo normal es volver a pulsar.
+- **La hora se guarda ya resuelta** a horario de Canarias, en `hora_local` y
+  `dia_semana`, para que las estadísticas no dependan de `CONVERT_TZ` —necesita
+  las tablas de zonas horarias cargadas en MySQL y la imagen de Docker no las
+  trae.
+- Al admin de grupo **no se le pregunta**: no está en ninguna sala.
+
+> **Es un sondeo, no una notificación push.** El panel pregunta a la API cada
+> minuto si toca. Una notificación de verdad —que suene con el panel cerrado—
+> necesita HTTPS, claves VAPID, un *service worker* y que alguien acepte el
+> permiso en cada dispositivo, y no es verificable hasta que haya dominio y
+> aparatos reales. Como el comandero tiene el panel abierto durante todo el
+> servicio, el sondeo cubre el caso. La decisión de *si toca preguntar* vive en
+> la API (`GET .../ocupacion/pendiente`), así que añadir push encima no obliga a
+> rehacer nada.
 
 ### Secciones de la carta
 

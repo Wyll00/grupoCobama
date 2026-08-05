@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { adminApi, ErrorApi } from '../api.js';
 import Modal from './Modal.jsx';
+import AvisoOcupacion from './AvisoOcupacion.jsx';
 import { Aviso, Boton, Campo, Entrada } from './Campos.jsx';
 
 export default function AdminLayout() {
@@ -29,6 +30,7 @@ export default function AdminLayout() {
             </NavLink>
             <NavLink to="/admin/carta">Cartas</NavLink>
             <NavLink to="/admin/platos">Catalogo</NavLink>
+            <NavLink to="/admin/ocupacion">Ocupacion</NavLink>
             {esAdmin && <NavLink to="/admin/usuarios">Usuarios</NavLink>}
           </nav>
 
@@ -46,6 +48,10 @@ export default function AdminLayout() {
       <main className="admin__contenido">
         <Outlet />
       </main>
+
+      {/* Fijo abajo y presente en todo el panel: en sala se esta en cualquier
+          pantalla cuando toca responder. */}
+      <AvisoOcupacion />
 
       {cambiandoPassword && (
         <CambiarPassword onCerrar={() => setCambiandoPassword(false)} onHecho={alSalir} />

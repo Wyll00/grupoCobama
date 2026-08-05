@@ -6,7 +6,7 @@ import { useDatos } from '../useDatos.js';
 import Modal from '../componentes/Modal.jsx';
 import PrecioEditable from '../componentes/PrecioEditable.jsx';
 import HistorialPrecios from '../componentes/HistorialPrecios.jsx';
-import CodigoQr from '../componentes/CodigoQr.jsx';
+import Compartir from '../componentes/Compartir.jsx';
 import EditorPlato from '../componentes/EditorPlato.jsx';
 import { Aviso, Boton, Campo, Entrada, Interruptor, Seleccion } from '../componentes/Campos.jsx';
 
@@ -83,7 +83,7 @@ export default function CartaLocal() {
             Anadir plato
           </Boton>
           <Boton onClick={() => setMostrandoQr(true)} disabled={!localId}>
-            QR de la carta
+            Compartir carta
           </Boton>
         </div>
       </header>
@@ -236,7 +236,7 @@ export default function CartaLocal() {
       )}
 
       {mostrandoQr && (
-        <CodigoQr
+        <Compartir
           restauranteId={localId}
           nombreLocal={local?.nombre}
           onCerrar={() => setMostrandoQr(false)}

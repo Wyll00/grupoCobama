@@ -606,6 +606,138 @@
   margin-bottom: 0;
 }
 
+/* --------------------------------------------------------- compartir -- */
+
+.compartir__enlace {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.compartir__enlace .entrada {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.compartir__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ------------------------------------------------------------ aforo --- */
+
+/* Barra fija abajo: en sala se pulsa de pie y con prisa, asi que tiene que
+   estar siempre a mano y con botones grandes. */
+.aforo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  background: var(--carbon);
+  color: var(--crema);
+  box-shadow: 0 -8px 32px rgba(31, 26, 23, 0.35);
+  padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
+}
+
+.aforo__interior {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.aforo__texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.aforo__texto strong { font-size: 1rem; }
+.aforo__texto .apagado { color: #9c9188; font-size: 0.82rem; }
+.aforo__error { color: #f0a89e; font-size: 0.82rem; }
+
+.aforo__niveles {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.aforo__boton {
+  flex: 1;
+  min-width: 5.5rem;
+  /* Alto de dedo, no de raton. */
+  min-height: 3rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid #4a413a;
+  border-radius: var(--radio-s);
+  background: #2e2723;
+  color: var(--crema);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.aforo__boton:hover:not(:disabled) { background: #3b322c; }
+.aforo__boton:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Del verde de "vacio" al rojo de "a tope", para que se pulse por color. */
+.aforo__boton--vacio  { border-color: #4f6b43; }
+.aforo__boton--flojo  { border-color: #6b7a43; }
+.aforo__boton--normal { border-color: #b08a2a; }
+.aforo__boton--lleno  { border-color: #c06a2a; }
+.aforo__boton--a_tope { border-color: #a63a2b; background: #3a231f; }
+
+.aforo__extras {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.aforo__extras .enlace { color: #b9afa4; }
+.aforo__extras .enlace:hover { color: var(--ocre); }
+
+.aforo__comensales { width: 8rem; }
+
+/* Que la barra no tape el final del contenido. */
+.admin__contenido { padding-bottom: 4rem; }
+
+/* -------------------------------------------------- mapa de ocupacion -- */
+
+.mapa-aforo {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.mapa-aforo th[scope='row'] {
+  text-align: left;
+  white-space: nowrap;
+  background: var(--crema-hueso);
+}
+
+.celda-aforo {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--carbon);
+  /* La opacidad la calcula el componente a partir de la media 0..4. */
+  background: rgba(192, 125, 42, var(--intensidad, 0));
+}
+
+.celda-aforo--sin-datos { background: transparent; }
+
+.punto--nivel-0 { color: var(--mojo-verde); }
+.punto--nivel-1 { color: #6b7a43; }
+.punto--nivel-2 { color: #b08a2a; }
+.punto--nivel-3 { color: #c06a2a; }
+.punto--nivel-4 { color: var(--mojo-rojo); }
+
 /* ------------------------------------------------------------- QR ---- */
 
 .qr {

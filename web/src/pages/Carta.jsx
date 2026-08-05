@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
+import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
@@ -65,6 +66,13 @@ export default function Carta() {
   }
 
   const hayFiltros = Boolean(busqueda || vegetariano || vegano || sinAlergenos.length);
+
+  useMetadatos({
+    titulo: local.datos ? `Carta de ${local.datos.nombre} · Grupo Cobama` : undefined,
+    descripcion: local.datos
+      ? `Carta de ${local.datos.nombre}, en ${local.datos.municipio}. ${local.datos.reclamo ?? ''}`.trim()
+      : undefined,
+  });
 
   const todasLasCategorias = carta.datos?.categorias ?? [];
   const visibles = categoria

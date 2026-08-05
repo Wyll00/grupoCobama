@@ -30,6 +30,7 @@ const rastro = {
   usuarioId: null,
   platoNuevoId: null,
   categoriaId: null,
+  ocupacionTramo: null,
 };
 
 function comprobar(descripcion, condicion, detalle) {
@@ -407,6 +408,65 @@ async function main() {
   const qrPropio = await basilica.peticion('GET', '/api/admin/restaurantes/2/qr');
   comprobar('pero si el del suyo (200)', qrPropio.status === 200);
 
+  // -------------------------------------------------------- ocupacion
+  seccion('Ocupacion del local');
+
+  const pend = await basilica.peticion('GET', '/api/admin/restaurantes/2/ocupacion/pendiente');
+  comprobar('se consulta si toca preguntar (200)', pend.status === 200);
+  comprobar('viene el tramo horario en ISO', /^\d{4}-\d{2}-\d{2}T\d{2}:00:00/.test(pend.cuerpo?.datos?.tramo ?? ''));
+  comprobar('vienen los cinco niveles', pend.cuerpo?.datos?.niveles?.length === 5);
+
+  // Si ya habia una lectura de este tramo, la prueba la sobrescribiria y no
+  // podria devolverla: se anota solo si el tramo estaba libre.
+  if (!pend.cuerpo?.datos?.respondido) {
+    rastro.ocupacionTramo = pend.cuerpo.datos.tramo.slice(0, 19).replace('T', ' ');
+  }
+
+  const registro = await basilica.peticion('POST', '/api/admin/restaurantes/2/ocupacion', {
+    nivel: 3,
+    comensales: 44,
+    nota: 'Prueba de humo',
+  });
+  comprobar('sala registra la lectura (201)', registro.status === 201);
+  comprobar('queda marcada como respondida', registro.cuerpo?.datos?.respondido === true);
+  comprobar('y ya no toca preguntar', registro.cuerpo?.datos?.toca === false);
+
+  // Volver a responder corrige, no duplica: en sala se falla el boton.
+  const correccion = await basilica.peticion('POST', '/api/admin/restaurantes/2/ocupacion', {
+    nivel: 4,
+  });
+  comprobar('responder otra vez corrige el mismo tramo', correccion.cuerpo?.datos?.respuesta?.nivel === 4);
+
+  const histAforo = await basilica.peticion('GET', '/api/admin/restaurantes/2/ocupacion?dias=1');
+  comprobar(
+    'el tramo no se ha duplicado',
+    histAforo.cuerpo?.datos?.length === 1,
+    `hay ${histAforo.cuerpo?.datos?.length} lecturas`
+  );
+  comprobar(
+    'la hora se guarda en horario de Canarias',
+    Number.isInteger(histAforo.cuerpo?.datos?.[0]?.hora_local)
+  );
+
+  const nivelMalo = await basilica.peticion('POST', '/api/admin/restaurantes/2/ocupacion', {
+    nivel: 9,
+  });
+  comprobar('un nivel fuera de rango se rechaza (400)', nivelMalo.status === 400);
+
+  const ocupacionAjena = await basilica.peticion(
+    'POST',
+    '/api/admin/restaurantes/4/ocupacion',
+    { nivel: 2 }
+  );
+  comprobar('un encargado no registra aforo de otro local (403)', ocupacionAjena.status === 403);
+
+  const patronAforo = await admin.peticion(
+    'GET',
+    '/api/admin/restaurantes/2/ocupacion/patron?dias=90'
+  );
+  comprobar('el admin ve el patron de cualquier local (200)', patronAforo.status === 200);
+  comprobar('con al menos una celda', patronAforo.cuerpo?.datos?.celdas?.length >= 1);
+
   // -------------------------------------------------------- categorias
   seccion('Secciones de la carta');
 
@@ -628,6 +688,14 @@ async function limpiar() {
     }
     if (rastro.categoriaId) {
       await pool.execute('DELETE FROM categorias WHERE id = ?', [rastro.categoriaId]);
+    }
+    if (rastro.ocupacionTramo) {
+      // Acotado al tramo exacto que ha escrito la prueba: una lectura real
+      // normalmente no lleva nota, asi que borrar por nota se llevaria datos
+      // buenos por delante.
+      await pool.execute('DELETE FROM ocupacion WHERE restaurante_id = 2 AND tramo = ?', [
+        rastro.ocupacionTramo,
+      ]);
     }
     if (rastro.usuarioId) {
       await pool.execute('DELETE FROM refresh_tokens WHERE usuario_id = ?', [rastro.usuarioId]);
