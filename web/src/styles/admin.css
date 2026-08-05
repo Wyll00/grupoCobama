@@ -4,11 +4,24 @@
    aqui se trabaja con tablas y se cambian precios, no se lee una carta.
    ===================================================================== */
 
-.admin {
+/*
+  Los tokens van en :root, NO en .admin.
+  La pantalla de login renderiza .entrar, que cuelga fuera de .admin porque no
+  pasa por AdminLayout. Con las variables limitadas a .admin, alli quedaban sin
+  definir: `border: 1px solid var(--linea)` es una declaracion invalida, se
+  descarta entera y los campos se quedaban sin borde y con fondo transparente
+  sobre la tarjeta crema. Es decir, invisibles.
+
+  Esta hoja solo se carga con el panel, asi que declararlos en :root no afecta
+  a la web publica.
+*/
+:root {
   --fondo: #f4f1ec;
   --panel: #ffffff;
   --linea: #e2d9cc;
+}
 
+.admin {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
