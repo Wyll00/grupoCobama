@@ -15,3 +15,6 @@ api/uploads/
 
 # QR generados
 qr/
+
+# Artefacto de un 2>$null mal escapado en PowerShell
+$null
