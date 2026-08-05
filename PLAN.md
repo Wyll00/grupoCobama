@@ -1,8 +1,8 @@
 # Plan de implementación — Web unificada Grupo Cobama
 
 **Proyecto:** plataforma web multi-local para los cuatro guachinches del Grupo Cobama
-**Fase actual:** Fase 1 completa en local
-**Última actualización:** 4 de agosto de 2026
+**Fase actual:** Fases 1 y 2 completas en local
+**Última actualización:** 5 de agosto de 2026
 
 ---
 
@@ -163,8 +163,17 @@ Los 14 alérgenos de declaración obligatoria según el Reglamento (UE) 1169/201
 `id`, `carta_item_id`, `precio_anterior`, `precio_nuevo`, `usuario_id`, `fecha`
 
 Se alimenta desde el servicio al actualizar un precio, dentro de la misma
-transacción. Es lo que convierte la web en herramienta de gestión: permite
-responder a preguntas del tipo "¿cuánto costaba el arroz al señoret en marzo?".
+transacción y con un `SELECT ... FOR UPDATE` sobre la línea de carta, para que
+dos encargados cambiando el precio a la vez no dejen el histórico incoherente.
+Es lo que convierte la web en herramienta de gestión: permite responder a
+preguntas del tipo "¿cuánto costaba el arroz al señoret en marzo?".
+
+**`refresh_tokens`** *(fase 2)*
+`id`, `usuario_id`, `token_hash`, `expira_en`, `revocado_en`, `reemplazado_por`,
+`user_agent`, `ip`
+
+**`migraciones`** *(fase 2)*
+`id`, `nombre`, `lote`, `aplicada`. La lleva el runner de `npm run db:migrate`.
 
 **`reservas`**
 `id`, `restaurante_id`, `nombre`, `telefono`, `email`, `fecha`, `hora`,
@@ -217,15 +226,22 @@ Es la fase que sustituye los PDFs y por sí sola justifica el proyecto.
 - [x] Diseño responsive con prioridad móvil (el cliente llega por QR desde la mesa)
 - [x] Generación de QR por local
 
-### Fase 2 — Panel de administración
+### Fase 2 — Panel de administración ✅
 
-- [ ] Autenticación JWT con refresh token
-- [ ] Middleware de roles y filtrado por `restaurante_id`
-- [ ] CRUD del catálogo maestro de platos
-- [ ] Gestión de carta por local: activar, desactivar, reordenar, cambiar precio
-- [ ] Registro automático en `historico_precios`
-- [ ] Subida y recorte de imágenes de platos
-- [ ] Gestión de usuarios
+- [x] Autenticación JWT con refresh token (rotación con detección de reutilización y margen para carreras)
+- [x] Middleware de roles y filtrado por `restaurante_id`
+- [x] CRUD del catálogo maestro de platos
+- [x] Gestión de carta por local: activar, desactivar, reordenar, cambiar precio
+- [x] Registro automático en `historico_precios`
+- [x] Subida y recorte de imágenes de platos
+- [x] Gestión de usuarios
+
+Extras que pedía el terreno y no estaban en la lista:
+
+- [x] Runner de migraciones. `docker-entrypoint-initdb.d` solo se ejecuta con el volumen vacío, así que cada cambio de esquema obligaba a borrar la base de datos.
+- [x] Límite de intentos de login, repartido por cuenta y por IP.
+- [x] Prueba de humo de 53 comprobaciones (`npm run humo --prefix api`).
+- [x] Carga perezosa del panel, para que la web pública no lo descargue.
 
 ### Fase 3 — Reservas
 

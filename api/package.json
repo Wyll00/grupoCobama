@@ -8,22 +8,34 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "qr": "node scripts/generar-qr.js"
+    "qr": "node scripts/generar-qr.js",
+    "humo": "node scripts/humo.js",
+    "db:migrate": "node scripts/db.js migrate",
+    "db:seed": "node scripts/db.js seed",
+    "db:setup": "node scripts/db.js setup",
+    "db:estado": "node scripts/db.js estado",
+    "db:adoptar": "node scripts/db.js adoptar"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.6.2",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
-    "mysql2": "^3.11.5"
+    "multer": "^2.2.0",
+    "mysql2": "^3.11.5",
+    "sharp": "^0.35.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "bcryptjs": "^2.4.3",
     "qrcode": "^1.5.4"
   }
 }

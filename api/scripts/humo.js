@@ -1,0 +1,533 @@
+/**
+ * Prueba de humo del panel de administracion.
+ *
+ *   npm run humo --prefix api
+ *
+ * Conviene lanzarla contra una API arrancada con `npm start`, no con
+ * `npm run dev`: el --watch de este ultimo reinicia el servidor si algo toca
+ * un fichero durante la ejecucion y la prueba muere con ECONNRESET.
+ *
+ * Recorre el flujo completo contra una API ya levantada: login, rotacion de
+ * refresco, limites por rol y por local, CRUD de catalogo, carta e historico
+ * de precios. No sustituye a una bateria de tests, pero detecta al momento si
+ * algo del panel se ha roto.
+ *
+ * Deja la base de datos como estaba: lo que crea, lo revierte al final.
+ */
+const BASE = process.env.API_URL ?? 'http://localhost:4000';
+const PASSWORD = 'cobama2026';
+
+let fallos = 0;
+let pruebas = 0;
+
+/**
+ * Lo que la prueba va creando. Se limpia en un finally: si la prueba se rompe
+ * a mitad, los datos sinteticos no pueden quedarse en la base de datos.
+ */
+const rastro = { platoId: null, itemId: null, usuarioId: null };
+
+function comprobar(descripcion, condicion, detalle) {
+  pruebas++;
+  if (condicion) {
+    console.log(`  ok    ${descripcion}`);
+  } else {
+    fallos++;
+    console.log(`  FALLO ${descripcion}${detalle ? `\n        ${detalle}` : ''}`);
+  }
+}
+
+function seccion(titulo) {
+  console.log(`\n${titulo}`);
+}
+
+/** Cliente minimo con cookie de sesion y access token. */
+function crearCliente() {
+  const cliente = { acceso: null, cookie: null, usuario: null };
+
+  cliente.peticion = async (metodo, ruta, cuerpo) => {
+    const cabeceras = {};
+    if (cliente.acceso) cabeceras.authorization = `Bearer ${cliente.acceso}`;
+    if (cliente.cookie) cabeceras.cookie = cliente.cookie;
+    if (cuerpo !== undefined) cabeceras['content-type'] = 'application/json';
+
+    const res = await fetch(`${BASE}${ruta}`, {
+      method: metodo,
+      headers: cabeceras,
+      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
+    });
+
+    const setCookie = res.headers.getSetCookie?.() ?? [];
+    for (const c of setCookie) {
+      if (c.startsWith('cobama_refresh=')) cliente.cookie = c.split(';')[0];
+    }
+
+    const texto = await res.text();
+    let json = null;
+    try {
+      json = texto ? JSON.parse(texto) : null;
+    } catch {
+      json = { crudo: texto.slice(0, 200) };
+    }
+
+    return { status: res.status, cuerpo: json };
+  };
+
+  cliente.login = async (email, password = PASSWORD) => {
+    const res = await cliente.peticion('POST', '/api/auth/login', { email, password });
+    if (res.status !== 200) {
+      throw new Error(`login de ${email} fallo: ${res.status} ${JSON.stringify(res.cuerpo)}`);
+    }
+    cliente.acceso = res.cuerpo.datos.acceso;
+    cliente.usuario = res.cuerpo.datos.usuario;
+    return res;
+  };
+
+  return cliente;
+}
+
+async function main() {
+  const salud = await fetch(`${BASE}/api/health`).catch(() => null);
+  if (!salud?.ok) {
+    console.error(`No responde la API en ${BASE}. Levantala con: npm run dev --prefix api`);
+    process.exit(1);
+  }
+
+  // ---------------------------------------------------------------- login
+  seccion('Autenticacion');
+
+  const anonimo = crearCliente();
+  const sinToken = await anonimo.peticion('GET', '/api/admin/platos');
+  comprobar('sin token, /api/admin devuelve 401', sinToken.status === 401);
+
+  const conBasura = crearCliente();
+  conBasura.acceso = 'esto.no.es.un.jwt';
+  const basura = await conBasura.peticion('GET', '/api/admin/platos');
+  comprobar('con token invalido devuelve 401', basura.status === 401);
+
+  const malPassword = await crearCliente().peticion('POST', '/api/auth/login', {
+    email: 'admin@grupocobama.es',
+    password: 'incorrecta',
+  });
+  comprobar('contrasena incorrecta devuelve 401', malPassword.status === 401);
+
+  const admin = crearCliente();
+  await admin.login('admin@grupocobama.es');
+  comprobar('login de admin_grupo', admin.usuario.rol === 'admin_grupo');
+  comprobar('admin_grupo no tiene local asignado', admin.usuario.restaurante_id === null);
+
+  const basilica = crearCliente();
+  await basilica.login('labasilica@grupocobama.es');
+  comprobar('login de encargado_local', basilica.usuario.rol === 'encargado_local');
+  comprobar('encargado ligado a La Basilica (2)', basilica.usuario.restaurante_id === 2);
+
+  // ----------------------------------------------------- rotacion de token
+  seccion('Rotacion del refresh token');
+
+  const cookieOriginal = basilica.cookie;
+  const refresco1 = await basilica.peticion('POST', '/api/auth/refresh');
+  comprobar('el refresco devuelve un access token nuevo', refresco1.status === 200);
+  comprobar('la cookie rota tras el refresco', basilica.cookie !== cookieOriginal);
+
+  // Dentro del margen de gracia, reutilizar el token anterior se entiende como
+  // carrera entre dos pestanas, no como robo.
+  const carrera = crearCliente();
+  carrera.cookie = cookieOriginal;
+  const enCarrera = await carrera.peticion('POST', '/api/auth/refresh');
+  comprobar(
+    'reutilizar el token recien rotado se acepta como carrera (200)',
+    enCarrera.status === 200,
+    `llego ${enCarrera.status}`
+  );
+  comprobar(
+    'en una carrera NO se vuelve a rotar la cookie',
+    carrera.cookie === cookieOriginal
+  );
+
+  const sigueViva = await basilica.peticion('POST', '/api/auth/refresh');
+  comprobar('la sesion legitima sigue viva tras la carrera', sigueViva.status === 200);
+
+  // Pasado el margen si es robo. Se simula envejeciendo la revocacion en la
+  // base de datos en vez de esperar diez segundos.
+  const { pool: bd } = await import('../src/config/db.js');
+  const { createHash } = await import('node:crypto');
+  const hashViejo = createHash('sha256')
+    .update(cookieOriginal.split('=')[1])
+    .digest('hex');
+  await bd.execute(
+    "UPDATE refresh_tokens SET revocado_en = NOW() - INTERVAL 60 SECOND WHERE token_hash = ?",
+    [hashViejo]
+  );
+
+  const ladron = crearCliente();
+  ladron.cookie = cookieOriginal;
+  const robado = await ladron.peticion('POST', '/api/auth/refresh');
+  comprobar('reutilizar un token viejo se rechaza (401)', robado.status === 401);
+
+  const trasRobo = await basilica.peticion('POST', '/api/auth/refresh');
+  comprobar(
+    'detectado el robo, se revoca toda la familia de sesiones',
+    trasRobo.status === 401,
+    `se esperaba 401 y llego ${trasRobo.status}`
+  );
+
+  // La sesion legitima se vuelve a abrir para el resto de la prueba.
+  await basilica.login('labasilica@grupocobama.es');
+
+  // ------------------------------------------------- limites por rol/local
+  seccion('Limites por rol y por local');
+
+  const ajena = await basilica.peticion('GET', '/api/admin/restaurantes/1/carta');
+  comprobar('un encargado no entra en la carta de otro local (403)', ajena.status === 403);
+
+  const propia = await basilica.peticion('GET', '/api/admin/restaurantes/2/carta');
+  comprobar('un encargado si entra en la suya (200)', propia.status === 200);
+
+  const crearPlatoComoEncargado = await basilica.peticion('POST', '/api/admin/platos', {
+    categoria_id: 1,
+    nombre: 'Intento no autorizado',
+  });
+  comprobar(
+    'un encargado no crea platos en el catalogo maestro (403)',
+    crearPlatoComoEncargado.status === 403
+  );
+
+  const usuariosComoEncargado = await basilica.peticion('GET', '/api/admin/usuarios');
+  comprobar('un encargado no lista usuarios (403)', usuariosComoEncargado.status === 403);
+
+  const listaPlatos = await basilica.peticion('GET', '/api/admin/platos');
+  comprobar('un encargado si LEE el catalogo maestro (200)', listaPlatos.status === 200);
+
+  // ------------------------------------------------------------- catalogo
+  seccion('Catalogo maestro');
+
+  const nombrePrueba = `Plato de prueba ${Date.now()}`;
+  const creado = await admin.peticion('POST', '/api/admin/platos', {
+    categoria_id: 1,
+    nombre: nombrePrueba,
+    descripcion: 'Creado por la prueba de humo.',
+    es_vegetariano: true,
+    alergenos: [1, 7],
+  });
+  comprobar('admin crea un plato (201)', creado.status === 201);
+  const platoId = creado.cuerpo?.datos?.id;
+  rastro.platoId = platoId;
+  comprobar('el plato guarda sus alergenos', creado.cuerpo?.datos?.alergenos?.length === 2);
+
+  const invalido = await admin.peticion('POST', '/api/admin/platos', {
+    categoria_id: 1,
+    nombre: 'x',
+  });
+  comprobar('un nombre demasiado corto devuelve 400', invalido.status === 400);
+  comprobar(
+    'el 400 explica que campo falla',
+    invalido.cuerpo?.error?.detalles?.[0]?.campo === 'nombre',
+    JSON.stringify(invalido.cuerpo?.error?.detalles)
+  );
+
+  const editado = await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, {
+    descripcion: 'Descripcion cambiada.',
+    alergenos: [3],
+  });
+  comprobar('admin edita el plato', editado.cuerpo?.datos?.descripcion === 'Descripcion cambiada.');
+  comprobar('los alergenos se sustituyen, no se acumulan', editado.cuerpo?.datos?.alergenos?.length === 1);
+
+  // -------------------------------------------------------------- imagenes
+  seccion('Imagenes de plato');
+
+  const sharp = (await import('sharp')).default;
+
+  // Imagen sintetica en vertical, para comprobar de paso que el recorte 4:3
+  // se aplica y no se limita a reescalar.
+  const jpeg = await sharp({
+    create: {
+      width: 900,
+      height: 1200,
+      channels: 3,
+      background: { r: 200, g: 120, b: 40 },
+    },
+  })
+    .jpeg()
+    .toBuffer();
+
+  const formulario = new FormData();
+  formulario.append('imagen', new Blob([jpeg], { type: 'image/jpeg' }), 'prueba.jpg');
+  formulario.append('x', '100');
+  formulario.append('y', '200');
+  formulario.append('ancho', '800');
+  formulario.append('alto', '600');
+
+  const subida = await fetch(`${BASE}/api/admin/platos/${platoId}/imagen`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${admin.acceso}` },
+    body: formulario,
+  });
+  const subidaJson = await subida.json().catch(() => null);
+
+  comprobar('admin sube una imagen (200)', subida.status === 200, `llego ${subida.status}`);
+  comprobar(
+    'se guardan las dos rutas, grande y miniatura',
+    Boolean(subidaJson?.datos?.imagen && subidaJson?.datos?.imagen_thumb)
+  );
+  comprobar(
+    'la imagen se convierte a webp',
+    subidaJson?.datos?.imagen?.endsWith('.webp') === true
+  );
+
+  if (subidaJson?.datos?.imagen) {
+    const descargada = await fetch(`${BASE}${subidaJson.datos.imagen}`);
+    const metadatos = await sharp(Buffer.from(await descargada.arrayBuffer())).metadata();
+    comprobar(
+      'la grande sale en 1200x900',
+      metadatos.width === 1200 && metadatos.height === 900,
+      `${metadatos.width}x${metadatos.height}`
+    );
+    comprobar('se sirve como webp', metadatos.format === 'webp');
+  }
+
+  const recorteFuera = new FormData();
+  recorteFuera.append('imagen', new Blob([jpeg], { type: 'image/jpeg' }), 'prueba.jpg');
+  recorteFuera.append('x', '0');
+  recorteFuera.append('y', '0');
+  recorteFuera.append('ancho', '5000');
+  recorteFuera.append('alto', '5000');
+
+  const fuera = await fetch(`${BASE}/api/admin/platos/${platoId}/imagen`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${admin.acceso}` },
+    body: recorteFuera,
+  });
+  comprobar('un recorte que se sale de la imagen se rechaza (400)', fuera.status === 400);
+
+  const noEsImagen = new FormData();
+  noEsImagen.append('imagen', new Blob(['esto no es una imagen'], { type: 'text/plain' }), 'x.txt');
+  const rechazado = await fetch(`${BASE}/api/admin/platos/${platoId}/imagen`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${admin.acceso}` },
+    body: noEsImagen,
+  });
+  comprobar('un fichero que no es imagen se rechaza (400)', rechazado.status === 400);
+
+  const borrada = await admin.peticion('DELETE', `/api/admin/platos/${platoId}/imagen`);
+  comprobar('se puede quitar la imagen', borrada.cuerpo?.datos?.imagen === null);
+
+  // ------------------------------------------------------ carta del local
+  seccion('Carta por local');
+
+  const anadido = await basilica.peticion('POST', '/api/admin/restaurantes/2/carta', {
+    plato_id: platoId,
+    precio: 9.5,
+  });
+  comprobar('el encargado anade el plato a su carta (201)', anadido.status === 201);
+  const itemId = anadido.cuerpo?.datos?.id;
+  rastro.itemId = itemId;
+
+  const duplicado = await basilica.peticion('POST', '/api/admin/restaurantes/2/carta', {
+    plato_id: platoId,
+    precio: 9.5,
+  });
+  comprobar('no se puede anadir dos veces el mismo plato (409)', duplicado.status === 409);
+
+  const enOtroLocal = await basilica.peticion('POST', '/api/admin/restaurantes/4/carta', {
+    plato_id: platoId,
+    precio: 9.5,
+  });
+  comprobar('el encargado no anade platos a otro local (403)', enOtroLocal.status === 403);
+
+  // --------------------------------------------------- historico de precios
+  seccion('Historico de precios');
+
+  await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, { precio: 11.25 });
+  await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, { precio: 12.0 });
+  // Un PATCH que no cambia el precio no debe generar registro.
+  await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, { precio: 12.0 });
+  await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, { destacado: true });
+
+  const hist = await basilica.peticion('GET', `/api/admin/carta-items/${itemId}/historico`);
+  const registros = hist.cuerpo?.datos ?? [];
+  comprobar('se registran 2 cambios de precio, no 4', registros.length === 2, `hay ${registros.length}`);
+  comprobar(
+    'el ultimo cambio es 11.25 -> 12.00',
+    Number(registros[0]?.precio_anterior) === 11.25 && Number(registros[0]?.precio_nuevo) === 12,
+    JSON.stringify(registros[0])
+  );
+  comprobar(
+    'el historico guarda quien lo cambio',
+    registros[0]?.usuario_email === 'labasilica@grupocobama.es',
+    registros[0]?.usuario_email
+  );
+
+  const itemAjeno = await admin.peticion('GET', '/api/admin/restaurantes/1/carta');
+  const idAjeno = itemAjeno.cuerpo?.datos?.categorias?.[0]?.items?.[0]?.id;
+  const tocarAjeno = await basilica.peticion('PATCH', `/api/admin/carta-items/${idAjeno}`, {
+    precio: 1,
+  });
+  comprobar(
+    'el encargado no toca una linea de carta de otro local (404)',
+    tocarAjeno.status === 404,
+    `llego ${tocarAjeno.status}`
+  );
+
+  // ------------------------------------------------------------ reordenar
+  seccion('Reordenar');
+
+  const cartaActual = await basilica.peticion('GET', '/api/admin/restaurantes/2/carta');
+  const ids = cartaActual.cuerpo.datos.categorias[0].items.map((i) => i.id);
+  const alReves = [...ids].reverse();
+
+  const reordenado = await basilica.peticion('PUT', '/api/admin/restaurantes/2/carta/orden', {
+    orden: alReves,
+  });
+  comprobar('reordenar responde 200', reordenado.status === 200);
+
+  const trasReordenar = await basilica.peticion('GET', '/api/admin/restaurantes/2/carta');
+  const nuevosIds = trasReordenar.cuerpo.datos.categorias[0].items.map((i) => i.id);
+  comprobar(
+    'el orden guardado es el enviado',
+    JSON.stringify(nuevosIds) === JSON.stringify(alReves),
+    `${nuevosIds} vs ${alReves}`
+  );
+
+  const conAjeno = await basilica.peticion('PUT', '/api/admin/restaurantes/2/carta/orden', {
+    orden: [...alReves, idAjeno],
+  });
+  comprobar('reordenar con una linea ajena se rechaza entero (400)', conAjeno.status === 400);
+
+  // Se deja el orden como estaba: reordenar es la unica comprobacion que
+  // toca datos reales del seed y no basta con borrar lo que ha creado.
+  await basilica.peticion('PUT', '/api/admin/restaurantes/2/carta/orden', { orden: ids });
+  const restaurado = await basilica.peticion('GET', '/api/admin/restaurantes/2/carta');
+  comprobar(
+    'el orden original queda restaurado',
+    JSON.stringify(restaurado.cuerpo.datos.categorias[0].items.map((i) => i.id)) ===
+      JSON.stringify(ids)
+  );
+
+  // ------------------------------------------- desactivar en cascada
+  seccion('Borrado logico');
+
+  await admin.peticion('DELETE', `/api/admin/platos/${platoId}`);
+  const trasBorrar = await admin.peticion('GET', `/api/admin/platos/${platoId}`);
+  comprobar('el plato sigue existiendo, desactivado', trasBorrar.cuerpo?.datos?.activo === false);
+  comprobar(
+    'desactivar el plato desactiva sus lineas de carta',
+    trasBorrar.cuerpo?.datos?.en_cartas?.every((c) => c.activo === false)
+  );
+
+  const reactivar = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, {
+    activo: true,
+  });
+  comprobar(
+    'no se reactiva una linea cuyo plato esta desactivado (400)',
+    reactivar.status === 400
+  );
+
+  const publica = await fetch(`${BASE}/api/restaurantes/la-basilica/carta`).then((r) => r.json());
+  const apareceEnPublica = publica.datos.categorias.some((c) =>
+    c.platos.some((p) => p.id === platoId)
+  );
+  comprobar('el plato desactivado desaparece de la carta publica', !apareceEnPublica);
+
+  // -------------------------------------------------------------- usuarios
+  seccion('Usuarios');
+
+  const emailPrueba = `humo-${Date.now()}@grupocobama.es`;
+  const usuarioCreado = await admin.peticion('POST', '/api/admin/usuarios', {
+    nombre: 'Usuario de prueba',
+    email: emailPrueba,
+    password: 'contrasenalarga',
+    rol: 'encargado_local',
+    restaurante_id: 3,
+  });
+  comprobar('admin crea un usuario (201)', usuarioCreado.status === 201);
+  const usuarioId = usuarioCreado.cuerpo?.datos?.id;
+  rastro.usuarioId = usuarioId;
+
+  const incoherente = await admin.peticion('POST', '/api/admin/usuarios', {
+    nombre: 'Admin con local',
+    email: `malo-${Date.now()}@grupocobama.es`,
+    password: 'contrasenalarga',
+    rol: 'admin_grupo',
+    restaurante_id: 1,
+  });
+  comprobar('un admin_grupo con local se rechaza (400)', incoherente.status === 400);
+
+  const emailRepetido = await admin.peticion('POST', '/api/admin/usuarios', {
+    nombre: 'Repetido',
+    email: emailPrueba,
+    password: 'contrasenalarga',
+    rol: 'encargado_local',
+    restaurante_id: 3,
+  });
+  comprobar('un email repetido se rechaza (409)', emailRepetido.status === 409);
+
+  const autoDesactivar = await admin.peticion('PATCH', `/api/admin/usuarios/${admin.usuario.id}`, {
+    activo: false,
+  });
+  comprobar('un admin no puede desactivarse a si mismo (400)', autoDesactivar.status === 400);
+
+  // Cambiar la contrasena tiene que cerrar las sesiones abiertas del usuario.
+  const nuevo = crearCliente();
+  await nuevo.login(emailPrueba, 'contrasenalarga');
+  await admin.peticion('PATCH', `/api/admin/usuarios/${usuarioId}`, {
+    password: 'otracontrasenalarga',
+  });
+  const trasCambio = await nuevo.peticion('POST', '/api/auth/refresh');
+  comprobar(
+    'cambiar la contrasena revoca las sesiones abiertas (401)',
+    trasCambio.status === 401,
+    `llego ${trasCambio.status}`
+  );
+
+  const desactivado = await admin.peticion('DELETE', `/api/admin/usuarios/${usuarioId}`);
+  comprobar('admin desactiva al usuario', desactivado.cuerpo?.datos?.activo === false);
+
+}
+
+/** Borra lo que haya creado la prueba, haya terminado bien o mal. */
+async function limpiar() {
+  const { pool } = await import('../src/config/db.js');
+  try {
+    if (rastro.itemId) {
+      await pool.execute('DELETE FROM historico_precios WHERE carta_item_id = ?', [rastro.itemId]);
+      await pool.execute('DELETE FROM carta_items WHERE id = ?', [rastro.itemId]);
+    }
+    if (rastro.platoId) {
+      // Puede haber quedado alguna linea de carta si la prueba murio antes de
+      // llegar a crearla por la via normal.
+      await pool.execute(
+        'DELETE hp FROM historico_precios hp JOIN carta_items ci ON ci.id = hp.carta_item_id WHERE ci.plato_id = ?',
+        [rastro.platoId]
+      );
+      await pool.execute('DELETE FROM carta_items WHERE plato_id = ?', [rastro.platoId]);
+      await pool.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [rastro.platoId]);
+      await pool.execute('DELETE FROM platos WHERE id = ?', [rastro.platoId]);
+    }
+    if (rastro.usuarioId) {
+      await pool.execute('DELETE FROM refresh_tokens WHERE usuario_id = ?', [rastro.usuarioId]);
+      await pool.execute('DELETE FROM usuarios WHERE id = ?', [rastro.usuarioId]);
+    }
+    console.log('\nLimpieza\n  ok    datos de prueba eliminados');
+  } finally {
+    await pool.end();
+  }
+}
+
+let roto = null;
+try {
+  await main();
+} catch (err) {
+  roto = err;
+}
+
+await limpiar().catch((err) => console.error('  FALLO al limpiar:', err.message));
+
+if (roto) {
+  console.error('\nLa prueba se ha roto:', roto);
+  process.exit(1);
+}
+
+console.log(`\n${pruebas - fallos}/${pruebas} comprobaciones correctas.`);
+if (fallos > 0) {
+  console.log(`${fallos} FALLOS.`);
+  process.exit(1);
+}

@@ -16,12 +16,10 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - cobama_db_data:/var/lib/mysql
-      # docker-entrypoint-initdb.d NO recorre subdirectorios: se montan los
-      # ficheros uno a uno y el prefijo numerico fija el orden de ejecucion.
-      - ./db/migrations/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
-      - ./db/seeds/001_base.sql:/docker-entrypoint-initdb.d/002_base.sql:ro
-      - ./db/seeds/002_carta.sql:/docker-entrypoint-initdb.d/003_carta.sql:ro
-      - ./db/seeds/003_usuarios.sql:/docker-entrypoint-initdb.d/004_usuarios.sql:ro
+      # El esquema NO se carga por docker-entrypoint-initdb.d: ese directorio
+      # solo se ejecuta con el volumen vacio, asi que cualquier cambio de
+      # esquema obligaba a borrar la base de datos. Lo aplica el runner:
+      #   npm run db:setup --prefix api
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 10s
