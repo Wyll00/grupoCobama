@@ -66,6 +66,36 @@ export const reordenarSchema = z.object({
     .min(1, 'Manda al menos un elemento'),
 });
 
+/**
+ * Alta de un plato que todavia no existe en el catalogo, directamente sobre la
+ * carta de un local: los campos del plato mas el precio de esa carta.
+ */
+export const crearPlatoEnCartaSchema = crearPlatoSchema
+  .omit({ activo: true })
+  .extend({
+    precio: z.coerce.number().min(0, 'El precio no puede ser negativo').max(9999.99),
+    destacado: booleano.optional().default(false),
+  });
+
+// ------------------------------------------------------------- categorias
+
+export const crearCategoriaSchema = z.object({
+  nombre: z.string().trim().min(2, 'El nombre es obligatorio').max(80),
+  nombre_en: textoOpcional(80),
+  orden: z.coerce.number().int().min(0).max(65535).optional(),
+});
+
+export const actualizarCategoriaSchema = z
+  .object({
+    nombre: z.string().trim().min(2).max(80).optional(),
+    nombre_en: textoOpcional(80),
+    orden: z.coerce.number().int().min(0).max(65535).optional(),
+    activo: booleano.optional(),
+  })
+  .refine((datos) => Object.keys(datos).length > 0, {
+    message: 'No hay ningun cambio que aplicar',
+  });
+
 // --------------------------------------------------------------- imagenes
 
 export const recorteSchema = z.object({

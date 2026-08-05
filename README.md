@@ -93,10 +93,11 @@ Para empezar de cero: `docker compose down -v && docker compose up -d` y
 npm run humo --prefix api
 ```
 
-53 comprobaciones end-to-end contra una API levantada: login, rotación de
-refresh tokens, límites por rol y por local, CRUD de catálogo, procesado de
-imágenes, histórico de precios, reordenación y gestión de usuarios. Deja la base
-de datos como estaba, incluso si se rompe a mitad.
+76 comprobaciones end-to-end contra una API levantada: login, rotación de
+refresh tokens, límites por rol y por local, CRUD de catálogo, alta de platos
+desde la carta, generación de QR, secciones, procesado de imágenes, histórico de
+precios, reordenación y gestión de usuarios. Deja la base de datos como estaba,
+incluso si se rompe a mitad.
 
 Lánzala contra una API arrancada con `npm start`, no con `npm run dev`: el
 `--watch` reinicia el servidor si algo toca un fichero durante la ejecución.
@@ -144,8 +145,13 @@ Todo bajo `/api/admin` exige `Authorization: Bearer <access token>`.
 | GET | `/api/admin/restaurantes/:id/carta/disponibles` | Su local |
 | POST | `/api/admin/restaurantes/:id/carta` | Su local |
 | PUT | `/api/admin/restaurantes/:id/carta/orden` | Su local |
+| POST | `/api/admin/restaurantes/:id/carta/nuevo-plato` | Solo `admin_grupo` |
+| GET | `/api/admin/restaurantes/:id/qr` | Su local |
 | PATCH · DELETE | `/api/admin/carta-items/:id` | Su local |
 | GET | `/api/admin/carta-items/:id/historico` | Su local |
+| GET | `/api/admin/categorias` | Cualquier usuario |
+| POST · PATCH · DELETE | `/api/admin/categorias[/:id]` | Solo `admin_grupo` |
+| PUT | `/api/admin/categorias/orden` | Solo `admin_grupo` |
 | GET · POST · PATCH · DELETE | `/api/admin/usuarios[/:id]` | Solo `admin_grupo` |
 
 Filtros de `/carta`:
@@ -246,17 +252,45 @@ estés haciendo:
 | Quiero... | Voy a |
 |---|---|
 | Cambiar los precios de un local | **Cartas** — todos los platos de una casa |
+| Meter en la carta un plato que ya existe | **Cartas** → *Añadir plato* → *Del catálogo* |
+| Meter un plato que no existe todavía | **Cartas** → *Añadir plato* → *Crear un plato nuevo* |
 | Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
 | Cambiar nombre, descripción, alérgenos o foto | **Catálogo** → el plato |
-| Dar de alta un plato nuevo del grupo | **Catálogo** → *Nuevo plato* |
+| Crear, renombrar u ordenar las secciones | **Catálogo** → *Secciones* |
+| Sacar el QR para imprimir o publicar | **Cartas** → *QR de la carta* |
 
-Son la misma tabla vista de dos formas: en Cartas, todos los platos de un local;
-en la ficha del plato, todos los locales de un plato. Sin la segunda, subir un
-precio en las cuatro casas obligaba a entrar cuatro veces en Cartas.
+Cartas y la ficha del plato son la misma tabla vista de dos formas: en Cartas,
+todos los platos de un local; en la ficha, todos los locales de un plato. Sin la
+segunda, subir un precio en las cuatro casas obligaba a entrar cuatro veces en
+Cartas.
 
-Desde la ficha del plato también se da de alta en una carta que todavía no lo
-sirve, y se consulta el histórico de precios de cada local. Un encargado solo ve
-editable la fila de su local; las demás no le aparecen.
+*Crear un plato nuevo* da de alta el plato en el catálogo del grupo **y** lo mete
+en esa carta, en una sola transacción: si fueran dos pasos y fallara el segundo,
+quedaría un plato huérfano que no sirve nadie. Toca el catálogo compartido, así
+que ese camino solo lo ve el admin de grupo; un encargado añade de lo que ya
+existe. Un encargado tampoco ve editable la fila de otro local en *Precio por
+local*: no le aparece.
+
+### QR de la carta
+
+**Cartas** → *QR de la carta* da el código de la carta pública del local, en SVG
+y en PNG. Para imprimir hay que usar el SVG: escala desde un adhesivo de mesa
+hasta un cartel sin pixelarse. El PNG va bien para redes o WhatsApp.
+
+El destino sale de `WEB_BASE_URL` en `api/.env`. Mientras eso apunte a
+`localhost` el panel avisa de que ese QR **no sirve para imprimir**, porque solo
+funcionaría en el ordenador que lo generó. Hay un script equivalente para
+generar los cuatro de golpe: `npm run qr --prefix api`.
+
+### Secciones de la carta
+
+Las secciones (entrantes, arroces, vinos...) se crean, renombran, ordenan y
+ocultan desde **Catálogo** → *Secciones*. El orden de esa lista es el orden en
+que el cliente las ve.
+
+Una sección con platos dentro no se borra: se oculta. Borrarla dejaría sin
+categoría a platos que siguen en cartas y en el histórico de precios. Solo se
+borra de verdad una que esté vacía, y el panel lo dice en el propio botón.
 
 ---
 
@@ -308,6 +342,15 @@ desde `api/uploads/`.
 > Drive. **No enseñar esos precios a cliente final.** Lo mismo vale para los
 > alérgenos: son una estimación y tiene que validarlos cocina antes de publicar,
 > porque es obligación legal.
+
+En la carta de bebidas (`db/seeds/004_bebidas.sql`) las marcas y las
+denominaciones de origen **sí son reales** — el catálogo de Coca-Cola, las
+cervezas canarias y las nueve D.O. del archipiélago. Los precios no: están para
+que la carta se pueda ver, y se cambian desde el panel.
+
+Los vinos van **por denominación de origen y no por bodega**, a propósito: son
+una plantilla. Cada casa sustituye la línea por la botella concreta que trabaja,
+con su bodega y su foto, desde **Catálogo**.
 
 Las coordenadas `lat`/`lng` son aproximadas a nivel de calle. Hay que verificarlas
 en Google Maps antes de publicar el mapa.

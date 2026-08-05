@@ -5,6 +5,7 @@ import { useDatos } from '../useDatos.js';
 import Modal from '../componentes/Modal.jsx';
 import RecorteImagen from '../componentes/RecorteImagen.jsx';
 import PreciosPorLocal from '../componentes/PreciosPorLocal.jsx';
+import Categorias from '../componentes/Categorias.jsx';
 import {
   Aviso,
   AreaTexto,
@@ -21,6 +22,7 @@ export default function Platos() {
   const [filtros, setFiltros] = useState({ q: '', categoria: '', activo: 'todos', pagina: 1 });
   const [busqueda, setBusqueda] = useState('');
   const [editando, setEditando] = useState(null); // id, o 'nuevo'
+  const [gestionandoCategorias, setGestionandoCategorias] = useState(false);
 
   // La busqueda no dispara una peticion por tecla.
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function Platos() {
 
         {esAdmin && (
           <div className="pagina__acciones">
+            <Boton onClick={() => setGestionandoCategorias(true)}>Secciones</Boton>
             <Boton variante="principal" onClick={() => setEditando('nuevo')}>
               Nuevo plato
             </Boton>
@@ -178,6 +181,16 @@ export default function Platos() {
             Siguiente
           </Boton>
         </nav>
+      )}
+
+      {gestionandoCategorias && (
+        <Categorias
+          onCerrar={() => setGestionandoCategorias(false)}
+          onCambio={() => {
+            categorias.recargar();
+            platos.recargar();
+          }}
+        />
       )}
 
       {editando && (

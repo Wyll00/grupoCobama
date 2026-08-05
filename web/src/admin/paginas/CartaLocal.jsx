@@ -6,7 +6,8 @@ import { useDatos } from '../useDatos.js';
 import Modal from '../componentes/Modal.jsx';
 import PrecioEditable from '../componentes/PrecioEditable.jsx';
 import HistorialPrecios from '../componentes/HistorialPrecios.jsx';
-import { Aviso, Boton, Campo, Entrada, Seleccion } from '../componentes/Campos.jsx';
+import CodigoQr from '../componentes/CodigoQr.jsx';
+import { Aviso, Boton, Campo, Entrada, Interruptor, Seleccion } from '../componentes/Campos.jsx';
 
 export default function CartaLocal() {
   const { esAdmin, localFijo } = useAuth();
@@ -29,6 +30,7 @@ export default function CartaLocal() {
   const [error, setError] = useState(null);
   const [anadiendo, setAnadiendo] = useState(false);
   const [historicoDe, setHistoricoDe] = useState(null);
+  const [mostrandoQr, setMostrandoQr] = useState(false);
 
   const local = listaLocales.find((l) => l.id === localId);
 
@@ -77,6 +79,9 @@ export default function CartaLocal() {
           )}
           <Boton variante="principal" onClick={() => setAnadiendo(true)} disabled={!localId}>
             Anadir plato
+          </Boton>
+          <Boton onClick={() => setMostrandoQr(true)} disabled={!localId}>
+            QR de la carta
           </Boton>
         </div>
       </header>
@@ -218,12 +223,63 @@ export default function CartaLocal() {
           onCerrar={() => setHistoricoDe(null)}
         />
       )}
+
+      {mostrandoQr && (
+        <CodigoQr
+          restauranteId={localId}
+          nombreLocal={local?.nombre}
+          onCerrar={() => setMostrandoQr(false)}
+        />
+      )}
     </>
   );
 }
 
-
+/**
+ * Alta de un plato en la carta, por dos caminos.
+ *
+ * "Del catalogo" es el habitual: el plato ya existe en el grupo y solo hay que
+ * decidir el precio de esta casa. "Crear nuevo" es para cuando el plato no
+ * existe todavia: lo da de alta en el catalogo y lo mete en esta carta de una
+ * vez, que es como se piensa en cocina cuando entra un plato nuevo.
+ *
+ * Crear toca el catalogo del grupo, asi que ese camino solo lo ve el admin.
+ */
 function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
+  const { esAdmin } = useAuth();
+  const [modo, setModo] = useState('catalogo');
+
+  return (
+    <Modal titulo={`Anadir plato a ${nombreLocal ?? 'la carta'}`} onCerrar={onCerrar} ancho="680px">
+      {esAdmin && (
+        <div className="pestanas-modal">
+          <button
+            type="button"
+            className={`pestana ${modo === 'catalogo' ? 'pestana--activa' : ''}`}
+            onClick={() => setModo('catalogo')}
+          >
+            Del catalogo del grupo
+          </button>
+          <button
+            type="button"
+            className={`pestana ${modo === 'nuevo' ? 'pestana--activa' : ''}`}
+            onClick={() => setModo('nuevo')}
+          >
+            Crear un plato nuevo
+          </button>
+        </div>
+      )}
+
+      {modo === 'catalogo' ? (
+        <DesdeCatalogo localId={localId} onCerrar={onCerrar} onHecho={onHecho} />
+      ) : (
+        <PlatoNuevo localId={localId} onCerrar={onCerrar} onHecho={onHecho} />
+      )}
+    </Modal>
+  );
+}
+
+function DesdeCatalogo({ localId, onCerrar, onHecho }) {
   const disponibles = useDatos(() => adminApi.cartaDisponibles(localId), [localId]);
   const [busqueda, setBusqueda] = useState('');
   const [elegido, setElegido] = useState(null);
@@ -234,9 +290,7 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
   const lista = useMemo(() => {
     const todos = disponibles.datos ?? [];
     const texto = busqueda.trim().toLowerCase();
-    return texto
-      ? todos.filter((p) => p.nombre.toLowerCase().includes(texto))
-      : todos;
+    return texto ? todos.filter((p) => p.nombre.toLowerCase().includes(texto)) : todos;
   }, [disponibles.datos, busqueda]);
 
   const guardar = async () => {
@@ -255,31 +309,14 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
   };
 
   return (
-    <Modal
-      titulo={`Anadir plato a ${nombreLocal ?? 'la carta'}`}
-      onCerrar={onCerrar}
-      pie={
-        <>
-          <Boton onClick={onCerrar} disabled={enviando}>
-            Cancelar
-          </Boton>
-          <Boton
-            variante="principal"
-            onClick={guardar}
-            disabled={!elegido || precio === '' || enviando}
-          >
-            {enviando ? 'Anadiendo...' : 'Anadir a la carta'}
-          </Boton>
-        </>
-      }
-    >
+    <>
       <Aviso tipo="error">{error}</Aviso>
 
       <Campo etiqueta="Buscar en el catalogo del grupo">
         <Entrada
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Croquetas, arroz..."
+          placeholder="Croquetas, arroz, Fanta..."
           autoFocus
         />
       </Campo>
@@ -295,7 +332,7 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
       )}
 
       <ul className="lista-elegible">
-        {lista.slice(0, 60).map((plato) => (
+        {lista.slice(0, 80).map((plato) => (
           <li key={plato.id}>
             <button
               type="button"
@@ -310,7 +347,7 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
       </ul>
 
       {elegido && (
-        <Campo etiqueta={`Precio en este local para "${elegido.nombre}"`}>
+        <Campo etiqueta={`Precio en este local para ${elegido.nombre}`}>
           <Entrada
             inputMode="decimal"
             value={precio}
@@ -319,7 +356,169 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
           />
         </Campo>
       )}
-    </Modal>
+
+      <div className="acciones-modal">
+        <Boton onClick={onCerrar} disabled={enviando}>
+          Cancelar
+        </Boton>
+        <Boton
+          variante="principal"
+          onClick={guardar}
+          disabled={!elegido || precio === '' || enviando}
+        >
+          {enviando ? 'Anadiendo...' : 'Anadir a la carta'}
+        </Boton>
+      </div>
+    </>
   );
 }
 
+const PLATO_VACIO = {
+  nombre: '',
+  categoria_id: '',
+  descripcion: '',
+  precio: '',
+  es_vegetariano: false,
+  es_vegano: false,
+  destacado: false,
+  alergenos: [],
+};
+
+function PlatoNuevo({ localId, onCerrar, onHecho }) {
+  const categorias = useDatos(() => adminApi.categorias(), []);
+  const alergenos = useDatos(() => adminApi.alergenos(), []);
+  const [form, setForm] = useState(PLATO_VACIO);
+  const [error, setError] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const cambiar = (campo) => (e) => {
+    const valor = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setForm((f) => ({ ...f, [campo]: valor }));
+  };
+
+  const alternarAlergeno = (id) =>
+    setForm((f) => ({
+      ...f,
+      alergenos: f.alergenos.includes(id)
+        ? f.alergenos.filter((a) => a !== id)
+        : [...f.alergenos, id],
+    }));
+
+  const guardar = async () => {
+    setEnviando(true);
+    setError(null);
+    try {
+      await adminApi.crearPlatoEnCarta(localId, {
+        ...form,
+        // Vegano implica vegetariano: se manda coherente.
+        es_vegetariano: form.es_vegetariano || form.es_vegano,
+        precio: Number(String(form.precio).replace(',', '.')),
+      });
+      onHecho();
+    } catch (err) {
+      setError(err instanceof ErrorApi ? err.detalle || err.message : 'Error inesperado');
+      setEnviando(false);
+    }
+  };
+
+  const completo = form.nombre.trim().length >= 2 && form.categoria_id && form.precio !== '';
+
+  return (
+    <>
+      <Aviso tipo="error">{error}</Aviso>
+      <Aviso>
+        El plato se da de alta en el catalogo del grupo y entra en esta carta. Las otras
+        casas podran anadirlo cuando quieran, cada una a su precio.
+      </Aviso>
+
+      <div className="formulario__fila">
+        <Campo etiqueta="Nombre del plato">
+          <Entrada
+            value={form.nombre}
+            onChange={cambiar('nombre')}
+            placeholder="Croquetas de bacalao"
+            autoFocus
+          />
+        </Campo>
+        <Campo etiqueta="Categoria">
+          <Seleccion value={form.categoria_id} onChange={cambiar('categoria_id')}>
+            <option value="">Elige una categoria</option>
+            {(categorias.datos ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </Seleccion>
+        </Campo>
+      </div>
+
+      <Campo etiqueta="Descripcion" ayuda="Lo que lee el cliente debajo del nombre">
+        <Entrada
+          value={form.descripcion}
+          onChange={cambiar('descripcion')}
+          placeholder="Ocho unidades, con alioli de la casa."
+        />
+      </Campo>
+
+      <div className="formulario__fila">
+        <Campo etiqueta="Precio en este local">
+          <Entrada
+            inputMode="decimal"
+            value={form.precio}
+            onChange={cambiar('precio')}
+            placeholder="9,50"
+          />
+        </Campo>
+        <Campo etiqueta="Marcas">
+          <div className="formulario__interruptores">
+            <Interruptor
+              etiqueta="Vegetariano"
+              checked={form.es_vegetariano || form.es_vegano}
+              disabled={form.es_vegano}
+              onChange={cambiar('es_vegetariano')}
+            />
+            <Interruptor
+              etiqueta="Vegano"
+              checked={form.es_vegano}
+              onChange={cambiar('es_vegano')}
+            />
+            <Interruptor
+              etiqueta="De la casa"
+              checked={form.destacado}
+              onChange={cambiar('destacado')}
+            />
+          </div>
+        </Campo>
+      </div>
+
+      <Campo
+        etiqueta="Alergenos"
+        ayuda="Obligatorio por el Reglamento (UE) 1169/2011. Confirmalo con cocina."
+      >
+        <div className="rejilla-alergenos">
+          {(alergenos.datos ?? []).map((a) => (
+            <Interruptor
+              key={a.id}
+              etiqueta={a.nombre}
+              checked={form.alergenos.includes(a.id)}
+              onChange={() => alternarAlergeno(a.id)}
+            />
+          ))}
+        </div>
+      </Campo>
+
+      <p className="apagado nota-seccion">
+        La foto se sube despues desde <strong>Catalogo</strong>, abriendo el plato.
+      </p>
+
+      <div className="acciones-modal">
+        <Boton onClick={onCerrar} disabled={enviando}>
+          Cancelar
+        </Boton>
+        <Boton variante="principal" onClick={guardar} disabled={!completo || enviando}>
+          {enviando ? 'Creando...' : 'Crear y anadir a la carta'}
+        </Boton>
+      </div>
+    </>
+  );
+}

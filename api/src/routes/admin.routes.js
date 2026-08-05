@@ -12,12 +12,16 @@ import {
   anadirACartaSchema,
   actualizarCartaItemSchema,
   reordenarSchema,
+  crearPlatoEnCartaSchema,
+  crearCategoriaSchema,
+  actualizarCategoriaSchema,
 } from '../esquemas/catalogo.js';
 import { crearUsuarioSchema, actualizarUsuarioSchema } from '../esquemas/usuarios.js';
 
 import * as platosCtrl from '../controllers/admin.platos.controller.js';
 import * as cartaCtrl from '../controllers/admin.carta.controller.js';
 import * as usuariosCtrl from '../controllers/admin.usuarios.controller.js';
+import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 
 export const adminRouter = Router();
 
@@ -81,6 +85,23 @@ adminRouter.put(
   asyncHandler(cartaCtrl.putOrden)
 );
 
+// Alta de un plato que no existe todavia, desde la propia carta. Toca el
+// catalogo del grupo, asi que sigue siendo cosa del admin.
+adminRouter.post(
+  '/restaurantes/:restauranteId/carta/nuevo-plato',
+  soloAdmin,
+  ambitoLocal(),
+  validarCuerpo(crearPlatoEnCartaSchema),
+  asyncHandler(cartaCtrl.postPlatoNuevo)
+);
+
+// QR de la carta publica del local, para imprimir o publicar.
+adminRouter.get(
+  '/restaurantes/:restauranteId/qr',
+  ambitoLocal(),
+  asyncHandler(cartaCtrl.getQr)
+);
+
 // Aqui el ambito se deduce del propio carta_item, no de la URL.
 adminRouter.patch(
   '/carta-items/:id',
@@ -90,6 +111,30 @@ adminRouter.patch(
 );
 adminRouter.delete('/carta-items/:id', ambitoCartaItem, asyncHandler(cartaCtrl.deleteItem));
 adminRouter.get('/carta-items/:id/historico', ambitoCartaItem, asyncHandler(cartaCtrl.getHistorico));
+
+// ---------------------------------------------------------------------------
+// Categorias - las lee cualquiera, las toca el admin
+// ---------------------------------------------------------------------------
+adminRouter.get('/categorias', asyncHandler(categoriasCtrl.getCategorias));
+adminRouter.post(
+  '/categorias',
+  soloAdmin,
+  validarCuerpo(crearCategoriaSchema),
+  asyncHandler(categoriasCtrl.postCategoria)
+);
+adminRouter.put(
+  '/categorias/orden',
+  soloAdmin,
+  validarCuerpo(reordenarSchema),
+  asyncHandler(categoriasCtrl.putOrdenCategorias)
+);
+adminRouter.patch(
+  '/categorias/:id',
+  soloAdmin,
+  validarCuerpo(actualizarCategoriaSchema),
+  asyncHandler(categoriasCtrl.patchCategoria)
+);
+adminRouter.delete('/categorias/:id', soloAdmin, asyncHandler(categoriasCtrl.deleteCategoria));
 
 // ---------------------------------------------------------------------------
 // Usuarios - solo admin de grupo

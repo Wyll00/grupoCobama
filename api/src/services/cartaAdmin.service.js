@@ -85,6 +85,69 @@ export async function anadir(restauranteId, { plato_id, precio, destacado, activ
 }
 
 /**
+ * Da de alta un plato en el catalogo del grupo y lo mete en la carta de un
+ * local, en una sola transaccion.
+ *
+ * Existe para el caso normal de la casa: llega un plato nuevo y quien lo esta
+ * dando de alta esta pensando en una carta concreta, no en el catalogo. Si
+ * fueran dos llamadas y fallase la segunda, quedaria un plato huerfano en el
+ * catalogo que nadie sirve.
+ */
+export async function crearYAnadir(restauranteId, { precio, destacado, alergenos = [], ...plato }) {
+  const platoId = await transaccion(async (conn) => {
+    const [res] = await conn.execute(
+      `INSERT INTO platos
+         (categoria_id, nombre, nombre_en, descripcion, descripcion_en,
+          es_vegetariano, es_vegano, activo)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      [
+        plato.categoria_id,
+        plato.nombre,
+        plato.nombre_en ?? null,
+        plato.descripcion ?? null,
+        plato.descripcion_en ?? null,
+        plato.es_vegetariano ? 1 : 0,
+        plato.es_vegano ? 1 : 0,
+      ]
+    );
+
+    const nuevoId = res.insertId;
+
+    if (alergenos.length > 0) {
+      const unicos = [...new Set(alergenos)];
+      await conn.execute(
+        `INSERT INTO plato_alergenos (plato_id, alergeno_id)
+         VALUES ${unicos.map(() => '(?, ?)').join(', ')}`,
+        unicos.flatMap((a) => [nuevoId, a])
+      );
+    }
+
+    const [[{ siguiente }]] = await conn.execute(
+      `SELECT COALESCE(MAX(ci.orden), 0) + 10 AS siguiente
+         FROM carta_items ci
+         JOIN platos p ON p.id = ci.plato_id
+        WHERE ci.restaurante_id = ? AND p.categoria_id = ?`,
+      [restauranteId, plato.categoria_id]
+    );
+
+    await conn.execute(
+      `INSERT INTO carta_items (restaurante_id, plato_id, precio, activo, orden, destacado)
+       VALUES (?, ?, ?, 1, ?, ?)`,
+      [restauranteId, nuevoId, precio, siguiente, destacado ? 1 : 0]
+    );
+
+    return nuevoId;
+  });
+
+  const [filas] = await pool.execute(
+    'SELECT id FROM carta_items WHERE restaurante_id = ? AND plato_id = ?',
+    [restauranteId, platoId]
+  );
+
+  return obtenerItem(filas[0].id);
+}
+
+/**
  * Actualiza una linea de carta.
  *
  * Si cambia el precio, el registro en historico_precios va en la MISMA

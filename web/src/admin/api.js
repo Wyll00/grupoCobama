@@ -121,12 +121,24 @@ export const adminApi = {
   subirImagen: (id, formData) => enviar('POST', `/admin/platos/${id}/imagen`, { formData }),
   quitarImagen: (id) => enviar('DELETE', `/admin/platos/${id}/imagen`),
 
+  // --- categorias ---------------------------------------------------------
+  categoriasAdmin: () => get('/admin/categorias'),
+  crearCategoria: (datos) => enviar('POST', '/admin/categorias', { cuerpo: datos }),
+  editarCategoria: (id, datos) => enviar('PATCH', `/admin/categorias/${id}`, { cuerpo: datos }),
+  borrarCategoria: (id) => enviar('DELETE', `/admin/categorias/${id}`),
+  reordenarCategorias: (orden) =>
+    enviar('PUT', '/admin/categorias/orden', { cuerpo: { orden } }),
+
   // --- carta por local ----------------------------------------------------
   carta: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/carta`),
   cartaDisponibles: (restauranteId) =>
     get(`/admin/restaurantes/${restauranteId}/carta/disponibles`),
   anadirACarta: (restauranteId, datos) =>
     enviar('POST', `/admin/restaurantes/${restauranteId}/carta`, { cuerpo: datos }),
+  // Crea el plato en el catalogo del grupo y lo mete en esta carta de una vez.
+  crearPlatoEnCarta: (restauranteId, datos) =>
+    enviar('POST', `/admin/restaurantes/${restauranteId}/carta/nuevo-plato`, { cuerpo: datos }),
+  qr: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/qr`),
   editarItem: (id, datos) => enviar('PATCH', `/admin/carta-items/${id}`, { cuerpo: datos }),
   quitarItem: (id) => enviar('DELETE', `/admin/carta-items/${id}`),
   reordenar: (restauranteId, orden) =>

@@ -240,8 +240,13 @@ Extras que pedía el terreno y no estaban en la lista:
 
 - [x] Runner de migraciones. `docker-entrypoint-initdb.d` solo se ejecuta con el volumen vacío, así que cada cambio de esquema obligaba a borrar la base de datos.
 - [x] Límite de intentos de login, repartido por cuenta y por IP.
-- [x] Prueba de humo de 53 comprobaciones (`npm run humo --prefix api`).
+- [x] Prueba de humo de 76 comprobaciones (`npm run humo --prefix api`).
 - [x] Carga perezosa del panel, para que la web pública no lo descargue.
+- [x] Precio por local desde la ficha del plato, además de desde la carta.
+- [x] Alta de un plato que no existe todavía, desde la propia carta y en una sola transacción.
+- [x] Gestión de las secciones de la carta: crear, renombrar, ordenar y ocultar.
+- [x] QR de cada local desde el panel, en SVG y PNG, con aviso si todavía apunta a `localhost`.
+- [x] Carta de bebidas de verdad: refrescos, cervezas canarias y las nueve D.O. de vino del archipiélago.
 
 ### Fase 3 — Reservas
 

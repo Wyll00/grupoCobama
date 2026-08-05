@@ -24,7 +24,13 @@ let pruebas = 0;
  * Lo que la prueba va creando. Se limpia en un finally: si la prueba se rompe
  * a mitad, los datos sinteticos no pueden quedarse en la base de datos.
  */
-const rastro = { platoId: null, itemId: null, usuarioId: null };
+const rastro = {
+  platoId: null,
+  itemId: null,
+  usuarioId: null,
+  platoNuevoId: null,
+  categoriaId: null,
+};
 
 function comprobar(descripcion, condicion, detalle) {
   pruebas++;
@@ -333,6 +339,115 @@ async function main() {
   });
   comprobar('el encargado no anade platos a otro local (403)', enOtroLocal.status === 403);
 
+  // ------------------------------------------- crear plato desde la carta
+  seccion('Crear un plato nuevo desde la carta');
+
+  const nombreDirecto = `Plato directo ${Date.now()}`;
+  const directo = await admin.peticion('POST', '/api/admin/restaurantes/4/carta/nuevo-plato', {
+    categoria_id: 1,
+    nombre: nombreDirecto,
+    descripcion: 'Creado desde la carta de El Descarado.',
+    precio: 13.4,
+    destacado: true,
+    alergenos: [1, 4],
+  });
+  comprobar('admin crea plato y lo mete en la carta de una vez (201)', directo.status === 201);
+  rastro.platoNuevoId = directo.cuerpo?.datos?.plato_id;
+  comprobar('la linea sale con su precio', Number(directo.cuerpo?.datos?.precio) === 13.4);
+  comprobar('y marcada como destacada', directo.cuerpo?.datos?.destacado === true);
+
+  const fichaDirecta = await admin.peticion('GET', `/api/admin/platos/${rastro.platoNuevoId}`);
+  comprobar(
+    'el plato queda en el catalogo del grupo',
+    fichaDirecta.cuerpo?.datos?.nombre === nombreDirecto
+  );
+  comprobar('con sus alergenos', fichaDirecta.cuerpo?.datos?.alergenos?.length === 2);
+  comprobar(
+    'y solo en la carta del local donde se creo',
+    fichaDirecta.cuerpo?.datos?.en_cartas?.length === 1 &&
+      fichaDirecta.cuerpo.datos.en_cartas[0].restaurante_id === 4
+  );
+
+  const directoComoEncargado = await basilica.peticion(
+    'POST',
+    '/api/admin/restaurantes/2/carta/nuevo-plato',
+    { categoria_id: 1, nombre: 'No deberia crearse', precio: 5 }
+  );
+  comprobar(
+    'un encargado no crea platos nuevos ni desde su carta (403)',
+    directoComoEncargado.status === 403
+  );
+
+  const sinPrecio = await admin.peticion('POST', '/api/admin/restaurantes/4/carta/nuevo-plato', {
+    categoria_id: 1,
+    nombre: 'Sin precio ninguno',
+  });
+  comprobar('crear sin precio se rechaza (400)', sinPrecio.status === 400);
+
+  // ---------------------------------------------------------------- QR
+  seccion('QR de la carta');
+
+  const qr = await admin.peticion('GET', '/api/admin/restaurantes/4/qr');
+  comprobar('se genera el QR (200)', qr.status === 200);
+  comprobar(
+    'apunta a la carta publica del local',
+    qr.cuerpo?.datos?.url?.endsWith('/el-descarado/carta'),
+    qr.cuerpo?.datos?.url
+  );
+  comprobar('trae SVG', qr.cuerpo?.datos?.svg?.startsWith('<svg'));
+  comprobar('trae PNG', qr.cuerpo?.datos?.png?.startsWith('data:image/png;base64,'));
+  comprobar(
+    'avisa de que con localhost no vale para imprimir',
+    qr.cuerpo?.datos?.listoParaImprimir === false
+  );
+
+  const qrAjeno = await basilica.peticion('GET', '/api/admin/restaurantes/4/qr');
+  comprobar('un encargado no saca el QR de otro local (403)', qrAjeno.status === 403);
+
+  const qrPropio = await basilica.peticion('GET', '/api/admin/restaurantes/2/qr');
+  comprobar('pero si el del suyo (200)', qrPropio.status === 200);
+
+  // -------------------------------------------------------- categorias
+  seccion('Secciones de la carta');
+
+  const nombreCat = `Seccion ${Date.now()}`;
+  const catCreada = await admin.peticion('POST', '/api/admin/categorias', { nombre: nombreCat });
+  comprobar('admin crea una seccion (201)', catCreada.status === 201);
+  rastro.categoriaId = catCreada.cuerpo?.datos?.id;
+  comprobar(
+    'el slug se genera sin tildes ni espacios',
+    /^[a-z0-9-]+$/.test(catCreada.cuerpo?.datos?.slug ?? ''),
+    catCreada.cuerpo?.datos?.slug
+  );
+
+  const catRepetida = await admin.peticion('POST', '/api/admin/categorias', { nombre: nombreCat });
+  comprobar('no deja repetir el nombre (409)', catRepetida.status === 409);
+
+  const catComoEncargado = await basilica.peticion('POST', '/api/admin/categorias', {
+    nombre: 'No autorizada',
+  });
+  comprobar('un encargado no crea secciones (403)', catComoEncargado.status === 403);
+
+  const catLeer = await basilica.peticion('GET', '/api/admin/categorias');
+  comprobar('pero si las lee (200)', catLeer.status === 200);
+
+  const catConPlatos = catLeer.cuerpo.datos.find((c) => c.platos > 0 && c.activo);
+  const intentoBorrar = await admin.peticion('DELETE', `/api/admin/categorias/${catConPlatos.id}`);
+  comprobar(
+    'una seccion con platos se oculta en lugar de borrarse',
+    intentoBorrar.cuerpo?.datos?.accion === 'desactivada',
+    JSON.stringify(intentoBorrar.cuerpo?.datos?.accion)
+  );
+  // Se vuelve a dejar visible: es dato real del seed.
+  await admin.peticion('PATCH', `/api/admin/categorias/${catConPlatos.id}`, { activo: true });
+
+  const borrarVacia = await admin.peticion('DELETE', `/api/admin/categorias/${rastro.categoriaId}`);
+  comprobar(
+    'una seccion vacia si se borra del todo',
+    borrarVacia.cuerpo?.datos?.accion === 'eliminada'
+  );
+  rastro.categoriaId = null;
+
   // --------------------------------------------------- historico de precios
   seccion('Historico de precios');
 
@@ -501,6 +616,18 @@ async function limpiar() {
       await pool.execute('DELETE FROM carta_items WHERE plato_id = ?', [rastro.platoId]);
       await pool.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [rastro.platoId]);
       await pool.execute('DELETE FROM platos WHERE id = ?', [rastro.platoId]);
+    }
+    if (rastro.platoNuevoId) {
+      await pool.execute(
+        'DELETE hp FROM historico_precios hp JOIN carta_items ci ON ci.id = hp.carta_item_id WHERE ci.plato_id = ?',
+        [rastro.platoNuevoId]
+      );
+      await pool.execute('DELETE FROM carta_items WHERE plato_id = ?', [rastro.platoNuevoId]);
+      await pool.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [rastro.platoNuevoId]);
+      await pool.execute('DELETE FROM platos WHERE id = ?', [rastro.platoNuevoId]);
+    }
+    if (rastro.categoriaId) {
+      await pool.execute('DELETE FROM categorias WHERE id = ?', [rastro.categoriaId]);
     }
     if (rastro.usuarioId) {
       await pool.execute('DELETE FROM refresh_tokens WHERE usuario_id = ?', [rastro.usuarioId]);

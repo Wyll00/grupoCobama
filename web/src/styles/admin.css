@@ -551,6 +551,88 @@
   border-radius: 0 0 var(--radio) var(--radio);
 }
 
+/* Pestanas dentro de un modal: elegir del catalogo o crear un plato nuevo. */
+.pestanas-modal {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--linea);
+}
+
+/* Acciones al pie del contenido, cuando el modal no usa la barra `pie`
+   porque cada pestana tiene las suyas. */
+.acciones-modal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linea);
+}
+
+/* Alta rapida al pie de una lista: campo mas boton, alineados abajo. */
+.alta-rapida {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linea);
+}
+
+.alta-rapida .campo {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------- QR ---- */
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--crema-hueso);
+  border-radius: var(--radio-s);
+}
+
+.qr__imagen {
+  width: 100%;
+  max-width: 260px;
+  line-height: 0;
+}
+
+.qr__imagen svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+.qr__url {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.qr__url a { color: var(--ocre); }
+
+.qr__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.qr__nota {
+  margin: 0.9rem 0 0;
+  font-size: 0.8rem;
+}
+
 /* ------------------------------------------------------ listas modal */
 
 .lista-elegible {

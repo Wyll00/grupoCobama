@@ -1,7 +1,16 @@
 import * as carta from '../services/cartaAdmin.service.js';
+import { generarQr } from '../services/qr.service.js';
 
 export async function getCarta(req, res) {
   res.json({ datos: await carta.listar(req.restauranteId) });
+}
+
+export async function postPlatoNuevo(req, res) {
+  res.status(201).json({ datos: await carta.crearYAnadir(req.restauranteId, req.body) });
+}
+
+export async function getQr(req, res) {
+  res.json({ datos: await generarQr(req.restauranteId) });
 }
 
 export async function getDisponibles(req, res) {
