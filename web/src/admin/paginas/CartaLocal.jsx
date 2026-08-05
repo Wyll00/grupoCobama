@@ -7,6 +7,7 @@ import Modal from '../componentes/Modal.jsx';
 import PrecioEditable from '../componentes/PrecioEditable.jsx';
 import HistorialPrecios from '../componentes/HistorialPrecios.jsx';
 import CodigoQr from '../componentes/CodigoQr.jsx';
+import EditorPlato from '../componentes/EditorPlato.jsx';
 import { Aviso, Boton, Campo, Entrada, Interruptor, Seleccion } from '../componentes/Campos.jsx';
 
 export default function CartaLocal() {
@@ -31,6 +32,7 @@ export default function CartaLocal() {
   const [anadiendo, setAnadiendo] = useState(false);
   const [historicoDe, setHistoricoDe] = useState(null);
   const [mostrandoQr, setMostrandoQr] = useState(false);
+  const [editandoPlato, setEditandoPlato] = useState(null);
 
   const local = listaLocales.find((l) => l.id === localId);
 
@@ -146,7 +148,16 @@ export default function CartaLocal() {
                         <span className="miniatura miniatura--vacia" aria-hidden="true" />
                       )}
                       <div>
-                        <strong>{item.nombre}</strong>
+                        {/* El nombre abre la ficha del plato: corregir una
+                            errata sin salir de la carta es lo normal. */}
+                        <button
+                          type="button"
+                          className="enlace-plato"
+                          onClick={() => setEditandoPlato(item.plato_id)}
+                          title={esAdmin ? 'Editar la ficha del plato' : 'Ver la ficha del plato'}
+                        >
+                          {item.nombre}
+                        </button>
                         {!item.plato_activo && (
                           <span className="etiqueta-mini etiqueta-mini--alerta">
                             retirado del catalogo
@@ -229,6 +240,19 @@ export default function CartaLocal() {
           restauranteId={localId}
           nombreLocal={local?.nombre}
           onCerrar={() => setMostrandoQr(false)}
+        />
+      )}
+
+      {editandoPlato && (
+        <EditorPlato
+          id={editandoPlato}
+          soloLectura={!esAdmin}
+          onCerrar={() => setEditandoPlato(null)}
+          onGuardado={() => {
+            setEditandoPlato(null);
+            // El nombre o la descripcion pueden haber cambiado.
+            carta.recargar();
+          }}
         />
       )}
     </>

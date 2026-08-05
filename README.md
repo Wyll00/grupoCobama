@@ -252,12 +252,17 @@ estés haciendo:
 | Quiero... | Voy a |
 |---|---|
 | Cambiar los precios de un local | **Cartas** — todos los platos de una casa |
+| Corregir el nombre o la descripción de un plato | **Cartas** → clic en el nombre del plato |
 | Meter en la carta un plato que ya existe | **Cartas** → *Añadir plato* → *Del catálogo* |
 | Meter un plato que no existe todavía | **Cartas** → *Añadir plato* → *Crear un plato nuevo* |
 | Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
-| Cambiar nombre, descripción, alérgenos o foto | **Catálogo** → el plato |
+| Cambiar alérgenos o foto | **Catálogo** → el plato |
 | Crear, renombrar u ordenar las secciones | **Catálogo** → *Secciones* |
 | Sacar el QR para imprimir o publicar | **Cartas** → *QR de la carta* |
+
+> El nombre, la descripción, los alérgenos y la foto son **del catálogo del
+> grupo**: corregirlos desde la carta de un local los cambia en los cuatro. Lo
+> que es de cada casa es el precio, si el plato está en carta y si va destacado.
 
 Cartas y la ficha del plato son la misma tabla vista de dos formas: en Cartas,
 todos los platos de un local; en la ficha, todos los locales de un plato. Sin la

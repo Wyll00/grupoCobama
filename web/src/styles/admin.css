@@ -357,6 +357,25 @@
 
 .celda-plato { display: flex; align-items: center; gap: 0.6rem; }
 
+/* El nombre del plato dentro de la carta es un boton que abre su ficha, pero
+   tiene que seguir leyendose como el titulo de la fila, no como un enlace. */
+.enlace-plato {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+}
+
+.enlace-plato:hover {
+  color: var(--ocre);
+  border-bottom-color: var(--ocre);
+}
+
 .miniatura {
   width: 44px;
   height: 33px;
