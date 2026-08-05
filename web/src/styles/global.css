@@ -544,6 +544,130 @@ button {
   background: var(--crema-hueso);
 }
 
+/* ----------------------------------------------- ver en la mesa ------ */
+
+.plato__ver-mesa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--carbon);
+}
+
+.plato__ver-mesa::before {
+  content: '';
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 1.5px solid var(--ocre);
+  border-radius: 2px;
+  /* Esquinas de encuadre, el icono universal de "apunta con la camara". */
+  clip-path: polygon(
+    0 0, 38% 0, 38% 12%, 12% 12%, 12% 38%, 0 38%,
+    0 62%, 12% 62%, 12% 88%, 38% 88%, 38% 100%, 0 100%,
+    100% 100%, 62% 100%, 62% 88%, 88% 88%, 88% 62%, 100% 62%,
+    100% 38%, 88% 38%, 88% 12%, 62% 12%, 62% 0, 100% 0
+  );
+}
+
+.plato__ver-mesa:hover { background: var(--crema-hueso); }
+
+.mesa__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(31, 26, 23, 0.75);
+}
+
+.mesa {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  background: var(--crema);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.mesa__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+.mesa__cabecera h2 { margin: 0; font-size: 1.1rem; }
+.mesa__medida { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--texto-suave); }
+
+.mesa__cerrar {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--texto-suave);
+}
+
+.mesa__cuerpo {
+  flex: 1;
+  min-height: 280px;
+  background: var(--carbon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mesa__visor {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  --poster-color: transparent;
+}
+
+.mesa__aviso { color: #b9afa4; font-size: 0.9rem; padding: 2rem; text-align: center; }
+
+.mesa__boton-ar {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ocre);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.mesa__pie {
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.mesa__pie p { margin: 0 0 0.5rem; }
+.mesa__pie p:last-child { margin-bottom: 0; }
+.mesa__nota { font-size: 0.78rem; }
+
 /* ---------------------------------------------------------- aviso ---- */
 
 .aviso {

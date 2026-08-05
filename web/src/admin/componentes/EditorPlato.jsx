@@ -34,6 +34,7 @@ const VACIO = {
   es_vegetariano: false,
   es_vegano: false,
   activo: true,
+  ancho_cm: '',
   alergenos: [],
 };
 
@@ -68,6 +69,7 @@ export default function EditorPlato({ id, soloLectura, onCerrar, onGuardado }) {
       es_vegetariano: plato.es_vegetariano,
       es_vegano: plato.es_vegano,
       activo: plato.activo,
+      ancho_cm: plato.ancho_cm ?? '',
       alergenos: plato.alergenos.map((a) => a.id),
     });
   }, [plato]);
@@ -204,6 +206,21 @@ export default function EditorPlato({ id, soloLectura, onCerrar, onGuardado }) {
 
         <Campo etiqueta="Descripcion en ingles">
           <AreaTexto value={form.descripcion_en} onChange={cambiar('descripcion_en')} />
+        </Campo>
+
+        <Campo
+          etiqueta="Ancho real del plato (cm)"
+          ayuda="De borde a borde de lo que llega a la mesa. Con esto y la foto, el cliente puede verlo a tamano real en su mesa desde el movil."
+        >
+          <Entrada
+            type="number"
+            min="5"
+            max="120"
+            step="0.5"
+            value={form.ancho_cm}
+            onChange={cambiar('ancho_cm')}
+            placeholder="26"
+          />
         </Campo>
 
         <div className="formulario__interruptores">

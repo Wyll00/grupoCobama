@@ -31,4 +31,5 @@ export const api = {
   carta: (slug, filtros, opts) => get(`/restaurantes/${slug}/carta`, filtros, opts),
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
+  ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
 };

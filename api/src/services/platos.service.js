@@ -3,7 +3,8 @@ import { ApiError } from '../utils/ApiError.js';
 
 const SELECT_PLATO = `
   SELECT p.id, p.categoria_id, p.nombre, p.nombre_en, p.descripcion,
-         p.descripcion_en, p.imagen, p.imagen_thumb, p.es_vegetariano,
+         p.descripcion_en, p.imagen, p.imagen_thumb, p.ancho_cm,
+         p.modelo_glb, p.modelo_usdz, p.es_vegetariano,
          p.es_vegano, p.activo, p.created_at, p.updated_at,
          c.slug AS categoria_slug, c.nombre AS categoria_nombre
     FROM platos p
@@ -15,6 +16,7 @@ const normalizar = (p) => ({
   es_vegetariano: Boolean(p.es_vegetariano),
   es_vegano: Boolean(p.es_vegano),
   activo: Boolean(p.activo),
+  ancho_cm: p.ancho_cm === null ? null : Number(p.ancho_cm),
 });
 
 export async function listar({ categoria, q, activo, pagina, porPagina }) {
@@ -125,7 +127,7 @@ export async function actualizar(id, datos) {
 
   const columnas = [
     'categoria_id', 'nombre', 'nombre_en', 'descripcion', 'descripcion_en',
-    'es_vegetariano', 'es_vegano', 'activo',
+    'es_vegetariano', 'es_vegano', 'activo', 'ancho_cm',
   ].filter((c) => campos[c] !== undefined);
 
   await transaccion(async (conn) => {

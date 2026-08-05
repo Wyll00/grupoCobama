@@ -314,8 +314,6 @@ async function main() {
   });
   comprobar('un fichero que no es imagen se rechaza (400)', rechazado.status === 400);
 
-  const borrada = await admin.peticion('DELETE', `/api/admin/platos/${platoId}/imagen`);
-  comprobar('se puede quitar la imagen', borrada.cuerpo?.datos?.imagen === null);
 
   // ------------------------------------------------------ carta del local
   seccion('Carta por local');
@@ -339,6 +337,72 @@ async function main() {
     precio: 9.5,
   });
   comprobar('el encargado no anade platos a otro local (403)', enOtroLocal.status === 403);
+
+  // ------------------------------------------------- ver en la mesa (AR)
+  seccion('Ver el plato en la mesa');
+
+  const sinMedida = await fetch(`${BASE}/api/platos/${platoId}/ar`).then((r) => r.json());
+  comprobar(
+    'sin medida, la vista no se ofrece',
+    sinMedida.datos?.disponible === false && sinMedida.datos?.falta === 'medida',
+    JSON.stringify(sinMedida.datos)
+  );
+
+  await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, { ancho_cm: 26 });
+
+  const conMedida = await fetch(`${BASE}/api/platos/${platoId}/ar`).then((r) => r.json());
+  comprobar('con foto y medida, ya se ofrece', conMedida.datos?.disponible === true);
+  comprobar(
+    'el modelo se genera desde la foto',
+    conMedida.datos?.modo === 'foto',
+    conMedida.datos?.modo
+  );
+  comprobar('devuelve la ruta del glb', conMedida.datos?.glb?.endsWith('.glb') === true);
+
+  const modelo = await fetch(`${BASE}${conMedida.datos.glb}`);
+  const glbBytes = Buffer.from(await modelo.arrayBuffer());
+  comprobar('el glb se sirve (200)', modelo.status === 200);
+  comprobar('y es un glTF binario de verdad', glbBytes.readUInt32LE(0) === 0x46546c67);
+
+  // El modelo tiene que llegar a la escala que se pidio: es justo el dato que
+  // hace util la funcion, y un fallo aqui no se ve, solo sale un plato de
+  // tamano equivocado en la mesa del cliente.
+  const largoJsonGlb = glbBytes.readUInt32LE(12);
+  const jsonGlb = JSON.parse(glbBytes.subarray(20, 20 + largoJsonGlb).toString('utf8'));
+  const anchoModeloCm = (jsonGlb.accessors[0].max[0] - jsonGlb.accessors[0].min[0]) * 100;
+  comprobar(
+    'el modelo mide los 26 cm que se indicaron',
+    Math.abs(anchoModeloCm - 26) < 0.05,
+    `${anchoModeloCm.toFixed(2)} cm`
+  );
+
+  const segundaVez = await fetch(`${BASE}/api/platos/${platoId}/ar`).then((r) => r.json());
+  comprobar(
+    'la segunda vez sirve el mismo fichero cacheado',
+    segundaVez.datos.glb === conMedida.datos.glb
+  );
+
+  const medidaAbsurda = await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, {
+    ancho_cm: 250,
+  });
+  comprobar('una medida imposible se rechaza (400)', medidaAbsurda.status === 400);
+
+  const enCartaPublica = await fetch(`${BASE}/api/restaurantes/la-basilica/carta`).then((r) =>
+    r.json()
+  );
+  const platoEnCarta = enCartaPublica.datos.categorias
+    .flatMap((c) => c.platos)
+    .find((p) => p.id === platoId);
+  comprobar(
+    'la carta publica marca el plato como visible en la mesa',
+    platoEnCarta?.ver_en_mesa === true
+  );
+
+  await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, { ancho_cm: null });
+
+
+  const borrada = await admin.peticion('DELETE', `/api/admin/platos/${platoId}/imagen`);
+  comprobar('se puede quitar la imagen', borrada.cuerpo?.datos?.imagen === null);
 
   // ------------------------------------------- crear plato desde la carta
   seccion('Crear un plato nuevo desde la carta');

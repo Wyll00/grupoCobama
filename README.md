@@ -93,7 +93,15 @@ Para empezar de cero: `docker compose down -v && docker compose up -d` y
 npm run humo --prefix api
 ```
 
-89 comprobaciones end-to-end contra una API levantada: login, rotación de
+```bash
+npm run glb --prefix api
+```
+
+99 comprobaciones end-to-end contra una API levantada, más 17 sobre el generador
+de modelos 3D, que parsea el GLB byte a byte porque un formato binario escrito a
+mano se rompe en silencio.
+
+Las 99: login, rotación de
 refresh tokens, límites por rol y por local, CRUD de catálogo, alta de platos
 desde la carta, generación de QR, secciones, procesado de imágenes, histórico de
 precios, reordenación y gestión de usuarios. Deja la base de datos como estaba,
@@ -262,6 +270,7 @@ estés haciendo:
 | Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
 | Cambiar alérgenos o foto | **Catálogo** → el plato |
 | Crear, renombrar u ordenar las secciones | **Catálogo** → *Secciones* |
+| Que el cliente vea el plato a tamaño real | **Catálogo** → el plato → *Ancho real* |
 | Sacar el enlace o el QR para publicar | **Cartas** → *Compartir carta* |
 | Ver a qué horas se llena el local | **Ocupación** |
 
@@ -305,6 +314,63 @@ Hay un script para generar los cuatro QR de golpe: `npm run qr --prefix api`.
 > tal cual sale del servidor. Arreglarlo pide prerenderizado en el despliegue
 > —una función de Cloudflare Pages que sirva las etiquetas Open Graph según la
 > ruta—, así que va con el dominio ya decidido.
+
+---
+
+## Ver el plato en la mesa (realidad aumentada)
+
+En la carta, los platos con foto y medida llevan un botón **Ver en mi mesa**.
+Desde el móvil abre la cámara y planta el plato encima de la mesa a tamaño real,
+para responder a la única pregunta que se hace el cliente delante de la carta:
+*¿esto es grande o pequeño?*.
+
+**No hace falta escanear los platos en 3D.** Basta con medir el ancho real de lo
+que llega a la mesa y ponerlo en **Catálogo** → el plato → *Ancho real del plato*.
+Con eso y la foto que ya existe, la API genera al vuelo un modelo a escala: la
+foto tumbada en la mesa al tamaño exacto. No es un plato 3D, pero contesta a la
+pregunta, y son treinta segundos con una regla frente a un escaneo por plato.
+
+Si algún día se escanea un plato de verdad, los campos `modelo_glb` y
+`modelo_usdz` tienen prioridad sobre la foto.
+
+Cómo funciona la AR en web, que no es obvio:
+
+- **Android** abre Scene Viewer, que consume `.glb`
+- **iOS** abre AR Quick Look, que consume `.usdz`
+
+No hay un formato que valga para ambos; `<model-viewer>` se encarga de despachar
+a uno u otro. Lo que se genera es `.glb`, así que **en Android funciona la cámara
+y en iPhone se ve el modelo girable pero sin botón de cámara** hasta que se suba
+un `.usdz`. Convertir glb→usdz en el servidor pide herramientas de Apple y queda
+fuera de esto.
+
+Detalles que costaron una vuelta:
+
+- El GLB se escribe a mano en [`api/src/lib/glb.js`](api/src/lib/glb.js). Un plano
+  texturizado es el caso más simple del formato —cuatro vértices, dos triángulos
+  y una imagen— y meter una librería de exportación glTF entera para esto sería
+  desproporcionado. Como un formato binario escrito a mano se rompe en silencio,
+  hay un validador que lo parsea byte a byte: `npm run glb --prefix api`.
+- **La cámara por defecto de `model-viewer` mira a 75° de la vertical**, casi
+  horizontal. Un plano tumbado visto de canto no se ve: hay que bajarla a 35° y
+  poner un tope para que al girar con el dedo no se acabe otra vez de canto.
+- El modelo se cachea en disco con un nombre derivado de la foto y la medida, así
+  que cambiar cualquiera de las dos lo regenera solo.
+- La textura se convierte a PNG: glTF admite PNG y JPEG, y WebP necesitaría la
+  extensión `EXT_texture_webp`, que no soportan todos los visores.
+- `model-viewer` son 300 KB, así que va en su propio *chunk* y solo se descarga
+  cuando alguien pulsa el botón. El bundle público no se entera.
+
+> **La cámara no está probada.** Se ha verificado que el GLB es válido, que carga
+> y que mide exactamente lo que se le pide (`getDimensions()` devuelve 0,26 m
+> para 26 cm), pero el render y la cámara necesitan un móvil de verdad: aquí la
+> pestaña no compone y `requestAnimationFrame` no llega a ejecutarse. Además la
+> AR exige **HTTPS** salvo en `localhost`, así que para probarla desde el teléfono
+> hace falta el sitio publicado o un túnel.
+
+Para verlo funcionando sin subir nada: `node scripts/demo-ar.js` deja el plato 1
+con una foto sintética y 26 cm de ancho, y `node scripts/demo-ar.js --limpiar` lo
+deshace.
 
 ---
 

@@ -24,6 +24,13 @@ export const crearPlatoSchema = z.object({
   es_vegano: booleano.optional().default(false),
   activo: booleano.optional().default(true),
   alergenos: z.array(z.coerce.number().int().positive()).max(14).optional(),
+  // Ancho real del plato servido. Es lo que permite ensenarlo a tamano real
+  // en la mesa: por debajo de 5 cm no es un plato y por encima de 120 no cabe.
+  ancho_cm: z
+    .union([z.coerce.number().min(5).max(120), z.literal(''), z.null()])
+    .transform((v) => (v === '' ? null : v))
+    .nullable()
+    .optional(),
 });
 
 export const actualizarPlatoSchema = crearPlatoSchema

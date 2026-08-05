@@ -68,6 +68,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
             ci.destacado,
             p.id            AS plato_id,
             p.nombre, p.nombre_en, p.descripcion, p.descripcion_en, p.imagen,
+            p.ancho_cm, p.modelo_glb,
             p.es_vegetariano, p.es_vegano,
             c.id            AS categoria_id,
             c.slug          AS categoria_slug,
@@ -108,6 +109,10 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       descripcion: item.descripcion,
       descripcion_en: item.descripcion_en,
       imagen: item.imagen,
+      ancho_cm: item.ancho_cm === null ? null : Number(item.ancho_cm),
+      // La carta solo necesita saber SI se puede ver en la mesa; el modelo lo
+      // pide luego el visor a /api/platos/:id/ar.
+      ver_en_mesa: Boolean(item.modelo_glb || (item.imagen && item.ancho_cm)),
       precio: item.precio,
       destacado: Boolean(item.destacado),
       es_vegetariano: Boolean(item.es_vegetariano),
