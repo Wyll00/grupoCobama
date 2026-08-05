@@ -14,7 +14,7 @@
  *
  * Deja la base de datos como estaba: lo que crea, lo revierte al final.
  */
-const BASE = process.env.API_URL ?? 'http://localhost:4000';
+const BASE = process.env.API_URL ?? 'http://localhost:4100';
 const PASSWORD = 'cobama2026';
 
 let fallos = 0;

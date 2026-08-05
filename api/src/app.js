@@ -22,7 +22,7 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
 
 // credentials: la cookie de refresco viaja entre origenes en desarrollo
-// (5173 -> 4000), asi que CORS tiene que permitirlo explicitamente.
+// (5180 -> 4100), asi que CORS tiene que permitirlo explicitamente.
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
 
 app.use(express.json({ limit: '1mb' }));

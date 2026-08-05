@@ -45,10 +45,15 @@ npm install --prefix web && npm run dev --prefix web
 
 | Servicio | URL |
 |---|---|
-| Web pública | http://localhost:5173 |
-| Panel | http://localhost:5173/admin |
-| API | http://localhost:4000/api |
+| Web pública | http://localhost:5180 |
+| Panel | http://localhost:5180/admin |
+| API | http://localhost:4100/api |
 | phpMyAdmin | http://localhost:8081 (usuario `cobama`, contraseña `cobama`) |
+
+Los puertos no son los de por defecto de Vite (5173) ni de Express (4000) a
+propósito: los usa cualquier otro proyecto que tengas abierto a la vez. Se
+cambian en `web/.env` (`WEB_PORT`, `API_URL`) y `api/.env` (`PORT`,
+`CORS_ORIGIN`, `WEB_BASE_URL`) — los tres del API tienen que ir a juego.
 
 ---
 
@@ -155,7 +160,7 @@ Filtros de `/carta`:
 | `q` | `arroz` | Busca en nombre y descripción |
 
 ```bash
-curl "http://localhost:4000/api/restaurantes/el-descarado/carta?sin_alergenos=gluten,lacteos"
+curl "http://localhost:4100/api/restaurantes/el-descarado/carta?sin_alergenos=gluten,lacteos"
 ```
 
 El frontend replica esos filtros en la query string de la URL, así que un

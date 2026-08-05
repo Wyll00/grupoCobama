@@ -31,7 +31,7 @@ function secreto(nombre) {
 }
 
 export const env = {
-  port: Number(req('PORT', 4000)),
+  port: Number(req('PORT', 4100)),
   nodeEnv: req('NODE_ENV', 'development'),
   isProd: enProduccion,
 
@@ -43,12 +43,12 @@ export const env = {
     database: req('DB_NAME', 'cobama'),
   },
 
-  corsOrigin: req('CORS_ORIGIN', 'http://localhost:5173')
+  corsOrigin: req('CORS_ORIGIN', 'http://localhost:5180')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean),
 
-  webBaseUrl: req('WEB_BASE_URL', 'http://localhost:5173'),
+  webBaseUrl: req('WEB_BASE_URL', 'http://localhost:5180'),
 
   jwt: {
     secreto: secreto('JWT_SECRET'),
