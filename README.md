@@ -237,6 +237,29 @@ dentro, así que seguiría valiendo hasta caducar si no se cortara.
 
 ---
 
+## Dónde se toca cada cosa
+
+El precio **no es del plato, es de cada carta**: el mismo plato puede costar
+distinto en cada casa. Por eso hay dos entradas al mismo dato, según lo que
+estés haciendo:
+
+| Quiero... | Voy a |
+|---|---|
+| Cambiar los precios de un local | **Cartas** — todos los platos de una casa |
+| Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
+| Cambiar nombre, descripción, alérgenos o foto | **Catálogo** → el plato |
+| Dar de alta un plato nuevo del grupo | **Catálogo** → *Nuevo plato* |
+
+Son la misma tabla vista de dos formas: en Cartas, todos los platos de un local;
+en la ficha del plato, todos los locales de un plato. Sin la segunda, subir un
+precio en las cuatro casas obligaba a entrar cuatro veces en Cartas.
+
+Desde la ficha del plato también se da de alta en una carta que todavía no lo
+sirve, y se consulta el histórico de precios de cada local. Un encargado solo ve
+editable la fila de su local; las demás no le aparecen.
+
+---
+
 ## Roles y filtrado por local
 
 | Rol | Alcance |

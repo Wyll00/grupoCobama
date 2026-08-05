@@ -1,0 +1,7 @@
+﻿docker : mysql: [Warning] Using a password on the command line interface can be insecure.
+En línea: 7 Carácter: 1
++ docker exec -i cobama-db mysql -ucobama -pcobama cobama --table -e "
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mysql: [Warning...an be insecure.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

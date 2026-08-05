@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { adminApi, ErrorApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import Modal from '../componentes/Modal.jsx';
+import PrecioEditable from '../componentes/PrecioEditable.jsx';
+import HistorialPrecios from '../componentes/HistorialPrecios.jsx';
 import { Aviso, Boton, Campo, Entrada, Seleccion } from '../componentes/Campos.jsx';
-
-const euros = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 
 export default function CartaLocal() {
   const { esAdmin, localFijo } = useAuth();
@@ -212,48 +212,16 @@ export default function CartaLocal() {
       )}
 
       {historicoDe && (
-        <HistorialPrecios item={historicoDe} onCerrar={() => setHistoricoDe(null)} />
+        <HistorialPrecios
+          cartaItemId={historicoDe.id}
+          titulo={historicoDe.nombre}
+          onCerrar={() => setHistoricoDe(null)}
+        />
       )}
     </>
   );
 }
 
-/** Precio editable en la propia tabla: guarda al salir del campo o con Enter. */
-function PrecioEditable({ valor, onGuardar }) {
-  // Se muestra con dos decimales, pero se admite escribir con coma.
-  const formatear = (v) => Number(v).toFixed(2);
-  const [texto, setTexto] = useState(() => formatear(valor));
-
-  useEffect(() => setTexto(formatear(valor)), [valor]);
-
-  const guardar = () => {
-    const numero = Number(texto.replace(',', '.'));
-    if (!Number.isFinite(numero) || numero < 0) {
-      setTexto(formatear(valor));
-      return;
-    }
-    if (numero === Number(valor)) {
-      setTexto(formatear(valor));
-      return;
-    }
-    onGuardar(numero);
-  };
-
-  return (
-    <input
-      className="entrada entrada--precio"
-      inputMode="decimal"
-      value={texto}
-      onChange={(e) => setTexto(e.target.value)}
-      onBlur={guardar}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') e.currentTarget.blur();
-        if (e.key === 'Escape') setTexto(formatear(valor));
-      }}
-      aria-label="Precio"
-    />
-  );
-}
 
 function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
   const disponibles = useDatos(() => adminApi.cartaDisponibles(localId), [localId]);
@@ -355,44 +323,3 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
   );
 }
 
-function HistorialPrecios({ item, onCerrar }) {
-  const historico = useDatos(() => adminApi.historico(item.id), [item.id]);
-  const registros = historico.datos ?? [];
-
-  return (
-    <Modal titulo={`Historico de precios · ${item.nombre}`} onCerrar={onCerrar} ancho="560px">
-      {historico.cargando && <p className="admin-cargando">Cargando...</p>}
-
-      {!historico.cargando && registros.length === 0 && (
-        <p className="admin-vacio">
-          Este plato no ha cambiado de precio desde que esta en la carta.
-        </p>
-      )}
-
-      {registros.length > 0 && (
-        <table className="tabla tabla--compacta">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Cambio</th>
-              <th>Quien</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registros.map((r) => (
-              <tr key={r.id}>
-                <td>{new Date(r.fecha.replace(' ', 'T') + 'Z').toLocaleString('es-ES')}</td>
-                <td>
-                  <span className="apagado">{euros.format(r.precio_anterior)}</span>
-                  {' → '}
-                  <strong>{euros.format(r.precio_nuevo)}</strong>
-                </td>
-                <td>{r.usuario_nombre ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </Modal>
-  );
-}

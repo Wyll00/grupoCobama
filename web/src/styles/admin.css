@@ -144,6 +144,12 @@
   color: var(--texto-suave);
 }
 
+.nota-seccion {
+  margin: -0.3rem 0 0.75rem;
+  font-size: 0.83rem;
+  max-width: 70ch;
+}
+
 /* ----------------------------------------------------------- botones */
 
 .btn {
@@ -574,24 +580,6 @@
 .elegible:hover { background: var(--crema-hueso); }
 .elegible--activo { background: #f6e6cd; font-weight: 600; }
 
-.lista-cartas {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--linea);
-  border-radius: var(--radio-s);
-  overflow: hidden;
-}
-.lista-cartas li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--linea);
-  font-size: 0.88rem;
-  background: var(--panel);
-}
-.lista-cartas li:last-child { border-bottom: none; }
 
 /* ----------------------------------------------------------- imagen */
 

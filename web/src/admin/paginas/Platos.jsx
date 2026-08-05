@@ -4,6 +4,7 @@ import { adminApi, ErrorApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import Modal from '../componentes/Modal.jsx';
 import RecorteImagen from '../componentes/RecorteImagen.jsx';
+import PreciosPorLocal from '../componentes/PreciosPorLocal.jsx';
 import {
   Aviso,
   AreaTexto,
@@ -439,24 +440,18 @@ function EditorPlato({ id, soloLectura, categorias, onCerrar, onGuardado }) {
             )}
           </div>
 
-          <h3 className="subtitulo">En que cartas esta</h3>
-          {plato?.en_cartas?.length ? (
-            <ul className="lista-cartas">
-              {plato.en_cartas.map((c) => (
-                <li key={c.id}>
-                  <span>{c.restaurante_nombre}</span>
-                  <span>
-                    {new Intl.NumberFormat('es-ES', {
-                      style: 'currency',
-                      currency: 'EUR',
-                    }).format(c.precio)}
-                    {!c.activo && <span className="apagado"> · fuera de carta</span>}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="apagado">Todavia no lo sirve ningun local.</p>
+          <h3 className="subtitulo">Precio por local</h3>
+          <p className="apagado nota-seccion">
+            El precio no es del plato, es de cada carta: el mismo plato puede costar
+            distinto en cada casa. Cambiarlo queda registrado en el historico.
+          </p>
+          {plato && (
+            <PreciosPorLocal
+              platoId={plato.id}
+              platoActivo={plato.activo}
+              enCartas={plato.en_cartas}
+              onCambio={async () => existente.recargar()}
+            />
           )}
         </>
       )}
