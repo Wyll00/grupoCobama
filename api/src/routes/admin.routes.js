@@ -2,7 +2,13 @@ import { Router } from 'express';
 
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { validarCuerpo, validarConsulta } from '../middleware/validar.js';
-import { autenticar, exigirRol, ambitoLocal, ambitoCartaItem } from '../middleware/auth.js';
+import {
+  autenticar,
+  exigirRol,
+  ambitoLocal,
+  ambitoCartaItem,
+  ambitoReserva,
+} from '../middleware/auth.js';
 import { manejarSubida } from '../middleware/subida.js';
 
 import {
@@ -27,6 +33,12 @@ import * as cartaCtrl from '../controllers/admin.carta.controller.js';
 import * as usuariosCtrl from '../controllers/admin.usuarios.controller.js';
 import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
+import * as reservasCtrl from '../controllers/reservas.controller.js';
+import {
+  crearReservaManualSchema,
+  actualizarReservaSchema,
+  listarReservasSchema,
+} from '../esquemas/reservas.js';
 
 export const adminRouter = Router();
 
@@ -116,6 +128,35 @@ adminRouter.patch(
 );
 adminRouter.delete('/carta-items/:id', ambitoCartaItem, asyncHandler(cartaCtrl.deleteItem));
 adminRouter.get('/carta-items/:id/historico', ambitoCartaItem, asyncHandler(cartaCtrl.getHistorico));
+
+// ---------------------------------------------------------------------------
+// Reservas
+// ---------------------------------------------------------------------------
+adminRouter.get(
+  '/restaurantes/:restauranteId/reservas',
+  ambitoLocal(),
+  validarConsulta(listarReservasSchema),
+  asyncHandler(reservasCtrl.getReservas)
+);
+adminRouter.get(
+  '/restaurantes/:restauranteId/reservas/resumen',
+  ambitoLocal(),
+  validarConsulta(listarReservasSchema),
+  asyncHandler(reservasCtrl.getResumen)
+);
+adminRouter.post(
+  '/restaurantes/:restauranteId/reservas',
+  ambitoLocal(),
+  validarCuerpo(crearReservaManualSchema),
+  asyncHandler(reservasCtrl.postReservaManual)
+);
+// El local sale de la propia reserva, no de la URL.
+adminRouter.patch(
+  '/reservas/:id',
+  ambitoReserva,
+  validarCuerpo(actualizarReservaSchema),
+  asyncHandler(reservasCtrl.patchReserva)
+);
 
 // ---------------------------------------------------------------------------
 // Ocupacion del local

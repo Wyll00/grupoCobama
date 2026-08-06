@@ -16,5 +16,9 @@ api/uploads/
 # QR generados
 qr/
 
+# Avisos de reserva escritos a disco mientras no hay SMTP.
+# Llevan nombre, telefono y email de clientes: no entran en el repositorio.
+api/correos/
+
 # Artefacto de un 2>$null mal escapado en PowerShell
 $null

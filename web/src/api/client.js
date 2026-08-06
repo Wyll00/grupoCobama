@@ -32,4 +32,22 @@ export const api = {
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
   ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
+
+  tramosReserva: (restauranteId, fecha, opts) =>
+    get('/reservas/tramos', { restaurante_id: restauranteId, fecha }, opts),
+
+  crearReserva: async (datos) => {
+    const res = await fetch('/api/reservas', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(datos),
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok) {
+      const error = new Error(json?.error?.mensaje ?? 'No se ha podido enviar la reserva');
+      error.detalles = json?.error?.detalles ?? [];
+      throw error;
+    }
+    return json.datos;
+  },
 };

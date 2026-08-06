@@ -69,6 +69,35 @@ export const ambitoLocal = (obtenerId = (req) => req.params.restauranteId) =>
   });
 
 /**
+ * Igual que ambitoCartaItem pero para una reserva: el local se deduce de la
+ * propia reserva, no de la URL.
+ */
+export const ambitoReserva = asyncHandler(async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw ApiError.peticionInvalida('Identificador de reserva invalido');
+  }
+
+  const [filas] = await pool.execute(
+    'SELECT id, restaurante_id FROM reservas WHERE id = ? LIMIT 1',
+    [id]
+  );
+
+  const reserva = filas[0];
+  // Mismo 404 si no existe que si es de otro local: no hay por que confirmarle
+  // a un encargado que existe una reserva en la casa de al lado.
+  if (
+    !reserva ||
+    (req.usuario.rol !== 'admin_grupo' && reserva.restaurante_id !== req.usuario.restaurante_id)
+  ) {
+    throw ApiError.noEncontrado('Esa reserva no existe');
+  }
+
+  req.restauranteId = reserva.restaurante_id;
+  next();
+});
+
+/**
  * Igual que ambitoLocal pero partiendo de un carta_item: primero averigua a
  * que local pertenece y despues comprueba el permiso.
  */

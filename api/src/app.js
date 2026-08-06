@@ -9,6 +9,7 @@ import { env } from './config/env.js';
 import { router } from './routes/index.js';
 import { authRouter } from './routes/auth.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
+import { reservasRouter } from './routes/reservas.routes.js';
 import { noEncontrado, manejadorErrores } from './middleware/errores.js';
 
 export const app = express();
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(env.uploads.directorio, { maxAge: '7d' }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/reservas', reservasRouter);
 app.use('/api', router);
 
 app.use(noEncontrado);

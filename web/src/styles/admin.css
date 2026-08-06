@@ -606,6 +606,93 @@
   margin-bottom: 0;
 }
 
+/* ---------------------------------------------------------- reservas -- */
+
+/* Navegacion por dias: en sala se mira el dia de hoy y como mucho el
+   siguiente, asi que las flechas pesan mas que el calendario. */
+.dia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-s);
+}
+
+.dia__centro {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dia__centro strong { text-transform: capitalize; }
+.dia__centro .entrada { width: auto; }
+
+.marcadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.marcador {
+  flex: 1;
+  min-width: 8rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-left-width: 3px;
+  border-radius: var(--radio-s);
+}
+
+.marcador strong { display: block; font-size: 1.5rem; line-height: 1.1; }
+.marcador span { font-size: 0.8rem; color: var(--texto-suave); }
+
+.marcador--pendiente { border-left-color: var(--ocre); }
+.marcador--confirmada { border-left-color: var(--mojo-verde); }
+.marcador--apagado { opacity: 0.6; }
+
+.hora-reserva {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+.codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.05em;
+}
+
+/* La nota interna no la ve el cliente: se marca para no confundirla con lo
+   que ha pedido el. */
+.nota-interna {
+  margin-top: 0.2rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--ocre);
+  font-style: italic;
+}
+
+.acciones-reserva {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.acciones-reserva .btn { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+
+.punto--pendiente { color: var(--ocre); }
+.punto--confirmada { color: var(--mojo-verde); }
+.punto--cancelada { color: var(--texto-suave); }
+.punto--no_presentado { color: var(--mojo-rojo); }
+
 /* --------------------------------------------------------- compartir -- */
 
 .compartir__enlace {

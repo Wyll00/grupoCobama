@@ -544,6 +544,59 @@ button {
   background: var(--crema-hueso);
 }
 
+/* -------------------------------------------------------- reservar --- */
+
+.reserva {
+  display: grid;
+  gap: 1rem;
+  max-width: 620px;
+}
+
+.reserva__campo {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.reserva__campo > span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--texto-suave);
+}
+
+.reserva__fila {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .reserva__fila { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}
+
+.reserva select.buscador,
+.reserva textarea.buscador { font: inherit; font-size: 0.95rem; }
+
+.reserva .boton { justify-self: start; }
+
+.aviso--error {
+  border-left-color: var(--mojo-rojo);
+  background: #f9eae7;
+  color: #7d2a1f;
+}
+
+.reserva-hecha { max-width: 620px; }
+
+.reserva-hecha__codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ocre);
+  margin: 0.5rem 0 1.25rem;
+}
+
 /* ----------------------------------------------- ver en la mesa ------ */
 
 .plato__ver-mesa {

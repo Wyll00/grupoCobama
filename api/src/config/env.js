@@ -74,4 +74,10 @@ export const env = {
     directorio: req('UPLOADS_DIR', 'uploads'),
     tamanoMaximoMb: Number(req('UPLOAD_MAX_MB', 8)),
   },
+
+  correo: {
+    // Sin SMTP los avisos se escriben en api/correos/ en lugar de perderse.
+    activo: Boolean(process.env.SMTP_HOST),
+    remitente: req('CORREO_REMITENTE', 'reservas@grupocobama.es'),
+  },
 };

@@ -29,6 +29,12 @@ export function horaAMinutos(hora) {
   return h * 60 + m;
 }
 
+/** 750 -> '12:30'. Admite valores por encima de 1440, que dan la vuelta. */
+export function minutosAHora(minutos) {
+  const n = ((minutos % 1440) + 1440) % 1440;
+  return `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+}
+
 /** '12:30:00' -> '12:30'. '24:00:00' -> '00:00'. */
 export function formatearHora(hora) {
   const minutos = horaAMinutos(hora);
@@ -87,6 +93,27 @@ export function estaAbiertoAhora(horarios, ahora = ahoraEnCanarias()) {
   }
 
   return false;
+}
+
+/** Fecha de hoy en Canarias, como 'YYYY-MM-DD'. */
+export function hoyEnCanarias(fecha = new Date()) {
+  // en-CA da directamente el formato ISO de fecha.
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: ZONA,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(fecha);
+}
+
+/**
+ * Dia de la semana de una fecha 'YYYY-MM-DD', en la convencion del esquema
+ * (0=domingo). Se parsea como UTC a proposito: es una fecha de calendario sin
+ * hora, y dejarla en manos del huso local la correria un dia segun donde
+ * corra el servidor.
+ */
+export function diaSemanaDeFecha(fecha) {
+  return new Date(`${fecha}T00:00:00Z`).getUTCDay();
 }
 
 const capitalizar = (t) => t.charAt(0).toUpperCase() + t.slice(1);

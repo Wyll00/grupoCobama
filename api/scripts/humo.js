@@ -31,6 +31,8 @@ const rastro = {
   platoNuevoId: null,
   categoriaId: null,
   ocupacionTramo: null,
+  reservaId: null,
+  reservaCodigo: null,
 };
 
 function comprobar(descripcion, condicion, detalle) {
@@ -472,6 +474,116 @@ async function main() {
   const qrPropio = await basilica.peticion('GET', '/api/admin/restaurantes/2/qr');
   comprobar('pero si el del suyo (200)', qrPropio.status === 200);
 
+  // --------------------------------------------------------- reservas
+  seccion('Reservas');
+
+  const manana = new Date();
+  manana.setUTCDate(manana.getUTCDate() + 1);
+  const diaReserva = manana.toISOString().slice(0, 10);
+
+  const tramos = await fetch(
+    `${BASE}/api/reservas/tramos?restaurante_id=2&fecha=${diaReserva}`
+  ).then((r) => r.json());
+  comprobar('las horas disponibles salen del horario del local', tramos.datos?.tramos?.length > 0);
+  comprobar(
+    'no se ofrecen horas antes de abrir',
+    tramos.datos.tramos[0] >= '12:30',
+    tramos.datos.tramos[0]
+  );
+
+  const reservaWeb = await fetch(`${BASE}/api/reservas`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      restaurante_id: 2,
+      nombre: 'Prueba de humo',
+      telefono: '922000111',
+      email: 'humo@ejemplo.es',
+      fecha: diaReserva,
+      hora: tramos.datos.tramos[0],
+      comensales: 4,
+      observaciones: 'Generada por la prueba de humo',
+    }),
+  });
+  const reservaJson = await reservaWeb.json();
+  comprobar('una reserva web se acepta (201)', reservaWeb.status === 201);
+  comprobar('entra como pendiente', reservaJson.datos?.estado === 'pendiente');
+  comprobar(
+    'devuelve un codigo legible de 6 caracteres',
+    /^[A-Z2-9]{6}$/.test(reservaJson.datos?.codigo ?? ''),
+    reservaJson.datos?.codigo
+  );
+  rastro.reservaCodigo = reservaJson.datos?.codigo;
+
+  const fueraHorario = await fetch(`${BASE}/api/reservas`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      restaurante_id: 2,
+      nombre: 'Fuera de hora',
+      telefono: '922000222',
+      fecha: diaReserva,
+      hora: '10:00',
+      comensales: 2,
+    }),
+  });
+  comprobar('una hora en la que el local no ha abierto se rechaza (400)', fueraHorario.status === 400);
+
+  const enElPasado = await fetch(`${BASE}/api/reservas`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      restaurante_id: 2,
+      nombre: 'Ayer',
+      telefono: '922000333',
+      fecha: '2020-01-01',
+      hora: '20:00',
+      comensales: 2,
+    }),
+  });
+  comprobar('una fecha pasada se rechaza (400)', enElPasado.status === 400);
+
+  const bandeja = await basilica.peticion(
+    'GET',
+    `/api/admin/restaurantes/2/reservas?desde=${diaReserva}&hasta=${diaReserva}`
+  );
+  comprobar('el encargado ve la bandeja de su local (200)', bandeja.status === 200);
+  const mia = bandeja.cuerpo.datos.find((r) => r.codigo === rastro.reservaCodigo);
+  comprobar('y encuentra la reserva recien hecha', Boolean(mia));
+  rastro.reservaId = mia?.id;
+
+  const bandejaAjena = await basilica.peticion('GET', '/api/admin/restaurantes/4/reservas');
+  comprobar('pero no la de otro local (403)', bandejaAjena.status === 403);
+
+  const confirmada = await basilica.peticion('PATCH', `/api/admin/reservas/${rastro.reservaId}`, {
+    estado: 'confirmada',
+  });
+  comprobar('confirmar la reserva funciona', confirmada.cuerpo?.datos?.estado === 'confirmada');
+  comprobar(
+    'y se genera el aviso al cliente, que tenia email',
+    confirmada.cuerpo?.datos?.aviso !== null
+  );
+
+  const resumen = await basilica.peticion(
+    'GET',
+    `/api/admin/restaurantes/2/reservas/resumen?desde=${diaReserva}`
+  );
+  comprobar(
+    'el resumen cuenta los comensales esperados',
+    resumen.cuerpo?.datos?.comensales_esperados >= 4,
+    JSON.stringify(resumen.cuerpo?.datos?.comensales)
+  );
+
+  // Mover una reserva a un hueco imposible tiene que fallar tambien desde el
+  // panel: si no, se puede colocar una reserva un dia cerrado.
+  const moverMal = await basilica.peticion('PATCH', `/api/admin/reservas/${rastro.reservaId}`, {
+    hora: '04:00',
+  });
+  comprobar('mover una reserva fuera de horario se rechaza (400)', moverMal.status === 400);
+
+  const bandejaAdmin = await admin.peticion('GET', '/api/admin/restaurantes/2/reservas');
+  comprobar('el admin ve las reservas de cualquier local (200)', bandejaAdmin.status === 200);
+
   // -------------------------------------------------------- ocupacion
   seccion('Ocupacion del local');
 
@@ -760,6 +872,9 @@ async function limpiar() {
       await pool.execute('DELETE FROM ocupacion WHERE restaurante_id = 2 AND tramo = ?', [
         rastro.ocupacionTramo,
       ]);
+    }
+    if (rastro.reservaId) {
+      await pool.execute('DELETE FROM reservas WHERE id = ?', [rastro.reservaId]);
     }
     if (rastro.usuarioId) {
       await pool.execute('DELETE FROM refresh_tokens WHERE usuario_id = ?', [rastro.usuarioId]);

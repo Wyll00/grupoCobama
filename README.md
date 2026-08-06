@@ -374,6 +374,57 @@ deshace.
 
 ---
 
+## Reservas
+
+El formulario de `/reservar` guarda la reserva en base de datos y avisa al
+local. Entra como **solicitud pendiente** hasta que alguien la confirma desde
+**Reservas** en el panel.
+
+No hay control de mesas ni de aforo: eso es un proyecto en sí mismo y hoy el
+grupo lo lleva por WhatsApp sin registro ninguno, así que una bandeja
+estructurada ya es la mejora. El panel enseña los comensales esperados del día
+para que sala decida.
+
+Lo que sí valida la API, porque es donde se cometen los errores:
+
+- **Contra el horario real de cada local.** Las horas que ofrece el formulario
+  salen de la tabla `horarios`, así que un viernes se puede reservar más tarde
+  que un lunes y un día cerrado no aparece. Mover una reserva desde el panel
+  vuelve a pasar por la misma validación: si no, se podría colocar una reserva
+  un día que el local no abre.
+- **Última mesa 45 minutos antes de cerrar.** Nadie sienta a alguien cinco
+  minutos antes de echar el cierre, y aceptarlo solo genera un plante en la
+  puerta.
+- **Una hora de antelación mínima por web.** La reserva necesita que alguien la
+  mire; para dentro de diez minutos no da tiempo. El alta manual desde el panel
+  se salta esa regla, porque quien la mete está hablando con el cliente.
+- **Máximo 90 días vista**, y nada en el pasado.
+
+Cada reserva lleva un **código de seis caracteres** (`5GYKMD`) que se le da al
+cliente. El id numérico no vale para eso: es correlativo, así que con el de uno
+se adivinan los demás. El alfabeto no tiene `0/O` ni `1/I/L`, porque el código
+se dicta por teléfono.
+
+El formulario público está limitado a 10 reservas por hora e IP. Sin captcha y
+sin límite, cualquiera llena la bandeja del local en un minuto.
+
+### Avisos por correo
+
+Sin SMTP configurado el sistema **no se calla ni finge que ha enviado**: escribe
+el correo en `api/correos/` y lo dice por consola, para poder leer exactamente
+lo que le llegaría al local y al cliente. Cuando haya servidor de correo se
+instala nodemailer y se sustituye `entregar` en
+[`correo.service.js`](api/src/services/correo.service.js); el resto de la
+aplicación no se entera.
+
+`api/correos/` está en el `.gitignore`: esos ficheros llevan nombre, teléfono y
+email de clientes.
+
+Que falle un aviso nunca tumba la reserva: ya está guardada y sala la ve igual
+en el panel.
+
+---
+
 ## Ocupación del local
 
 Cada hora, mientras el local está abierto, aparece una barra fija abajo del

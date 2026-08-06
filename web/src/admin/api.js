@@ -140,6 +140,19 @@ export const adminApi = {
     enviar('POST', `/admin/restaurantes/${restauranteId}/carta/nuevo-plato`, { cuerpo: datos }),
   qr: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/qr`),
 
+  // --- reservas -----------------------------------------------------------
+  reservas: (restauranteId, filtros = {}) => {
+    const query = new URLSearchParams(
+      Object.entries(filtros).filter(([, v]) => v !== '' && v != null)
+    );
+    return get(`/admin/restaurantes/${restauranteId}/reservas?${query}`);
+  },
+  resumenReservas: (restauranteId, fecha) =>
+    get(`/admin/restaurantes/${restauranteId}/reservas/resumen?desde=${fecha}`),
+  crearReserva: (restauranteId, datos) =>
+    enviar('POST', `/admin/restaurantes/${restauranteId}/reservas`, { cuerpo: datos }),
+  editarReserva: (id, datos) => enviar('PATCH', `/admin/reservas/${id}`, { cuerpo: datos }),
+
   // --- ocupacion ----------------------------------------------------------
   ocupacionPendiente: (restauranteId) =>
     get(`/admin/restaurantes/${restauranteId}/ocupacion/pendiente`),
