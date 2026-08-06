@@ -307,13 +307,8 @@ El destino sale de `WEB_BASE_URL` en `api/.env`. Mientras eso apunte a
 `localhost` el panel avisa de que ese enlace **no sirve fuera de ese ordenador**.
 Hay un script para generar los cuatro QR de golpe: `npm run qr --prefix api`.
 
-> **Pendiente para la fase 4: la vista previa del enlace en redes.** Al pegarlo
-> en WhatsApp o Instagram sale el título genérico del grupo, no el del local. El
-> título y la descripción sí cambian por local, pero lo hace JavaScript en el
-> navegador, y los rastreadores de las redes no ejecutan JavaScript: leen el HTML
-> tal cual sale del servidor. Arreglarlo pide prerenderizado en el despliegue
-> —una función de Cloudflare Pages que sirva las etiquetas Open Graph según la
-> ruta—, así que va con el dominio ya decidido.
+La vista previa al pegar el enlace en WhatsApp o Instagram sale con el nombre
+del local, no con el genérico del grupo. Ver **Lo que ve un buscador** más abajo.
 
 ---
 
@@ -371,6 +366,58 @@ Detalles que costaron una vuelta:
 Para verlo funcionando sin subir nada: `node scripts/demo-ar.js` deja el plato 1
 con una foto sintética y 26 cm de ancho, y `node scripts/demo-ar.js --limpiar` lo
 deshace.
+
+---
+
+## Lo que ve un buscador
+
+La web es una SPA: el HTML que sale del servidor es un `<div>` vacío y los
+platos los pinta JavaScript. Eso vale para una persona con navegador, pero **los
+rastreadores de WhatsApp, Instagram y Facebook no ejecutan JavaScript**. Sin
+tratamiento, los cuatro locales comparten el mismo título genérico al compartir
+el enlace, y Google no sabe que son restaurantes.
+
+Por eso la API sirve la web con el `<head>` ya relleno para cada ruta:
+
+| Ruta | Título que recibe el rastreador |
+|---|---|
+| `/` | Grupo Cobama · Cocina canaria en Tenerife |
+| `/el-descarado` | El Descarado · La Orotava · Grupo Cobama |
+| `/el-descarado/carta` | Carta de El Descarado · La Orotava · Grupo Cobama |
+| `/reservar` | Reservar mesa · Grupo Cobama |
+
+Además de título y descripción se inyectan Open Graph, Twitter Card, la URL
+canónica y **datos estructurados `schema.org/Restaurant`** por local: dirección,
+coordenadas, teléfono, horario por franjas y enlace a la carta y a reservas. Es
+lo que alimenta la ficha lateral de Google con el "Abierto ahora". Todo sale de
+la base de datos, así que cambiar un horario en el panel lo cambia también ahí.
+
+También se sirven `/robots.txt` y `/sitemap.xml`, generados de los locales
+activos. La carta va como `daily` y la ficha como `weekly`: la carta es la que
+cambia.
+
+### Probarlo en local
+
+```bash
+npm run build --prefix web
+```
+
+La API sirve la web construida en su propio puerto, con el prerenderizado
+puesto. Para ver lo que recibe un rastreador:
+
+```bash
+curl -A "WhatsApp/2.23" http://localhost:4100/el-descarado/carta
+```
+
+En el día a día el front lo sigue sirviendo Vite en el 5180, sin prerenderizar.
+Esto es para comprobar el SEO y como alternativa de despliegue si la web acaba
+en el mismo VPS que la API; en Cloudflare Pages lo hará una función equivalente.
+
+> **Falta la imagen de la vista previa.** `restaurantes.imagen_portada` está
+> vacío en los cuatro, así que la tarjeta de WhatsApp sale sin foto y la
+> `twitter:card` cae a `summary` en lugar de `summary_large_image`. En cuanto
+> haya una foto por local —decisión 4 del plan, la sesión de fotografía— se
+> rellena el campo y las etiquetas salen solas.
 
 ---
 

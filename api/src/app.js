@@ -11,6 +11,9 @@ import { authRouter } from './routes/auth.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
 import { reservasRouter } from './routes/reservas.routes.js';
 import { noEncontrado, manejadorErrores } from './middleware/errores.js';
+import { prerender, DIST } from './middleware/prerender.js';
+import { asyncHandler } from './utils/asyncHandler.js';
+import { getRobots, getSitemap } from './controllers/seo.controller.js';
 
 export const app = express();
 
@@ -37,6 +40,19 @@ app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/reservas', reservasRouter);
 app.use('/api', router);
+
+// --- Web publica servida desde la API ---------------------------------------
+// Sirve para probar en local exactamente lo que veria un buscador, y como
+// alternativa de despliegue si la web acaba en el mismo VPS que la API. En
+// desarrollo del dia a dia el front lo sirve Vite en su puerto.
+
+app.get('/robots.txt', asyncHandler(getRobots));
+app.get('/sitemap.xml', asyncHandler(getSitemap));
+
+// index: false para que sea el prerenderizado quien sirva el HTML, no el
+// middleware de estaticos.
+app.use(express.static(DIST, { index: false, maxAge: '1y' }));
+app.use(prerender());
 
 app.use(noEncontrado);
 app.use(manejadorErrores);
