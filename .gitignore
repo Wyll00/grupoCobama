@@ -22,3 +22,9 @@ api/correos/
 
 # Artefacto de un 2>$null mal escapado en PowerShell
 $null
+
+# La carta estatica de La Basilica tiene repositorio propio, en
+# github.com/Wyll00/cartaBasilica, y su .git vive dentro de esta carpeta.
+# Sin esta linea, un "git add -A" la anadiria aqui como gitlink: una referencia
+# a un commit en vez de los ficheros, y queda un submodulo que nadie clona.
+La Basilica/
