@@ -62,6 +62,12 @@ export const actualizarCartaItemSchema = z
     activo: booleano.optional(),
     destacado: booleano.optional(),
     orden: z.coerce.number().int().min(0).max(65535).optional(),
+    // Hasta cuando esta agotado. El cliente dice que quiere decir, no calcula
+    // fechas: 'hoy' para lo que vuelve manana, una fecha para una temporada,
+    // y null para deshacerlo.
+    agotado_hasta: z
+      .union([z.literal('hoy'), z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.null()])
+      .optional(),
   })
   .refine((datos) => Object.keys(datos).length > 0, {
     message: 'No hay ningun cambio que aplicar',

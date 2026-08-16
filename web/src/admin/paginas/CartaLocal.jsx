@@ -8,6 +8,7 @@ import PrecioEditable from '../componentes/PrecioEditable.jsx';
 import HistorialPrecios from '../componentes/HistorialPrecios.jsx';
 import Compartir from '../componentes/Compartir.jsx';
 import EditorPlato from '../componentes/EditorPlato.jsx';
+import Agotado from '../componentes/Agotado.jsx';
 import { Aviso, Boton, Campo, Entrada, Interruptor, Seleccion } from '../componentes/Campos.jsx';
 
 export default function CartaLocal() {
@@ -111,6 +112,7 @@ export default function CartaLocal() {
                 <th className="tabla__orden">Orden</th>
                 <th>Plato</th>
                 <th className="tabla__precio">Precio</th>
+                <th className="tabla__centro">Hay</th>
                 <th className="tabla__centro">En carta</th>
                 <th className="tabla__centro">Destacado</th>
                 <th />
@@ -171,6 +173,16 @@ export default function CartaLocal() {
                     <PrecioEditable
                       valor={item.precio}
                       onGuardar={(precio) => conError(() => adminApi.editarItem(item.id, { precio }))}
+                    />
+                  </td>
+
+                  <td className="tabla__centro">
+                    <Agotado
+                      item={item}
+                      disabled={!item.activo}
+                      onCambiar={(hasta) =>
+                        conError(() => adminApi.editarItem(item.id, { agotado_hasta: hasta }))
+                      }
                     />
                   </td>
 

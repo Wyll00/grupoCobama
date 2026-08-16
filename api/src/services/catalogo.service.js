@@ -66,6 +66,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
     `SELECT ci.id           AS carta_item_id,
             ci.precio,
             ci.destacado,
+            (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
             p.id            AS plato_id,
             p.nombre, p.nombre_en, p.descripcion, p.descripcion_en, p.imagen,
             p.ancho_cm, p.modelo_glb,
@@ -115,6 +116,10 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       ver_en_mesa: Boolean(item.modelo_glb || (item.imagen && item.ancho_cm)),
       precio: item.precio,
       destacado: Boolean(item.destacado),
+      // Se sigue enseñando, marcado. Esconderlo haria que el cliente lo
+      // pidiera igual porque lo vio ayer; verlo tachado le ahorra la pregunta
+      // y a sala la explicacion.
+      agotado: Boolean(item.agotado),
       es_vegetariano: Boolean(item.es_vegetariano),
       es_vegano: Boolean(item.es_vegano),
       alergenos: alergenosPorPlato.get(item.plato_id) ?? [],

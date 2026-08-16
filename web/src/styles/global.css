@@ -525,6 +525,18 @@ button {
 
 .etiqueta--destacado { background: #f6e6cd; color: #8a5a12; }
 .etiqueta--veg { background: #e3ecdd; color: var(--mojo-verde); }
+.etiqueta--agotado { background: #f7e3e0; color: var(--mojo-rojo); }
+
+/* Agotado se apaga pero se sigue leyendo: la idea es que el cliente vea que
+   el plato existe y que hoy no hay, no que desaparezca de la carta. */
+.plato--agotado .plato__nombre > span:first-child,
+.plato--agotado .plato__precio {
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.plato--agotado .plato__descripcion { opacity: 0.55; }
 
 .alergenos {
   display: flex;

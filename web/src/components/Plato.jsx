@@ -13,11 +13,16 @@ export default function Plato({ plato }) {
   const [enMesa, setEnMesa] = useState(false);
 
   return (
-    <li className="plato">
+    <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
       <div className="plato__info">
         <div className="plato__nombre">
           <span>{plato.nombre}</span>
-          {plato.destacado && <span className="etiqueta etiqueta--destacado">De la casa</span>}
+          {/* Se sigue enseñando en lugar de esconderlo: si desaparece, el
+              cliente lo pide igual porque lo vio ayer. */}
+          {plato.agotado && <span className="etiqueta etiqueta--agotado">Hoy no queda</span>}
+          {plato.destacado && !plato.agotado && (
+            <span className="etiqueta etiqueta--destacado">De la casa</span>
+          )}
           {plato.es_vegano ? (
             <span className="etiqueta etiqueta--veg">Vegano</span>
           ) : plato.es_vegetariano ? (
@@ -27,7 +32,7 @@ export default function Plato({ plato }) {
 
         {plato.descripcion && <p className="plato__descripcion">{plato.descripcion}</p>}
 
-        {plato.ver_en_mesa && (
+        {plato.ver_en_mesa && !plato.agotado && (
           <button type="button" className="plato__ver-mesa" onClick={() => setEnMesa(true)}>
             Ver en mi mesa
             {plato.ancho_cm && <span className="apagado"> · {plato.ancho_cm} cm</span>}

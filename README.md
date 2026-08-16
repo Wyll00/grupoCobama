@@ -265,6 +265,7 @@ estés haciendo:
 |---|---|
 | Cambiar los precios de un local | **Cartas** — todos los platos de una casa |
 | Corregir el nombre o la descripción de un plato | **Cartas** → clic en el nombre del plato |
+| Decir que un plato se ha acabado hoy | **Cartas** → *Se acabó* en su fila |
 | Meter en la carta un plato que ya existe | **Cartas** → *Añadir plato* → *Del catálogo* |
 | Meter un plato que no existe todavía | **Cartas** → *Añadir plato* → *Crear un plato nuevo* |
 | Cambiar el precio de un plato en varias casas | **Catálogo** → el plato → *Precio por local* |
@@ -522,6 +523,24 @@ borra de verdad una que esté vacía, y el panel lo dice en el propio botón.
 |---|---|
 | `admin_grupo` | Los cuatro locales, el catálogo maestro y los usuarios |
 | `encargado_local` | Solo su `restaurante_id`: da de alta platos, ajusta precios, reordena su carta y gestiona sus reservas |
+
+### Quitar un plato: hay dos formas y no son lo mismo
+
+| | Qué hace | Cuándo |
+|---|---|---|
+| **Se acabó** | Sigue en la carta, tachado y con "Hoy no queda". **Vuelve solo** al día siguiente. | Se agotó hoy |
+| **Se acabó → ⋯** | Igual, pero hasta la fecha que elijas. También vuelve solo. | No hay en una temporada |
+| Casilla **En carta** | Desaparece de la carta pública. No vuelve hasta que lo marques. | Ya no se sirve |
+
+La distinción importa: con una sola casilla, lo que se agota un martes se queda
+escondido tres semanas porque nadie se acuerda de volver a marcarlo. Con fecha de
+vuelta no hay que acordarse de nada, y no hace falta ninguna tarea programada
+porque la caducidad se evalúa al leer (`agotado_hasta > NOW()`).
+
+Un plato agotado **se sigue enseñando al cliente**, tachado, en lugar de
+esconderlo. Si desaparece, el cliente lo pide igual porque lo vio ayer; verlo
+tachado le ahorra la pregunta y a sala la explicación. Lo que sí se le quita es
+el botón de verlo en la mesa.
 
 ### Quién puede tocar un plato
 

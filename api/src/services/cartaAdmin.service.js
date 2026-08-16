@@ -8,6 +8,8 @@ import { ApiError } from '../utils/ApiError.js';
 export async function listar(restauranteId) {
   const [filas] = await pool.execute(
     `SELECT ci.id, ci.plato_id, ci.precio, ci.activo, ci.orden, ci.destacado,
+            ci.agotado_hasta,
+            (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
             p.nombre, p.imagen_thumb, p.activo AS plato_activo,
             c.id AS categoria_id, c.slug AS categoria_slug, c.nombre AS categoria_nombre
        FROM carta_items ci
@@ -41,6 +43,10 @@ export async function listar(restauranteId) {
       orden: f.orden,
       activo: Boolean(f.activo),
       destacado: Boolean(f.destacado),
+      agotado: Boolean(f.agotado),
+      // Solo interesa la fecha si todavia no ha pasado: una de la semana
+      // pasada es ruido en pantalla.
+      agotado_hasta: f.agotado ? f.agotado_hasta : null,
       // Si el plato esta desactivado en el catalogo maestro, la linea de carta
       // no se puede reactivar hasta que cocina central lo reactive.
       plato_activo: Boolean(f.plato_activo),
@@ -148,6 +154,29 @@ export async function crearYAnadir(restauranteId, { precio, destacado, alergenos
 }
 
 /**
+ * Traduce lo que dice el panel a una fecha concreta.
+ *
+ * Las 05:00 UTC del dia siguiente son las 05:00 o las 06:00 en Canarias segun
+ * la epoca del ano. Las dos caen despues del cierre (que como muy tarde es a
+ * medianoche) y antes de abrir (12:30), asi que el plato vuelve solo justo
+ * para el siguiente servicio sin tener que hacer cuentas de husos horarios.
+ */
+function resolverAgotado(valor) {
+  if (valor === null || valor === undefined) return null;
+
+  const dia = new Date();
+  if (valor === 'hoy') {
+    dia.setUTCDate(dia.getUTCDate() + 1);
+  } else {
+    const [a, m, d] = valor.split('-').map(Number);
+    dia.setUTCFullYear(a, m - 1, d);
+    // Una fecha es "vuelve ESE dia", asi que la marca cae al empezar el dia.
+  }
+  dia.setUTCHours(5, 0, 0, 0);
+  return dia.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+/**
  * Actualiza una linea de carta.
  *
  * Si cambia el precio, el registro en historico_precios va en la MISMA
@@ -180,12 +209,18 @@ export async function actualizar(id, cambios, usuarioId) {
     const columnas = ['precio', 'activo', 'destacado', 'orden'].filter(
       (c) => cambios[c] !== undefined
     );
-    if (columnas.length === 0) return;
-
-    const asignaciones = columnas.map((c) => `${c} = ?`).join(', ');
     const valores = columnas.map((c) =>
       typeof cambios[c] === 'boolean' ? (cambios[c] ? 1 : 0) : cambios[c]
     );
+
+    if (cambios.agotado_hasta !== undefined) {
+      columnas.push('agotado_hasta');
+      valores.push(resolverAgotado(cambios.agotado_hasta));
+    }
+
+    if (columnas.length === 0) return;
+
+    const asignaciones = columnas.map((c) => `${c} = ?`).join(', ');
     await conn.execute(`UPDATE carta_items SET ${asignaciones} WHERE id = ?`, [...valores, id]);
 
     const precioNuevo = cambios.precio;
@@ -272,8 +307,9 @@ export async function disponibles(restauranteId) {
 async function obtenerItem(id) {
   const [filas] = await pool.execute(
     `SELECT ci.id, ci.restaurante_id, ci.plato_id, ci.precio, ci.activo,
-            ci.orden, ci.destacado, p.nombre, p.imagen_thumb,
-            p.activo AS plato_activo
+            ci.orden, ci.destacado, ci.agotado_hasta,
+            (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
+            p.nombre, p.imagen_thumb, p.activo AS plato_activo
        FROM carta_items ci
        JOIN platos p ON p.id = ci.plato_id
       WHERE ci.id = ?`,
@@ -285,5 +321,7 @@ async function obtenerItem(id) {
     activo: Boolean(f.activo),
     destacado: Boolean(f.destacado),
     plato_activo: Boolean(f.plato_activo),
+    agotado: Boolean(f.agotado),
+    agotado_hasta: f.agotado ? f.agotado_hasta : null,
   };
 }

@@ -749,6 +749,65 @@ async function main() {
   );
   rastro.categoriaId = null;
 
+  // ------------------------------------------------------ platos agotados
+  seccion('Platos agotados');
+
+  const agotadoHoy = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, {
+    agotado_hasta: 'hoy',
+  });
+  comprobar('el encargado marca un plato agotado (200)', agotadoHoy.status === 200);
+  comprobar('queda marcado', agotadoHoy.cuerpo?.datos?.agotado === true);
+  comprobar('con fecha de vuelta', Boolean(agotadoHoy.cuerpo?.datos?.agotado_hasta));
+
+  const cartaConAgotado = await fetch(`${BASE}/api/restaurantes/la-basilica/carta`).then((r) =>
+    r.json()
+  );
+  const platoAgotado = cartaConAgotado.datos.categorias
+    .flatMap((c) => c.platos)
+    .find((p) => p.carta_item_id === itemId);
+  comprobar(
+    'sigue saliendo en la carta publica, no se esconde',
+    Boolean(platoAgotado),
+    'ha desaparecido'
+  );
+  comprobar('y el cliente lo ve marcado como agotado', platoAgotado?.agotado === true);
+
+  // La fecha de vuelta se evalua al leer, asi que envejecerla en base de datos
+  // equivale a que haya pasado el dia.
+  await bd.execute(
+    'UPDATE carta_items SET agotado_hasta = NOW() - INTERVAL 1 HOUR WHERE id = ?',
+    [itemId]
+  );
+  const yaVolvio = await fetch(`${BASE}/api/restaurantes/la-basilica/carta`).then((r) => r.json());
+  comprobar(
+    'pasada la fecha vuelve solo, sin tocar nada',
+    yaVolvio.datos.categorias
+      .flatMap((c) => c.platos)
+      .find((p) => p.carta_item_id === itemId)?.agotado === false
+  );
+
+  const hastaFecha = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, {
+    agotado_hasta: '2099-01-01',
+  });
+  comprobar('se puede agotar hasta una fecha lejana', hastaFecha.cuerpo?.datos?.agotado === true);
+
+  const deshecho = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, {
+    agotado_hasta: null,
+  });
+  comprobar('y deshacerlo a mano', deshecho.cuerpo?.datos?.agotado === false);
+
+  const fechaInvalida = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemId}`, {
+    agotado_hasta: 'manana por la tarde',
+  });
+  comprobar('una fecha que no lo es se rechaza (400)', fechaInvalida.status === 400);
+
+  const cartaDeOtro = await admin.peticion('GET', '/api/admin/restaurantes/1/carta');
+  const itemDeOtro = cartaDeOtro.cuerpo.datos.categorias[0].items[0].id;
+  const agotarAjeno = await basilica.peticion('PATCH', `/api/admin/carta-items/${itemDeOtro}`, {
+    agotado_hasta: 'hoy',
+  });
+  comprobar('no se puede agotar un plato de otro local (404)', agotarAjeno.status === 404);
+
   // --------------------------------------------------- historico de precios
   seccion('Historico de precios');
 

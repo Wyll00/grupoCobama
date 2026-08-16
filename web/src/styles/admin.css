@@ -357,6 +357,31 @@
 
 .celda-plato { display: flex; align-items: center; gap: 0.6rem; }
 
+/* "Se acabo" se pulsa de pie en mitad del servicio: boton ancho y a un toque,
+   con la fecha detras del puntito para lo que pasa una vez al mes. */
+.agotado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.btn--agotar {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  border-color: var(--linea);
+  white-space: nowrap;
+}
+
+.btn--agotar:hover:not(:disabled) {
+  background: #f7e3e0;
+  border-color: var(--mojo-rojo);
+  color: var(--mojo-rojo);
+}
+
+.agotado .etiqueta-mini { margin-left: 0; }
+
 /* El nombre del plato dentro de la carta es un boton que abre su ficha, pero
    tiene que seguir leyendose como el titulo de la fila, no como un enlace. */
 .enlace-plato {
