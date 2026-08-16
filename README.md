@@ -521,7 +521,30 @@ borra de verdad una que esté vacía, y el panel lo dice en el propio botón.
 | Rol | Alcance |
 |---|---|
 | `admin_grupo` | Los cuatro locales, el catálogo maestro y los usuarios |
-| `encargado_local` | Solo su `restaurante_id`: activa platos, ajusta precios y reordena su carta |
+| `encargado_local` | Solo su `restaurante_id`: da de alta platos, ajusta precios, reordena su carta y gestiona sus reservas |
+
+### Quién puede tocar un plato
+
+El precio, si el plato está en carta y si va destacado son **de cada casa**: los
+cambia su encargado y punto. El nombre, la descripción, los alérgenos y la foto
+son **del catálogo compartido**, así que ahí la regla es por plato, no por rol:
+
+| Situación del plato | Quién lo edita |
+|---|---|
+| No lo sirve nadie todavía | Cualquiera |
+| Solo lo sirve un local | El encargado de ese local, y el admin |
+| Lo sirven dos o más | Solo el admin de grupo |
+
+Un encargado da de alta un plato nuevo desde **Cartas** → *Añadir plato* →
+*Crear un plato nuevo*, que es lo que pasa cuando entra un plato en su cocina.
+El plato nace sirviéndolo solo su casa, así que sigue siendo suyo para editarlo.
+En cuanto otro local lo añade a su carta pasa a mantenerlo la administración del
+grupo: renombrarlo se lo cambiaría a los demás.
+
+La regla vive en `ambitoPlato`
+([`api/src/middleware/auth.js`](api/src/middleware/auth.js)) y el panel la
+replica en [`web/src/admin/permisos.js`](web/src/admin/permisos.js) solo para no
+enseñar botones que van a responder 403. El límite de verdad está en la API.
 
 El límite se aplica en el middleware del backend
 ([`api/src/middleware/auth.js`](api/src/middleware/auth.js)), nunca solo en el

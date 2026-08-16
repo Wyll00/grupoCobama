@@ -54,12 +54,17 @@ export async function listar({ categoria, q, activo, pagina, porPagina }) {
   );
 
   const alergenos = await alergenosDe(filas.map((f) => f.id));
+  const cartas = await cartasDe(filas.map((f) => f.id));
 
   // Mismo envoltorio { datos } que el resto de la API, con la paginacion
   // aparte: si el listado devolviera sus campos en la raiz, seria el unico
   // endpoint con una forma distinta.
   return {
-    datos: filas.map((f) => ({ ...normalizar(f), alergenos: alergenos.get(f.id) ?? [] })),
+    datos: filas.map((f) => ({
+      ...normalizar(f),
+      alergenos: alergenos.get(f.id) ?? [],
+      ...(cartas.get(f.id) ?? { locales: 0, unico_restaurante_id: null }),
+    })),
     paginacion: {
       total,
       pagina: Number(pagina),
@@ -88,6 +93,10 @@ export async function obtener(id) {
   return {
     ...normalizar(plato),
     alergenos: alergenos.get(plato.id) ?? [],
+    // Cuantos locales lo sirven decide quien puede editarlo: un plato que solo
+    // esta en una carta es de ese local; en cuanto lo pone otro, es del grupo.
+    locales: enCartas.length,
+    unico_restaurante_id: enCartas.length === 1 ? enCartas[0].restaurante_id : null,
     en_cartas: enCartas.map((c) => ({
       ...c,
       activo: Boolean(c.activo),
@@ -188,6 +197,33 @@ async function sustituirAlergenos(conn, platoId, alergenos) {
     `INSERT INTO plato_alergenos (plato_id, alergeno_id) VALUES ${huecos}`,
     unicos.flatMap((a) => [platoId, a])
   );
+}
+
+/**
+ * En cuantas cartas esta cada plato, y en cual si solo esta en una. Lo usa el
+ * panel para saber que puede tocar un encargado sin tener que preguntar plato
+ * a plato.
+ */
+async function cartasDe(platoIds) {
+  const mapa = new Map();
+  if (platoIds.length === 0) return mapa;
+
+  const huecos = platoIds.map(() => '?').join(', ');
+  const [filas] = await pool.execute(
+    `SELECT plato_id, COUNT(*) AS locales, MIN(restaurante_id) AS unico
+       FROM carta_items
+      WHERE plato_id IN (${huecos})
+      GROUP BY plato_id`,
+    platoIds
+  );
+
+  for (const f of filas) {
+    mapa.set(f.plato_id, {
+      locales: Number(f.locales),
+      unico_restaurante_id: Number(f.locales) === 1 ? f.unico : null,
+    });
+  }
+  return mapa;
 }
 
 async function alergenosDe(platoIds) {

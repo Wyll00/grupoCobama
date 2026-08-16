@@ -33,6 +33,7 @@ const rastro = {
   ocupacionTramo: null,
   reservaId: null,
   reservaCodigo: null,
+  platoEncargadoId: null,
 };
 
 function comprobar(descripcion, condicion, detalle) {
@@ -435,14 +436,78 @@ async function main() {
       fichaDirecta.cuerpo.datos.en_cartas[0].restaurante_id === 4
   );
 
-  const directoComoEncargado = await basilica.peticion(
+  // Un encargado SI puede dar de alta un plato desde su carta: es lo que pasa
+  // cuando entra un plato nuevo en su cocina.
+  const nombreEncargado = `Plato del encargado ${Date.now()}`;
+  const platoEncargado = await basilica.peticion(
     'POST',
     '/api/admin/restaurantes/2/carta/nuevo-plato',
-    { categoria_id: 1, nombre: 'No deberia crearse', precio: 5 }
+    { categoria_id: 1, nombre: nombreEncargado, precio: 8.5 }
+  );
+  comprobar('un encargado crea un plato desde su carta (201)', platoEncargado.status === 201);
+  rastro.platoEncargadoId = platoEncargado.cuerpo?.datos?.plato_id;
+
+  const fichaEncargado = await basilica.peticion(
+    'GET',
+    `/api/admin/platos/${rastro.platoEncargadoId}`
   );
   comprobar(
-    'un encargado no crea platos nuevos ni desde su carta (403)',
-    directoComoEncargado.status === 403
+    'y nace sirviendolo solo su local',
+    fichaEncargado.cuerpo?.datos?.locales === 1 &&
+      fichaEncargado.cuerpo?.datos?.unico_restaurante_id === 2
+  );
+
+  const editaElSuyo = await basilica.peticion(
+    'PATCH',
+    `/api/admin/platos/${rastro.platoEncargadoId}`,
+    { descripcion: 'Corregido por el encargado' }
+  );
+  comprobar('puede editar el plato que solo sirve el (200)', editaElSuyo.status === 200);
+
+  // En cuanto otra casa lo pone en carta, deja de ser suyo.
+  await admin.peticion('POST', '/api/admin/restaurantes/4/carta', {
+    plato_id: rastro.platoEncargadoId,
+    precio: 9,
+  });
+  const yaCompartido = await basilica.peticion(
+    'PATCH',
+    `/api/admin/platos/${rastro.platoEncargadoId}`,
+    { nombre: 'Intento de renombrar algo compartido' }
+  );
+  comprobar(
+    'cuando lo sirve otra casa, ya no puede renombrarlo (403)',
+    yaCompartido.status === 403,
+    `llego ${yaCompartido.status}`
+  );
+
+  // El plato 1 (papas arrugadas) esta en las cuatro cartas: es del grupo.
+  const compartidoPorTodos = await basilica.peticion('PATCH', '/api/admin/platos/1', {
+    descripcion: 'No deberia poder',
+  });
+  comprobar(
+    'no puede editar un plato que sirven varias casas (403)',
+    compartidoPorTodos.status === 403,
+    compartidoPorTodos.cuerpo?.error?.mensaje
+  );
+
+  // El plato 9 (almogrote) solo lo sirve La Casa del Mago: es de esa casa.
+  const deOtraCasa = await basilica.peticion('PATCH', '/api/admin/platos/9', {
+    descripcion: 'No deberia poder',
+  });
+  comprobar(
+    'ni uno que solo sirve otra casa (403)',
+    deOtraCasa.status === 403,
+    deOtraCasa.cuerpo?.error?.mensaje
+  );
+
+  // Pero el que solo esta en su carta, si: aunque lo creara el admin.
+  const soloSuyo = await basilica.peticion('PATCH', `/api/admin/platos/${platoId}`, {
+    descripcion: 'Ajustado por el encargado',
+  });
+  comprobar(
+    'y si edita cualquiera que solo este en su carta (200)',
+    soloSuyo.status === 200,
+    `llego ${soloSuyo.status}`
   );
 
   const sinPrecio = await admin.peticion('POST', '/api/admin/restaurantes/4/carta/nuevo-plato', {
@@ -861,6 +926,15 @@ async function limpiar() {
       await pool.execute('DELETE FROM carta_items WHERE plato_id = ?', [rastro.platoNuevoId]);
       await pool.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [rastro.platoNuevoId]);
       await pool.execute('DELETE FROM platos WHERE id = ?', [rastro.platoNuevoId]);
+    }
+    if (rastro.platoEncargadoId) {
+      await pool.execute(
+        'DELETE hp FROM historico_precios hp JOIN carta_items ci ON ci.id = hp.carta_item_id WHERE ci.plato_id = ?',
+        [rastro.platoEncargadoId]
+      );
+      await pool.execute('DELETE FROM carta_items WHERE plato_id = ?', [rastro.platoEncargadoId]);
+      await pool.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [rastro.platoEncargadoId]);
+      await pool.execute('DELETE FROM platos WHERE id = ?', [rastro.platoEncargadoId]);
     }
     if (rastro.categoriaId) {
       await pool.execute('DELETE FROM categorias WHERE id = ?', [rastro.categoriaId]);

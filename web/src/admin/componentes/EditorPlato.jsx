@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi, ErrorApi } from '../api.js';
+import { useAuth } from '../auth.jsx';
+import { puedeEditarPlato, motivoNoEditable } from '../permisos.js';
 import { useDatos } from '../useDatos.js';
 import Modal from './Modal.jsx';
 import RecorteImagen from './RecorteImagen.jsx';
@@ -21,9 +23,10 @@ import {
  * desde Catalogo, para dar de alta y mantener el plato; y desde la carta de un
  * local, para corregir sobre la marcha lo que se vea mal sin salir de la carta.
  *
- * `soloLectura` bloquea los campos del catalogo, que son del grupo. El precio
- * por local no depende de eso: lo gobierna PreciosPorLocal segun el ambito de
- * cada usuario.
+ * Los campos del catalogo se bloquean segun quien sea el plato: un encargado
+ * edita los que solo sirve su casa, pero no los que comparten varias, porque
+ * el nombre es el mismo para todas. El precio por local no depende de eso: lo
+ * gobierna PreciosPorLocal segun el ambito de cada usuario.
  */
 const VACIO = {
   categoria_id: '',
@@ -38,7 +41,8 @@ const VACIO = {
   alergenos: [],
 };
 
-export default function EditorPlato({ id, soloLectura, onCerrar, onGuardado }) {
+export default function EditorPlato({ id, onCerrar, onGuardado }) {
+  const { esAdmin, localFijo } = useAuth();
   // Las categorias se piden aqui y no llegan por prop: se abre desde dos
   // pantallas y pasarlas de la mano era una fuente de errores, aparte de
   // acoplar cada pantalla a un dato que no es suyo.
@@ -57,6 +61,15 @@ export default function EditorPlato({ id, soloLectura, onCerrar, onGuardado }) {
   const [subiendo, setSubiendo] = useState(false);
 
   const plato = existente.datos;
+
+  // Quien puede tocar el plato se decide con el propio plato, no con el rol a
+  // secas: un encargado edita los suyos, pero no los que comparten varias
+  // casas. La API aplica la misma regla; esto solo evita ensenar botones que
+  // van a responder 403.
+  const soloLectura = esNuevo
+    ? !esAdmin
+    : !puedeEditarPlato(plato, { esAdmin, localFijo });
+  const motivo = plato ? motivoNoEditable(plato, { esAdmin, localFijo }) : null;
 
   useEffect(() => {
     if (!plato) return;
@@ -177,6 +190,7 @@ export default function EditorPlato({ id, soloLectura, onCerrar, onGuardado }) {
       }
     >
       <Aviso tipo="error">{error}</Aviso>
+      {motivo && <Aviso>Solo lectura. {motivo}</Aviso>}
       {existente.cargando && <p className="admin-cargando">Cargando...</p>}
 
       <fieldset disabled={soloLectura} className="formulario">

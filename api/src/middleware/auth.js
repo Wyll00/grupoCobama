@@ -69,6 +69,47 @@ export const ambitoLocal = (obtenerId = (req) => req.params.restauranteId) =>
   });
 
 /**
+ * Permite tocar un plato del catalogo del grupo.
+ *
+ * El admin siempre. Un encargado, solo si el plato lo sirve unicamente su
+ * local, o todavia ninguno.
+ *
+ * La razon es que el nombre, la descripcion, los alergenos y la foto son del
+ * catalogo COMPARTIDO: si La Basilica renombra las croquetas, se renombran en
+ * las cuatro casas. Un plato que solo sirve un local es suyo a todos los
+ * efectos y no hay motivo para que dependa de nadie; en cuanto lo sirve otro,
+ * pasa a ser del grupo.
+ */
+export const ambitoPlato = asyncHandler(async (req, res, next) => {
+  if (req.usuario.rol === 'admin_grupo') return next();
+
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw ApiError.peticionInvalida('Identificador de plato invalido');
+  }
+
+  const [filas] = await pool.execute(
+    `SELECT COUNT(*) AS locales,
+            MIN(restaurante_id) AS unico
+       FROM carta_items WHERE plato_id = ?`,
+    [id]
+  );
+
+  const { locales, unico } = filas[0];
+
+  if (locales > 1) {
+    throw ApiError.prohibido(
+      'Este plato lo sirven varios locales, asi que lo mantiene la administracion del grupo'
+    );
+  }
+  if (locales === 1 && unico !== req.usuario.restaurante_id) {
+    throw ApiError.prohibido('Este plato es de otro local');
+  }
+
+  next();
+});
+
+/**
  * Igual que ambitoCartaItem pero para una reserva: el local se deduce de la
  * propia reserva, no de la URL.
  */

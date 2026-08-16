@@ -3,11 +3,12 @@ import { useAuth } from '../auth.jsx';
 import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import EditorPlato from '../componentes/EditorPlato.jsx';
+import { puedeEditarPlato } from '../permisos.js';
 import Categorias from '../componentes/Categorias.jsx';
 import { Aviso, Boton, Entrada, Seleccion } from '../componentes/Campos.jsx';
 
 export default function Platos() {
-  const { esAdmin } = useAuth();
+  const { esAdmin, localFijo } = useAuth();
 
   const [filtros, setFiltros] = useState({ q: '', categoria: '', activo: 'todos', pagina: 1 });
   const [busqueda, setBusqueda] = useState('');
@@ -51,8 +52,10 @@ export default function Platos() {
 
       {!esAdmin && (
         <Aviso>
-          Solo lectura: el catalogo lo mantiene la administracion del grupo. Desde{' '}
-          <strong>Cartas</strong> puedes anadir cualquiera de estos platos a tu local.
+          Aqui estan los platos de las cuatro casas. Puedes editar los que solo sirvas tu;
+          los que comparten varios locales los mantiene la administracion del grupo,
+          porque el nombre y la descripcion son los mismos para todos. Para dar de alta
+          uno nuevo, ve a <strong>Cartas</strong> → <strong>Anadir plato</strong>.
         </Aviso>
       )}
 
@@ -143,7 +146,7 @@ export default function Platos() {
                 </td>
                 <td className="tabla__derecha">
                   <button type="button" className="enlace" onClick={() => setEditando(plato.id)}>
-                    {esAdmin ? 'Editar' : 'Ver'}
+                    {puedeEditarPlato(plato, { esAdmin, localFijo }) ? 'Editar' : 'Ver'}
                   </button>
                 </td>
               </tr>
@@ -186,7 +189,6 @@ export default function Platos() {
       {editando && (
         <EditorPlato
           id={editando === 'nuevo' ? null : editando}
-          soloLectura={!esAdmin}
           onCerrar={() => setEditando(null)}
           onGuardado={() => {
             setEditando(null);

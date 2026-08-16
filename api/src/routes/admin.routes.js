@@ -8,6 +8,7 @@ import {
   ambitoLocal,
   ambitoCartaItem,
   ambitoReserva,
+  ambitoPlato,
 } from '../middleware/auth.js';
 import { manejarSubida } from '../middleware/subida.js';
 
@@ -62,16 +63,18 @@ adminRouter.post(
   validarCuerpo(crearPlatoSchema),
   asyncHandler(platosCtrl.postPlato)
 );
+// Editar, retirar y poner foto: el admin siempre; un encargado solo si el
+// plato lo sirve nada mas que su local. Ver ambitoPlato.
 adminRouter.patch(
   '/platos/:id',
-  soloAdmin,
+  ambitoPlato,
   validarCuerpo(actualizarPlatoSchema),
   asyncHandler(platosCtrl.patchPlato)
 );
-adminRouter.delete('/platos/:id', soloAdmin, asyncHandler(platosCtrl.deletePlato));
+adminRouter.delete('/platos/:id', ambitoPlato, asyncHandler(platosCtrl.deletePlato));
 
-adminRouter.post('/platos/:id/imagen', soloAdmin, manejarSubida, asyncHandler(platosCtrl.postImagen));
-adminRouter.delete('/platos/:id/imagen', soloAdmin, asyncHandler(platosCtrl.deleteImagen));
+adminRouter.post('/platos/:id/imagen', ambitoPlato, manejarSubida, asyncHandler(platosCtrl.postImagen));
+adminRouter.delete('/platos/:id/imagen', ambitoPlato, asyncHandler(platosCtrl.deleteImagen));
 
 // ---------------------------------------------------------------------------
 // Carta por local
@@ -102,11 +105,12 @@ adminRouter.put(
   asyncHandler(cartaCtrl.putOrden)
 );
 
-// Alta de un plato que no existe todavia, desde la propia carta. Toca el
-// catalogo del grupo, asi que sigue siendo cosa del admin.
+// Alta de un plato que no existe todavia, desde la propia carta. Lo puede
+// hacer el encargado: es lo que pasa cuando entra un plato nuevo en su cocina.
+// El plato nace sirviendolo solo su local, asi que sigue siendo suyo para
+// editarlo mientras nadie mas lo ponga en carta.
 adminRouter.post(
   '/restaurantes/:restauranteId/carta/nuevo-plato',
-  soloAdmin,
   ambitoLocal(),
   validarCuerpo(crearPlatoEnCartaSchema),
   asyncHandler(cartaCtrl.postPlatoNuevo)

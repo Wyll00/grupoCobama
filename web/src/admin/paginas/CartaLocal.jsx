@@ -246,7 +246,6 @@ export default function CartaLocal() {
       {editandoPlato && (
         <EditorPlato
           id={editandoPlato}
-          soloLectura={!esAdmin}
           onCerrar={() => setEditandoPlato(null)}
           onGuardado={() => {
             setEditandoPlato(null);
@@ -270,29 +269,26 @@ export default function CartaLocal() {
  * Crear toca el catalogo del grupo, asi que ese camino solo lo ve el admin.
  */
 function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
-  const { esAdmin } = useAuth();
   const [modo, setModo] = useState('catalogo');
 
   return (
     <Modal titulo={`Anadir plato a ${nombreLocal ?? 'la carta'}`} onCerrar={onCerrar} ancho="680px">
-      {esAdmin && (
-        <div className="pestanas-modal">
-          <button
-            type="button"
-            className={`pestana ${modo === 'catalogo' ? 'pestana--activa' : ''}`}
-            onClick={() => setModo('catalogo')}
-          >
-            Del catalogo del grupo
-          </button>
-          <button
-            type="button"
-            className={`pestana ${modo === 'nuevo' ? 'pestana--activa' : ''}`}
-            onClick={() => setModo('nuevo')}
-          >
-            Crear un plato nuevo
-          </button>
-        </div>
-      )}
+      <div className="pestanas-modal">
+        <button
+          type="button"
+          className={`pestana ${modo === 'catalogo' ? 'pestana--activa' : ''}`}
+          onClick={() => setModo('catalogo')}
+        >
+          Del catalogo del grupo
+        </button>
+        <button
+          type="button"
+          className={`pestana ${modo === 'nuevo' ? 'pestana--activa' : ''}`}
+          onClick={() => setModo('nuevo')}
+        >
+          Crear un plato nuevo
+        </button>
+      </div>
 
       {modo === 'catalogo' ? (
         <DesdeCatalogo localId={localId} onCerrar={onCerrar} onHecho={onHecho} />
@@ -451,8 +447,10 @@ function PlatoNuevo({ localId, onCerrar, onHecho }) {
     <>
       <Aviso tipo="error">{error}</Aviso>
       <Aviso>
-        El plato se da de alta en el catalogo del grupo y entra en esta carta. Las otras
-        casas podran anadirlo cuando quieran, cada una a su precio.
+        El plato se da de alta en el catalogo del grupo y entra en esta carta. Mientras
+        solo lo sirvas tu, es tuyo y puedes editarlo. Si otra casa lo anade a su carta,
+        pasa a mantenerlo la administracion del grupo, porque el nombre y la descripcion
+        son los mismos para todos.
       </Aviso>
 
       <div className="formulario__fila">
