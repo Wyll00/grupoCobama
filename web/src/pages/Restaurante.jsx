@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
+import BarraReserva from '../components/BarraReserva.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
@@ -34,8 +35,22 @@ export default function Restaurante() {
           <EstadoApertura abierto={local.abierto_ahora} />
           <p style={{ marginTop: '1rem' }}>{local.descripcion}</p>
 
+          {/*
+            Reservar es la accion principal y lleva al formulario con este
+            local ya elegido. Antes solo habia WhatsApp aqui, asi que desde la
+            ficha de un local no habia forma de llegar al formulario.
+            WhatsApp se queda como alternativa, que es como reserva mucha
+            gente, pero deja de ser el unico camino.
+          */}
           <div className="ficha__acciones">
-            <Link className="boton boton--principal" to={`/${local.slug}/carta`}>
+            <Link className="boton boton--principal" to={`/reservar?local=${local.slug}`}>
+              Reservar mesa
+            </Link>
+            <Link
+              className="boton boton--secundario"
+              style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
+              to={`/${local.slug}/carta`}
+            >
               Ver la carta
             </Link>
             <a
@@ -43,7 +58,7 @@ export default function Restaurante() {
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
               href={enlaceWhatsApp(`Hola, me gustaria reservar mesa en ${local.nombre}.`)}
             >
-              Reservar por WhatsApp
+              WhatsApp
             </a>
             {local.telefono && (
               <a
@@ -117,6 +132,8 @@ export default function Restaurante() {
           </div>
         </section>
       )}
+
+      <BarraReserva local={local} />
     </>
   );
 }

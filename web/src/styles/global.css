@@ -814,3 +814,44 @@ button {
 }
 
 .app > main { flex: 1; }
+
+/* ------------------------------------------- barra fija de reserva --- */
+
+/*
+  Solo en movil. En escritorio los botones de la cabecera se ven sin
+  desplazarse y una barra flotante nada mas tapa contenido.
+*/
+.barra-reserva { display: none; }
+
+@media (max-width: 767px) {
+  .barra-reserva {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom));
+    background: rgba(250, 246, 240, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--borde);
+  }
+
+  .barra-reserva__principal {
+    flex: 1;
+    /* Alto de dedo. */
+    min-height: 3rem;
+  }
+
+  .barra-reserva__telefono {
+    min-height: 3rem;
+    background: #fff;
+  }
+
+  /*
+    Hueco al final para que la barra no tape lo ultimo de la pagina: el aviso
+    de alergenos de la carta y los menus de grupo de la ficha caen justo ahi.
+  */
+  .app > main { padding-bottom: 4.5rem; }
+}

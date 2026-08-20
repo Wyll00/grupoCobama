@@ -5,6 +5,7 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
+import BarraReserva from '../components/BarraReserva.jsx';
 
 export default function Carta() {
   const { slug } = useParams();
@@ -227,6 +228,8 @@ export default function Carta() {
           </div>
         </div>
       </section>
+
+      <BarraReserva local={local.datos} />
     </>
   );
 }

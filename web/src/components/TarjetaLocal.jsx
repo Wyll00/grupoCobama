@@ -26,12 +26,17 @@ export default function TarjetaLocal({ local }) {
           {local.tiene_parking && ' · Parking propio'}
         </p>
 
+        {/*
+          Reservar va primero y con el local ya elegido: desde la tarjeta, la
+          persona ya ha decidido a cual quiere ir. El nombre de arriba sigue
+          llevando a la ficha, asi que no hace falta un boton para eso.
+        */}
         <div className="tarjeta__acciones">
-          <Link className="boton boton--principal" to={`/${local.slug}/carta`}>
-            Ver la carta
+          <Link className="boton boton--principal" to={`/reservar?local=${local.slug}`}>
+            Reservar
           </Link>
-          <Link className="boton boton--secundario" to={`/${local.slug}`}>
-            El local
+          <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
+            Ver la carta
           </Link>
           {local.telefono && (
             <a className="boton boton--secundario" href={enlaceTelefono(local.telefono)}>
