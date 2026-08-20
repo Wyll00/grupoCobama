@@ -28,3 +28,7 @@ $null
 # Sin esta linea, un "git add -A" la anadiria aqui como gitlink: una referencia
 # a un commit en vez de los ficheros, y queda un submodulo que nadie clona.
 La Basilica/
+
+# Fotos originales de portada: pesan y son material con derechos.
+fotos/*
+!fotos/LEEME.md

@@ -15,7 +15,8 @@
     "db:seed": "node scripts/db.js seed",
     "db:setup": "node scripts/db.js setup",
     "db:estado": "node scripts/db.js estado",
-    "db:adoptar": "node scripts/db.js adoptar"
+    "db:adoptar": "node scripts/db.js adoptar",
+    "portadas": "node scripts/subir-portadas.js"
   },
   "engines": {
     "node": ">=20"
