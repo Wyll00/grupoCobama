@@ -581,6 +581,31 @@ desactivar el último admin activo ni el propio usuario.
 
 ---
 
+## Foto de portada de cada local
+
+La cabecera de la ficha de un local puede llevar una foto de fondo, atenuada,
+con el nombre encima. Se sube desde **Inicio** en el panel, en la tarjeta del
+local: *Poner foto de portada*. Se recorta en panorámico y se guarda en
+1920×1000 WebP.
+
+La capa oscura que va encima **no es decorativa**: sin ella el nombre en crema
+sobre una foto clara deja de leerse, y el contraste de texto sobre imagen es lo
+primero que se rompe al meter fotos en una cabecera. Va más cerrada por la
+izquierda, donde cae el texto, y más abierta a la derecha para que la foto se
+vea.
+
+Sin foto la cabecera tampoco queda plana: lleva un resplandor cálido del ocre de
+la marca, que da profundidad sin fingir que hay una imagen.
+
+> **Tiene que ser una foto vuestra.** Una imagen sacada de internet en una web
+> comercial expone al grupo a una reclamación de derechos, por muy fácil que sea
+> descargarla. Sirve una foto propia del local o de la sesión de fotografía
+> —decisión 4 del plan—. En cuanto haya archivos, se suben desde el panel y ya
+> aparecen también en la vista previa al compartir el enlace, que hoy sale sin
+> imagen por esto mismo.
+
+---
+
 ## Imágenes de plato
 
 Se suben en memoria (`multer`), se procesan con `sharp` y **el original nunca se

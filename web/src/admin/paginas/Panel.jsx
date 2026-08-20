@@ -3,6 +3,7 @@ import { useAuth } from '../auth.jsx';
 import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import { Aviso } from '../componentes/Campos.jsx';
+import PortadaLocal from '../componentes/PortadaLocal.jsx';
 
 export default function Panel() {
   const { usuario, esAdmin, localFijo } = useAuth();
@@ -36,6 +37,16 @@ export default function Panel() {
               </span>
             </header>
             <p className="apagado">{local.municipio}</p>
+            {/* Miniatura de la portada: se ve de un vistazo cual de los cuatro
+                locales todavia no tiene foto. */}
+            {local.imagen_portada ? (
+              <img className="tarjeta-panel__portada" src={local.imagen_portada} alt="" />
+            ) : (
+              <div className="tarjeta-panel__portada tarjeta-panel__portada--vacia">
+                Sin foto de portada
+              </div>
+            )}
+
             <div className="tarjeta-panel__acciones">
               <Link className="btn btn--principal" to={`/admin/carta?local=${local.id}`}>
                 Gestionar carta
@@ -48,6 +59,7 @@ export default function Panel() {
               >
                 Ver publica
               </a>
+              <PortadaLocal local={local} onCambio={() => locales.recargar()} />
             </div>
           </article>
         ))}

@@ -300,9 +300,47 @@ button {
 /* -------------------------------------------------- ficha local ----- */
 
 .ficha__cabecera {
+  position: relative;
   background: var(--carbon);
   color: var(--crema);
   padding-block: clamp(2.5rem, 7vw, 4rem);
+  /*
+    Sin foto tampoco se queda plano: un resplandor calido muy suave desde
+    arriba a la izquierda, del mismo ocre de la marca, que le da profundidad
+    sin fingir que hay una imagen.
+  */
+  background-image: radial-gradient(
+    120% 90% at 12% 0%,
+    rgba(192, 125, 42, 0.16) 0%,
+    rgba(192, 125, 42, 0) 60%
+  );
+}
+
+.ficha__cabecera--con-foto {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/*
+  Capa oscura sobre la foto. Sin ella, el nombre en crema sobre una foto clara
+  no se lee, y el contraste de texto sobre imagen es justo lo que se rompe al
+  meter fotos en una cabecera. Mas oscura por la izquierda, que es donde cae
+  el texto, y mas abierta a la derecha para que la foto se vea.
+*/
+.ficha__cabecera--con-foto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(31, 26, 23, 0.94) 0%, rgba(31, 26, 23, 0.82) 45%, rgba(31, 26, 23, 0.6) 100%),
+    linear-gradient(0deg, rgba(31, 26, 23, 0.55) 0%, rgba(31, 26, 23, 0) 55%);
+}
+
+/* El contenido, por encima de la capa. */
+.ficha__cabecera > .contenedor {
+  position: relative;
+  z-index: 1;
 }
 
 .ficha__cabecera h1 { color: var(--crema); }

@@ -35,6 +35,7 @@ import * as usuariosCtrl from '../controllers/admin.usuarios.controller.js';
 import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 import * as reservasCtrl from '../controllers/reservas.controller.js';
+import * as localesCtrl from '../controllers/admin.locales.controller.js';
 import {
   crearReservaManualSchema,
   actualizarReservaSchema,
@@ -114,6 +115,19 @@ adminRouter.post(
   ambitoLocal(),
   validarCuerpo(crearPlatoEnCartaSchema),
   asyncHandler(cartaCtrl.postPlatoNuevo)
+);
+
+// Foto de portada del local, la que va de fondo en la cabecera de su ficha.
+adminRouter.post(
+  '/restaurantes/:restauranteId/portada',
+  ambitoLocal(),
+  manejarSubida,
+  asyncHandler(localesCtrl.postPortada)
+);
+adminRouter.delete(
+  '/restaurantes/:restauranteId/portada',
+  ambitoLocal(),
+  asyncHandler(localesCtrl.deletePortada)
 );
 
 // QR de la carta publica del local, para imprimir o publicar.

@@ -34,6 +34,7 @@ const rastro = {
   reservaId: null,
   reservaCodigo: null,
   platoEncargadoId: null,
+  portadaLocal: null,
 };
 
 function comprobar(descripcion, condicion, detalle) {
@@ -515,6 +516,63 @@ async function main() {
     nombre: 'Sin precio ninguno',
   });
   comprobar('crear sin precio se rechaza (400)', sinPrecio.status === 400);
+
+  // -------------------------------------------------- portada del local
+  seccion('Foto de portada del local');
+
+  const portadaJpeg = await sharp({
+    create: { width: 2400, height: 1400, channels: 3, background: { r: 90, g: 70, b: 55 } },
+  })
+    .jpeg()
+    .toBuffer();
+
+  const formPortada = new FormData();
+  formPortada.append('imagen', new Blob([portadaJpeg], { type: 'image/jpeg' }), 'portada.jpg');
+
+  const subidaPortada = await fetch(`${BASE}/api/admin/restaurantes/2/portada`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${basilica.acceso}` },
+    body: formPortada,
+  });
+  const portadaJson = await subidaPortada.json().catch(() => null);
+  comprobar('el encargado sube la portada de su local (200)', subidaPortada.status === 200);
+  comprobar(
+    'se guarda la ruta',
+    portadaJson?.datos?.imagen_portada?.startsWith('/uploads/portadas/') === true,
+    portadaJson?.datos?.imagen_portada
+  );
+  rastro.portadaLocal = portadaJson?.datos?.imagen_portada;
+
+  if (rastro.portadaLocal) {
+    const bajada = await fetch(`${BASE}${rastro.portadaLocal}`);
+    const meta = await sharp(Buffer.from(await bajada.arrayBuffer())).metadata();
+    comprobar(
+      'sale panoramica en 1920x1000 y en webp',
+      meta.width === 1920 && meta.height === 1000 && meta.format === 'webp',
+      `${meta.format} ${meta.width}x${meta.height}`
+    );
+  }
+
+  const enPublica = await fetch(`${BASE}/api/restaurantes/la-basilica`).then((r) => r.json());
+  comprobar(
+    'la ficha publica la devuelve',
+    enPublica.datos?.imagen_portada === rastro.portadaLocal
+  );
+
+  const portadaAjena = await fetch(`${BASE}/api/admin/restaurantes/4/portada`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${basilica.acceso}` },
+    body: (() => {
+      const f = new FormData();
+      f.append('imagen', new Blob([portadaJpeg], { type: 'image/jpeg' }), 'x.jpg');
+      return f;
+    })(),
+  });
+  comprobar('un encargado no pone la portada de otro local (403)', portadaAjena.status === 403);
+
+  const quitada = await basilica.peticion('DELETE', '/api/admin/restaurantes/2/portada');
+  comprobar('se puede quitar la portada', quitada.cuerpo?.datos?.imagen_portada === null);
+  rastro.portadaLocal = null;
 
   // ---------------------------------------------------------------- QR
   seccion('QR de la carta');

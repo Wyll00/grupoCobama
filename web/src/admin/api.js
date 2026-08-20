@@ -140,6 +140,12 @@ export const adminApi = {
     enviar('POST', `/admin/restaurantes/${restauranteId}/carta/nuevo-plato`, { cuerpo: datos }),
   qr: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/qr`),
 
+  // --- portada del local --------------------------------------------------
+  subirPortada: (restauranteId, formData) =>
+    enviar('POST', `/admin/restaurantes/${restauranteId}/portada`, { formData }),
+  quitarPortada: (restauranteId) =>
+    enviar('DELETE', `/admin/restaurantes/${restauranteId}/portada`),
+
   // --- reservas -----------------------------------------------------------
   reservas: (restauranteId, filtros = {}) => {
     const query = new URLSearchParams(

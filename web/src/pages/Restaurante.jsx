@@ -28,7 +28,20 @@ export default function Restaurante() {
 
   return (
     <>
-      <section className="ficha__cabecera">
+      {/*
+        La foto va de fondo, atenuada y con degradado encima. La capa no es
+        decorativa: sin ella el texto blanco sobre una foto clara se vuelve
+        ilegible, y el contraste es lo primero que se pierde al meter imagenes
+        en una cabecera.
+      */}
+      <section
+        className={`ficha__cabecera ${local.imagen_portada ? 'ficha__cabecera--con-foto' : ''}`}
+        style={
+          local.imagen_portada
+            ? { backgroundImage: `url(${local.imagen_portada})` }
+            : undefined
+        }
+      >
         <div className="contenedor">
           <p className="tarjeta__municipio">{local.municipio}</p>
           <h1>{local.nombre}</h1>

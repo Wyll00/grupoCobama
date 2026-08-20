@@ -1058,3 +1058,31 @@
   font-size: 0.88rem;
   color: var(--texto-suave);
 }
+
+/* Miniatura de la portada en la tarjeta de cada local del panel. */
+.tarjeta-panel__portada {
+  width: 100%;
+  aspect-ratio: 1920 / 1000;
+  object-fit: cover;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--linea);
+  margin-top: 0.75rem;
+}
+
+.tarjeta-panel__portada--vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  background: var(--crema-hueso);
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+
+.portada {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.portada .btn { flex: 1; cursor: pointer; }

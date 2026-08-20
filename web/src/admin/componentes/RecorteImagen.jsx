@@ -1,16 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Boton } from './Campos.jsx';
 
-// Las fichas de plato se muestran en 4:3, asi que el recorte fuerza esa
-// proporcion. Si se dejara libre, cada foto llegaria con una distinta y la
-// carta se veria irregular.
-const PROPORCION = 4 / 3;
+// Las fichas de plato se muestran en 4:3 y las portadas de local en
+// panoramico. El recorte fuerza la proporcion que toque: si se dejara libre,
+// cada foto llegaria con una distinta y las cartas y cabeceras se verian
+// irregulares.
+const PROPORCION_PLATO = 4 / 3;
 
 /**
  * Selector de recorte. Devuelve el rectangulo en pixeles de la imagen
  * ORIGINAL, que es lo que espera sharp en el servidor.
  */
-export default function RecorteImagen({ fichero, onConfirmar, onCancelar, enviando }) {
+export default function RecorteImagen({
+  fichero,
+  onConfirmar,
+  onCancelar,
+  enviando,
+  proporcion = PROPORCION_PLATO,
+  nota,
+}) {
+  const PROPORCION = proporcion;
   const [url, setUrl] = useState(null);
   const [original, setOriginal] = useState(null);
   const [caja, setCaja] = useState(null);
@@ -25,7 +34,7 @@ export default function RecorteImagen({ fichero, onConfirmar, onCancelar, envian
     return () => URL.revokeObjectURL(objectUrl);
   }, [fichero]);
 
-  // Recorte mas grande posible en 4:3, centrado.
+  // Recorte mas grande posible en la proporcion pedida, centrado.
   const cajaMaxima = useMemo(() => {
     if (!original) return null;
     const { ancho, alto } = original;
@@ -33,7 +42,7 @@ export default function RecorteImagen({ fichero, onConfirmar, onCancelar, envian
     return anchoPorAlto <= ancho
       ? { ancho: Math.floor(anchoPorAlto), alto }
       : { ancho, alto: Math.floor(ancho / PROPORCION) };
-  }, [original]);
+  }, [original, PROPORCION]);
 
   const alCargar = (e) => {
     const { naturalWidth: ancho, naturalHeight: alto } = e.currentTarget;
@@ -147,8 +156,8 @@ export default function RecorteImagen({ fichero, onConfirmar, onCancelar, envian
           </label>
 
           <p className="recorte__nota">
-            Se guardara en 4:3, convertida a WebP, en dos tamanos: 1200×900 para la
-            ficha y 400×300 para los listados.
+            {nota ??
+              'Se guardara en 4:3, convertida a WebP, en dos tamanos: 1200x900 para la ficha y 400x300 para los listados.'}
           </p>
         </>
       )}
