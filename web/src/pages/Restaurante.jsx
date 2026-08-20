@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
+import BotonReservar from '../components/BotonReservar.jsx';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
@@ -56,9 +57,7 @@ export default function Restaurante() {
             gente, pero deja de ser el unico camino.
           */}
           <div className="ficha__acciones">
-            <Link className="boton boton--principal" to={`/reservar?local=${local.slug}`}>
-              Reservar mesa
-            </Link>
+            <BotonReservar local={local} />
             <Link
               className="boton boton--secundario"
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}

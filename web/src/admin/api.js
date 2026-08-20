@@ -159,6 +159,8 @@ export const adminApi = {
   crearReserva: (restauranteId, datos) =>
     enviar('POST', `/admin/restaurantes/${restauranteId}/reservas`, { cuerpo: datos }),
   editarReserva: (id, datos) => enviar('PATCH', `/admin/reservas/${id}`, { cuerpo: datos }),
+  editarLocal: (id, datos) => enviar('PATCH', `/admin/restaurantes/${id}`, { cuerpo: datos }),
+
   reenviarCoverManager: (id) =>
     enviar('POST', `/admin/reservas/${id}/reenviar-covermanager`),
 

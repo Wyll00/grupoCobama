@@ -1171,3 +1171,37 @@
 .cm--error .cm__etiqueta {
   color: #b3261e;
 }
+
+/* ------------------------------------------ reservas fuera de aqui --- */
+
+.reservas-externas {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--linea);
+}
+
+/* Ambar y no rojo: no esta roto, es una decision. Pero tiene consecuencias
+   que no se ven hasta que alguien busca una reserva que no esta. */
+.reservas-externas__aviso {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #b8860b;
+  background: rgba(184, 134, 11, 0.09);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.reservas-externas__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b3261e;
+}
+
+.reservas-externas__ok {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #2f7d4f;
+}

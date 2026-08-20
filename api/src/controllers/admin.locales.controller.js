@@ -12,6 +12,33 @@ async function obtener(id) {
   return filas[0];
 }
 
+/**
+ * Ajustes del local. De momento solo la direccion del boton de reservar.
+ *
+ * Devuelve la fila entera para que el panel se refresque con lo que hay
+ * guardado de verdad y no con lo que el formulario cree haber mandado.
+ */
+export async function patchLocal(req, res) {
+  const campos = [];
+  const valores = [];
+
+  if (req.body.url_reservas !== undefined) {
+    campos.push('url_reservas = ?');
+    valores.push(req.body.url_reservas);
+  }
+
+  if (campos.length > 0) {
+    valores.push(req.restauranteId);
+    await pool.execute(`UPDATE restaurantes SET ${campos.join(', ')} WHERE id = ?`, valores);
+  }
+
+  const [filas] = await pool.execute(
+    'SELECT id, slug, nombre, url_reservas FROM restaurantes WHERE id = ? LIMIT 1',
+    [req.restauranteId]
+  );
+  res.json({ datos: filas[0] });
+}
+
 export async function postPortada(req, res) {
   if (!req.file) throw ApiError.peticionInvalida('No se ha recibido ninguna imagen');
 

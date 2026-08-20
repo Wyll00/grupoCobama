@@ -782,6 +782,49 @@ del cliente, el problema no desaparece por no tener campo.
 
 ---
 
+## Reservar fuera de aquí
+
+Cada local decide adónde lleva su botón de reservar, desde **Inicio** en el
+panel. Vacío → el formulario de la web. Con una dirección → ahí fuera (el widget
+de CoverManager, TheFork, lo que sea).
+
+Va por local y no en una variable de entorno porque las cuatro casas no tienen
+por qué ir a la vez: se puede probar en una, dejar las otras como están, y
+volver atrás borrando el campo.
+
+### Lo que se pierde, y por qué el panel lo avisa
+
+Una reserva hecha fuera **no existe en esta aplicación**. No sale en la bandeja,
+no llega el aviso al local y no cuenta para el histórico. Parece un ajuste sin
+consecuencias y no lo es, así que el panel lo dice en ámbar en cuanto está
+puesto. Sin ese aviso, es una trampa que se descubre semanas después, cuando
+alguien busca una reserva que no está.
+
+### Solo http y https
+
+La comprobación del protocolo no es cosmética. El valor lo escribe una persona
+en el panel y acaba dentro de un `href` que pulsa cualquier visitante: con un
+`javascript:` ahí, un encargado —o quien le robe la sesión— ejecuta código en el
+navegador de todos los clientes de ese local.
+
+Se valida en el servidor y por **lista blanca**, no prohibiendo `javascript:` a
+mano: eso dejaría fuera `data:`, `vbscript:` y los que vengan mañana. Los enlaces
+externos llevan `rel="noopener"`, sin el cual la página de destino puede
+redirigir la nuestra desde `window.opener`.
+
+### Un solo sitio donde se decide
+
+Hay cuatro botones de reservar: portada, tarjeta de local, ficha y barra de
+móvil. Todos pasan por `BotonReservar`. Repartida, la decisión se olvida en uno
+de ellos y ese botón sigue llevando al formulario cuando ya no debe — el cliente
+reserva por un sitio que el local ha dejado de mirar.
+
+El formulario también lo comprueba: si eliges del desplegable un local que
+reserva fuera, desaparecen los campos y sale el enlace. El enlace «Reservar» de
+la cabecera es del grupo, no de un local, así que ese sigue yendo al formulario.
+
+---
+
 ## Alérgenos
 
 Los 14 de declaración obligatoria (Reglamento UE 1169/2011, Anexo II) viven en

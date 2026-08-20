@@ -4,6 +4,7 @@ import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import { Aviso } from '../componentes/Campos.jsx';
 import PortadaLocal from '../componentes/PortadaLocal.jsx';
+import ReservasExternas from '../componentes/ReservasExternas.jsx';
 
 export default function Panel() {
   const { usuario, esAdmin, localFijo } = useAuth();
@@ -60,6 +61,7 @@ export default function Panel() {
                 Ver publica
               </a>
               <PortadaLocal local={local} onCambio={() => locales.recargar()} />
+              <ReservasExternas local={local} onCambio={() => locales.recargar()} />
             </div>
           </article>
         ))}

@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { enlaceTelefono } from '../datos/grupo.js';
+import BotonReservar from './BotonReservar.jsx';
 
 /**
  * Barra fija de reserva, solo en movil.
@@ -17,9 +17,7 @@ export default function BarraReserva({ local }) {
 
   return (
     <div className="barra-reserva">
-      <Link className="boton boton--principal barra-reserva__principal" to={`/reservar?local=${local.slug}`}>
-        Reservar mesa
-      </Link>
+      <BotonReservar local={local} className="boton boton--principal barra-reserva__principal" />
 
       {local.telefono && (
         <a

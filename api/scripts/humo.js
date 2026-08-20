@@ -564,6 +564,53 @@ async function main() {
   comprobar('crear sin precio se rechaza (400)', sinPrecio.status === 400);
 
   // -------------------------------------------------- portada del local
+  // ---------------------------------------------- reservar en otro sistema
+  seccion('Boton de reservar apuntando fuera');
+
+  // Este valor lo escribe un encargado en el panel y acaba dentro de un href
+  // que pulsa cualquier cliente. Si entrara un javascript:, seria ejecucion de
+  // codigo en el navegador de todos los que reserven en ese local.
+  const urlPeligrosa = await admin.peticion('PATCH', '/api/admin/restaurantes/2', {
+    url_reservas: 'javascript:alert(document.cookie)',
+  });
+  comprobar('una url javascript: se rechaza (400)', urlPeligrosa.status === 400);
+
+  const urlData = await admin.peticion('PATCH', '/api/admin/restaurantes/2', {
+    url_reservas: 'data:text/html,<script>1</script>',
+  });
+  comprobar('una url data: se rechaza (400)', urlData.status === 400);
+
+  const urlSuelta = await admin.peticion('PATCH', '/api/admin/restaurantes/2', {
+    url_reservas: 'covermanager.com/algo',
+  });
+  comprobar('una direccion sin protocolo se rechaza (400)', urlSuelta.status === 400);
+
+  const urlDeOtroLocal = await basilica.peticion('PATCH', '/api/admin/restaurantes/1', {
+    url_reservas: 'https://ejemplo.es',
+  });
+  comprobar('un encargado no toca el boton de otro local (403)', urlDeOtroLocal.status === 403);
+
+  const urlBuena = await admin.peticion('PATCH', '/api/admin/restaurantes/2', {
+    url_reservas: 'https://www.covermanager.com/reserve/prueba-humo',
+  });
+  comprobar('una url https se acepta (200)', urlBuena.status === 200);
+
+  const publicaConUrl = await (await fetch(`${BASE}/api/restaurantes/la-basilica`)).json();
+  comprobar(
+    'la web publica ve adonde tiene que llevar el boton',
+    publicaConUrl.datos?.url_reservas === 'https://www.covermanager.com/reserve/prueba-humo',
+    publicaConUrl.datos?.url_reservas
+  );
+
+  // Y se tiene que poder volver atras: vaciarlo devuelve el boton al
+  // formulario de la web. Si no se pudiera, mandar las reservas fuera seria
+  // un viaje de ida.
+  const urlVacia = await admin.peticion('PATCH', '/api/admin/restaurantes/2', {
+    url_reservas: '',
+  });
+  comprobar('vaciarlo lo deja a null (200)', urlVacia.status === 200);
+  comprobar('y vuelve al formulario propio', urlVacia.cuerpo?.datos?.url_reservas === null);
+
   seccion('Foto de portada del local');
 
   const portadaJpeg = await sharp({

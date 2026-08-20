@@ -36,6 +36,7 @@ import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
+import { actualizarLocalSchema } from '../esquemas/locales.js';
 import {
   crearReservaManualSchema,
   actualizarReservaSchema,
@@ -123,6 +124,14 @@ adminRouter.post(
   ambitoLocal(),
   validarCuerpo(crearPlatoEnCartaSchema),
   asyncHandler(cartaCtrl.postPlatoNuevo)
+);
+
+// Ajustes del local. Mismo ambito que la portada: un encargado toca el suyo.
+adminRouter.patch(
+  '/restaurantes/:restauranteId',
+  ambitoLocal(),
+  validarCuerpo(actualizarLocalSchema),
+  asyncHandler(localesCtrl.patchLocal)
 );
 
 // Foto de portada del local, la que va de fondo en la cabecera de su ficha.

@@ -65,7 +65,7 @@ export default function RevisionAlergenos({ plato, soloLectura, onConfirmado }) 
       </div>
 
       {!confirmado && !soloLectura && (
-        <Boton tipo="secundario" onClick={confirmar} disabled={enviando}>
+        <Boton variante="secundario" onClick={confirmar} disabled={enviando}>
           {enviando ? 'Confirmando...' : 'Los he comprobado'}
         </Boton>
       )}

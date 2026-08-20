@@ -1162,3 +1162,19 @@ button {
   height: 1.05rem;
   accent-color: var(--mojo-rojo);
 }
+
+/* Local que lleva sus reservas fuera: en vez del formulario, se dice y se
+   manda donde toca. */
+.derivacion {
+  display: grid;
+  justify-items: start;
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--crema-hueso);
+}
+
+.derivacion p {
+  margin: 0;
+}

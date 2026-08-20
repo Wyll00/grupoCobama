@@ -4,7 +4,7 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error } from '../components/Estado.jsx';
-import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
+import { GRUPO, enlaceWhatsApp, enlaceTelefono } from '../datos/grupo.js';
 import { LEGAL, VERSION_POLITICA } from '../datos/legal.js';
 
 /** Hoy en formato AAAA-MM-DD, que es lo que espera <input type="date">. */
@@ -94,6 +94,12 @@ export default function Reservar() {
   const marcar = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.checked }));
 
   const local = lista.find((l) => String(l.id) === String(form.restaurante_id));
+
+  // Hay locales que llevan sus reservas en su propio sistema. Si se deja el
+  // formulario a la vista, alguien lo rellena y esa reserva cae en una
+  // bandeja que ese local ya no mira: el cliente se presenta convencido de
+  // tener mesa. Mejor decirlo y mandarlo donde toca.
+  const reservaFuera = local?.url_reservas ?? null;
 
   const completo =
     form.restaurante_id &&
@@ -219,6 +225,27 @@ export default function Reservar() {
                 </select>
               </label>
 
+              {reservaFuera ? (
+                <div className="derivacion">
+                  <p>
+                    <strong>{local.nombre}</strong> lleva sus reservas en su propio sistema.
+                    Se abre en otra pestana y esta pagina se queda aqui.
+                  </p>
+                  <a
+                    className="boton boton--principal"
+                    href={reservaFuera}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Reservar en {local.nombre}
+                  </a>
+                  <p className="apagado" style={{ fontSize: '0.85rem' }}>
+                    Si prefieres, llama al{' '}
+                    <a href={enlaceTelefono(local.telefono)}>{local.telefono}</a>.
+                  </p>
+                </div>
+              ) : (
+                <>
               <div className="reserva__fila">
                 <label className="reserva__campo">
                   <span>Dia</span>
@@ -388,6 +415,8 @@ export default function Reservar() {
               >
                 {enviando ? 'Enviando...' : 'Pedir la reserva'}
               </button>
+                </>
+              )}
 
               <p className="apagado" style={{ fontSize: '0.85rem' }}>
                 Tambien puedes reservar por WhatsApp al{' '}

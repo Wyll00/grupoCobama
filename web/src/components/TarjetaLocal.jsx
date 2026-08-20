@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import BotonReservar from './BotonReservar.jsx';
 import { EstadoApertura } from './Estado.jsx';
 import { enlaceTelefono } from '../datos/grupo.js';
 
@@ -32,9 +33,7 @@ export default function TarjetaLocal({ local }) {
           llevando a la ficha, asi que no hace falta un boton para eso.
         */}
         <div className="tarjeta__acciones">
-          <Link className="boton boton--principal" to={`/reservar?local=${local.slug}`}>
-            Reservar
-          </Link>
+          <BotonReservar local={local}>Reservar</BotonReservar>
           <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
             Ver la carta
           </Link>

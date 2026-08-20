@@ -4,7 +4,7 @@ import { estaAbiertoAhora, resumirHorarios } from '../utils/horarios.js';
 const CAMPOS_LISTADO = `
   r.id, r.slug, r.nombre, r.municipio, r.direccion, r.telefono, r.email,
   r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.imagen_portada,
-  r.tiene_parking, r.orden
+  r.tiene_parking, r.orden, r.url_reservas
 `;
 
 export async function listarRestaurantes() {
