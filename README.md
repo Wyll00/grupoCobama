@@ -315,6 +315,16 @@ del local, no con el genérico del grupo. Ver **Lo que ve un buscador** más aba
 
 ## Ver el plato en la mesa (realidad aumentada)
 
+> **Apagado desde el 21-08-2026.** El botón «Ver en mi mesa» ya no sale en la
+> carta y el campo del ancho ya no está en el panel. Todo lo de abajo sigue
+> montado y funcionando (endpoint, generación del GLB, `VerEnMesa.jsx`, las
+> columnas y once comprobaciones de la prueba de humo): está **dormido**, no
+> borrado. Volver a encenderlo son tres líneas en `Plato.jsx`.
+>
+> Quitarlo se llevó por delante el trozo de `model-viewer`, que era **1 MB del
+> build**. Solo se descargaba al pulsar el botón, así que ningún cliente lo
+> pagaba sin querer, pero ya no está ni ahí.
+
 En la carta, los platos con foto y medida llevan un botón **Ver en mi mesa**.
 Desde el móvil abre la cámara y planta el plato encima de la mesa a tamaño real,
 para responder a la única pregunta que se hace el cliente delante de la carta:

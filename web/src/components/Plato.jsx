@@ -1,10 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
-
 import IconoAlergeno from './IconoAlergeno.jsx';
-
-// El visor arrastra model-viewer, que son unos 300 KB: solo se carga cuando
-// alguien pulsa el boton.
-const VerEnMesa = lazy(() => import('./VerEnMesa.jsx'));
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -12,8 +6,6 @@ const formatoPrecio = new Intl.NumberFormat('es-ES', {
 });
 
 export default function Plato({ plato }) {
-  const [enMesa, setEnMesa] = useState(false);
-
   return (
     <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
       <div className="plato__info">
@@ -33,19 +25,6 @@ export default function Plato({ plato }) {
         </div>
 
         {plato.descripcion && <p className="plato__descripcion">{plato.descripcion}</p>}
-
-        {plato.ver_en_mesa && !plato.agotado && (
-          <button type="button" className="plato__ver-mesa" onClick={() => setEnMesa(true)}>
-            Ver en mi mesa
-            {plato.ancho_cm && <span className="apagado"> · {plato.ancho_cm} cm</span>}
-          </button>
-        )}
-
-        {enMesa && (
-          <Suspense fallback={null}>
-            <VerEnMesa plato={plato} onCerrar={() => setEnMesa(false)} />
-          </Suspense>
-        )}
 
         {plato.alergenos.length > 0 && (
           <ul className="alergenos" aria-label={`Alergenos de ${plato.nombre}`}>
