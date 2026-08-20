@@ -755,6 +755,26 @@ npm run cm --prefix api
 Esa prueba cubre envío correcto, 500, 422, timeout, local sin integrar, no
 mandar dos veces la misma y el reintento manual.
 
+### Cómo probarlo, en tres niveles
+
+```bash
+npm run cm --prefix api          # 1. la maquinaria, contra un servidor falso
+npm run cm-check --prefix api    # 2. qué se enviaría, sin enviar nada
+npm run cm-check --prefix api -- --enviar   # 3. contra su API de verdad
+```
+
+El nivel 2 es el útil **antes** de tener credenciales: imprime la petición
+exacta con los datos personales sustituidos por unos de ejemplo, y ese volcado
+se le reenvía al contacto de CoverManager preguntando «¿es correcto?». Convierte
+un contrato desconocido en una pregunta que se contesta en un correo.
+
+El volcado enmascara siempre nombre, teléfono, email y observaciones: está hecho
+para pegarlo en correos, y no puede llevar datos de clientes. Con `--enviar` sí
+va la reserva real, sin tocar.
+
+Que su API responda 200 **no** prueba que la reserva exista: eso solo se ve
+abriendo el panel de CoverManager. El paso 3 lo recuerda.
+
 Una cosa que hay que preguntarles: **cómo evitan un duplicado**. Ahora se manda
 nuestro código de reserva como `external_id` para que un reintento que se cruce
 con un envío que sí llegó no genere dos mesas. Si su API no admite referencia

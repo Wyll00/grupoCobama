@@ -20,7 +20,8 @@
     "alergenos": "node scripts/iconos-alergenos.js",
     "carta-basilica": "node scripts/cargar-alergenos-basilica.js",
     "purgar": "node scripts/purgar-reservas.js",
-    "cm": "node scripts/probar-covermanager.js"
+    "cm": "node scripts/probar-covermanager.js",
+    "cm-check": "node scripts/cm-diagnostico.js"
   },
   "engines": {
     "node": ">=20"

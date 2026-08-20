@@ -65,6 +65,12 @@ export class ErrorTemporal extends Error {
  * duplicado, porque el problema no desaparece por no tener campo.
  */
 function PETICION({ reserva, local }) {
+  // La hora sale de MySQL como "21:00:00" y del formulario como "21:00". Se
+  // normaliza a HH:MM para mandar siempre lo mismo: una API que acepte un
+  // formato y rechace el otro fallaria solo a veces, y eso es lo peor que
+  // puede pasar porque parece aleatorio. Confirmar cual quieren ellos.
+  const hora = String(reserva.hora).slice(0, 5);
+
   return {
     camino: '/reservations',
     metodo: 'POST',
@@ -75,7 +81,7 @@ function PETICION({ reserva, local }) {
     cuerpo: {
       restaurant_id: local.covermanager_id,
       date: reserva.fecha,
-      time: reserva.hora,
+      time: hora,
       people: reserva.comensales,
       customer: {
         name: reserva.nombre,
@@ -90,6 +96,17 @@ function PETICION({ reserva, local }) {
     // Donde viene el identificador en la respuesta.
     leerId: (json) => json?.id ?? json?.reservation_id ?? null,
   };
+}
+
+/**
+ * Solo para el script de diagnostico.
+ *
+ * Expone la peticion sin enviarla, para poder ensenarla y preguntarle a
+ * CoverManager si el formato es el correcto. Va aparte y con nombre feo a
+ * proposito: no es parte de la interfaz que usa la aplicacion.
+ */
+export function __peticionParaDiagnostico({ reserva, local }) {
+  return PETICION({ reserva, local });
 }
 
 /**
