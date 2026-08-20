@@ -77,32 +77,59 @@ export default function Restaurante() {
         <div className="contenedor datos">
           <div className="bloque-dato">
             <h3>Donde estamos</h3>
-            <p>{local.direccion}</p>
-            <p className="apagado">
-              {local.tiene_parking ? 'Con parking propio.' : 'Sin parking propio.'}
-            </p>
-            <a
-              className="boton boton--secundario"
-              href={enlaceMapa(local)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Como llegar
-            </a>
+
+            {/* Misma tarjeta que el horario, para que las dos columnas pesen
+                igual. El parking se marca como dato util, no como frase: en
+                Tenerife decide si vas o no. */}
+            <div className="sitio">
+              <p className="sitio__direccion">{local.direccion}</p>
+
+              <ul className="sitio__datos">
+                <li className={local.tiene_parking ? 'sitio__dato--si' : 'sitio__dato--no'}>
+                  {local.tiene_parking ? 'Parking propio' : 'Sin parking propio'}
+                </li>
+                <li className="sitio__dato--si">{local.municipio}</li>
+              </ul>
+
+              <a
+                className="boton boton--principal sitio__llegar"
+                href={enlaceMapa(local)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Como llegar
+              </a>
+            </div>
           </div>
 
           <div className="bloque-dato">
             <h3>Horario</h3>
-            <table className="tabla-horario">
-              <tbody>
-                {local.horarios.map((tramo) => (
-                  <tr key={tramo.dias}>
-                    <td>{tramo.dias}</td>
-                    <td className={tramo.cerrado ? 'apagado' : undefined}>{tramo.horario}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            {/*
+              El dia de hoy va marcado: quien mira un horario casi siempre
+              quiere saber a que hora abren HOY, no leerse los siete dias.
+              Lo decide la API en hora de Canarias, no el navegador.
+            */}
+            <ul className="horario">
+              {local.horarios.map((tramo) => (
+                <li
+                  key={tramo.dias}
+                  className={`horario__tramo ${tramo.es_hoy ? 'horario__tramo--hoy' : ''}`}
+                >
+                  <span className="horario__dias">
+                    {tramo.dias}
+                    {tramo.es_hoy && <span className="horario__hoy">hoy</span>}
+                  </span>
+                  <span className={`horario__horas ${tramo.cerrado ? 'horario__horas--cerrado' : ''}`}>
+                    {tramo.horario}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="horario__pie">
+              <EstadoApertura abierto={local.abierto_ahora} />
+            </p>
           </div>
         </div>
       </section>

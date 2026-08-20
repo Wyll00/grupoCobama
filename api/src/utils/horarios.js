@@ -120,9 +120,13 @@ const capitalizar = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
 /**
  * Agrupa los siete dias en tramos legibles.
- * [{ dias: 'Lunes a jueves', horario: '12:30 - 23:00', cerrado: false }, ...]
+ * [{ dias: 'Lunes a jueves', horario: '12:30 - 23:00', cerrado, es_hoy }, ...]
+ *
+ * `es_hoy` se calcula aqui y no en el navegador a proposito: el dia se decide
+ * en horario de Canarias, y para alguien que mire la carta desde la peninsula
+ * a las 00:30 el "hoy" de su navegador seria el dia equivocado.
  */
-export function resumirHorarios(horarios) {
+export function resumirHorarios(horarios, hoy = ahoraEnCanarias().dia) {
   const porDia = new Map(horarios.map((h) => [Number(h.dia_semana), h]));
 
   const tramos = [];
@@ -150,6 +154,7 @@ export function resumirHorarios(horarios) {
     return {
       dias: etiqueta,
       cerrado: firma === 'cerrado',
+      es_hoy: dias.includes(hoy),
       horario: firma === 'cerrado'
         ? 'Cerrado'
         : `${formatearHora(registro.hora_apertura)} - ${formatearHora(registro.hora_cierre)}`,

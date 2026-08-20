@@ -334,24 +334,127 @@ button {
   margin-bottom: 0.6rem;
 }
 
-.tabla-horario {
-  width: 100%;
-  border-collapse: collapse;
+/*
+  Donde estamos, en la misma tarjeta que el horario: son las dos columnas de
+  la misma fila y antes una pesaba mucho menos que la otra.
+*/
+.sitio {
+  padding: 1rem;
+  background: var(--crema-hueso);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.sitio__direccion {
+  margin: 0 0 0.75rem;
+  font-family: var(--fuente-titulo);
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--carbon);
+}
+
+.sitio__datos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.sitio__datos li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--borde);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+/* Que se lea de un vistazo si hay parking, que en Tenerife decide si vas. */
+.sitio__dato--si::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mojo-verde);
+}
+
+.sitio__dato--no::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--texto-suave);
+  opacity: 0.5;
+}
+
+.sitio__llegar { width: 100%; }
+
+/*
+  El horario va en tarjeta y con el dia de hoy destacado. Antes era una tabla
+  de lineas sueltas donde los siete dias pesaban igual, y quien mira un
+  horario casi siempre busca uno solo: el de hoy.
+*/
+.horario {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem;
+  background: var(--crema-hueso);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.horario__tramo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radio-s);
   font-size: 0.95rem;
 }
 
-.tabla-horario td {
-  padding: 0.4rem 0;
-  border-bottom: 1px solid var(--borde);
+.horario__tramo + .horario__tramo {
+  /* Separador que no llega a los bordes, para que la tarjeta respire. */
+  box-shadow: inset 0 1px 0 rgba(31, 26, 23, 0.07);
 }
 
-.tabla-horario td:last-child {
-  text-align: right;
+.horario__tramo--hoy {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(31, 26, 23, 0.06);
+  font-weight: 600;
+}
+
+.horario__dias {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horario__hoy {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--ocre);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.horario__horas {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.tabla-horario tr:last-child td { border-bottom: none; }
+.horario__horas--cerrado { color: var(--texto-suave); }
+
+.horario__pie { margin: 0.75rem 0 0; }
 
 /* --------------------------------------------------------- carta ----- */
 
@@ -852,6 +955,10 @@ button {
   /*
     Hueco al final para que la barra no tape lo ultimo de la pagina: el aviso
     de alergenos de la carta y los menus de grupo de la ficha caen justo ahi.
+
+    Se suma el safe-area igual que en la barra. Sin eso, en un iPhone con barra
+    de gestos la barra crece ~34 px y el hueco se queda corto justo en los
+    moviles donde mas se lee la carta.
   */
-  .app > main { padding-bottom: 4.5rem; }
+  .app > main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
 }
