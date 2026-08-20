@@ -1,5 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 
+import IconoAlergeno from './IconoAlergeno.jsx';
+
 // El visor arrastra model-viewer, que son unos 300 KB: solo se carga cuando
 // alguien pulsa el boton.
 const VerEnMesa = lazy(() => import('./VerEnMesa.jsx'));
@@ -49,8 +51,11 @@ export default function Plato({ plato }) {
           <ul className="alergenos" aria-label={`Alergenos de ${plato.nombre}`}>
             {plato.alergenos.map((a) => (
               <li key={a.id} className="alergeno">
-                {a.nombre}
-                {a.trazas && ' (trazas)'}
+                <IconoAlergeno alergeno={a} />
+                <span>
+                  {a.nombre}
+                  {a.trazas && ' (trazas)'}
+                </span>
               </li>
             ))}
           </ul>

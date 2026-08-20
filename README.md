@@ -623,6 +623,79 @@ desde `api/uploads/`.
 
 ---
 
+## Alérgenos
+
+Los 14 de declaración obligatoria (Reglamento UE 1169/2011, Anexo II) viven en
+la tabla `alergenos` y cuelgan del **plato**, no de la línea de carta: un plato
+es el mismo en las cuatro casas, así que sus alérgenos también.
+
+### Los dibujos
+
+Van en `web/public/alergenos/{slug}.webp`, 128×128 con transparencia. Para
+regenerarlos, deja los originales en `iconos-alergenos/` y:
+
+```
+npm run alergenos --prefix api
+```
+
+Recorta el margen transparente (si no, cada icono se ve de un tamaño distinto),
+cuadra a 128, guarda el WebP y apunta el fichero en `alergenos.icono`.
+
+`icono` vale `NULL` cuando todavía no hay dibujo, y eso es deliberado: la web
+solo pinta la imagen si hay valor, y si aquí hubiera un nombre inventado
+saldría una **imagen rota justo donde va un alérgeno**, que se lee como un
+fallo de carga y no como información que falta. El icono nunca sustituye al
+nombre; lo acompaña. Un cangrejo y una concha se confunden de un vistazo.
+
+**Faltan `gluten` y `mostaza`** del envío del 13-08-2026 (llegaron 12 de 14).
+Hasta que lleguen salen como etiqueta de texto.
+
+### De dónde salen los datos
+
+`db/datos/alergenos-basilica.json` es la transcripción de las fotos de la carta
+impresa de La Basílica: 70 platos con sus alérgenos. Se carga con
+
+```
+npm run carta-basilica --prefix api           # ensayo, no toca nada
+npm run carta-basilica --prefix api -- --sql  # aplicarlo
+```
+
+Entra en el **catálogo**, no en la carta de ningún local, porque la
+transcripción no trae precios. Inventar un precio para que se vea algo sería
+peor que no tener el plato: en una carta pública un precio falso se lee como
+verdadero. Cuando lleguen los precios, añadirlos desde el panel arrastra los
+alérgenos solos — para eso está separado el catálogo de la carta.
+
+### Confirmado vs. transcrito
+
+`platos.alergenos_revisados_en` es `NULL` mientras nadie de cocina lo haya
+comprobado, que es el estado por defecto a propósito: confirmar es un acto, no
+la ausencia de uno.
+
+Hace falta porque **un plato con los alérgenos bien y otro con los alérgenos mal
+se ven exactamente igual**. Sin una marca, en dos meses nadie sabe qué filas
+están revisadas y cuáles se copiaron de una foto, y la duda desaparece sola.
+
+Se confirma con un botón en la ficha del plato, no guardando el formulario: el
+formulario se guarda por mil motivos que no tienen que ver con los alérgenos.
+Y **cambiar la lista invalida la firma anterior**, porque cocina firmó unos
+alérgenos concretos; si la lista cambia, esa firma ya no dice nada de lo que
+hay ahora.
+
+### Lo que queda antes de publicar
+
+1. Que cocina compare la transcripción con las fichas de receta y la firme.
+2. Aclarar si los iconos son ingrediente directo, trazas o ambos.
+3. Los menús de celebración (Clásico, Tradicional, Infantil) **no** heredan los
+   alérgenos de platos con nombre parecido: van por receta.
+
+El filtro de la carta pública dice «ocultar platos que contengan» y no «sin
+gluten», también a propósito: esconder platos no es garantizar que el resto sea
+apto. El aviso de contaminación cruzada sale dentro del propio panel de
+filtros, que es donde está mirando quien filtra por alergia.
+
+---
+
 ## Datos de prueba
 
 > ⚠️ **Los platos y precios de `db/seeds/002_carta.sql` son PROVISIONALES.**

@@ -6,6 +6,7 @@ import { useDatos } from '../useDatos.js';
 import Modal from './Modal.jsx';
 import RecorteImagen from './RecorteImagen.jsx';
 import PreciosPorLocal from './PreciosPorLocal.jsx';
+import RevisionAlergenos from './RevisionAlergenos.jsx';
 import {
   Aviso,
   AreaTexto,
@@ -262,6 +263,14 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
               />
             ))}
           </div>
+
+          {!esNuevo && (
+            <RevisionAlergenos
+              plato={plato}
+              soloLectura={soloLectura}
+              onConfirmado={() => existente.recargar()}
+            />
+          )}
         </Campo>
       </fieldset>
 

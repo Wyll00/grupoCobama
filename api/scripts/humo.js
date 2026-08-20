@@ -246,6 +246,48 @@ async function main() {
   comprobar('admin edita el plato', editado.cuerpo?.datos?.descripcion === 'Descripcion cambiada.');
   comprobar('los alergenos se sustituyen, no se acumulan', editado.cuerpo?.datos?.alergenos?.length === 1);
 
+  // ------------------------------------------------- revision de alergenos
+  seccion('Confirmar alergenos');
+
+  comprobar(
+    'un plato nace con los alergenos sin confirmar',
+    editado.cuerpo?.datos?.alergenos_revisados_en === null,
+    String(editado.cuerpo?.datos?.alergenos_revisados_en)
+  );
+
+  const confirmado = await admin.peticion('POST', `/api/admin/platos/${platoId}/confirmar-alergenos`);
+  comprobar('confirmar responde 200', confirmado.status === 200);
+  comprobar(
+    'queda la fecha de confirmacion',
+    Boolean(confirmado.cuerpo?.datos?.alergenos_revisados_en)
+  );
+  comprobar(
+    'queda quien lo confirmo',
+    Boolean(confirmado.cuerpo?.datos?.alergenos_revisados_por)
+  );
+
+  // Lo importante de todo esto: la firma vale para una lista concreta de
+  // alergenos, no para el plato. Si la lista cambia, la firma ya no dice
+  // nada y tiene que caerse sola.
+  const trasCambiar = await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, {
+    alergenos: [3, 7],
+  });
+  comprobar(
+    'cambiar los alergenos invalida la confirmacion',
+    trasCambiar.cuerpo?.datos?.alergenos_revisados_en === null,
+    String(trasCambiar.cuerpo?.datos?.alergenos_revisados_en)
+  );
+
+  const cambioSinAlergenos = await admin.peticion('POST', `/api/admin/platos/${platoId}/confirmar-alergenos`);
+  comprobar('vuelve a confirmarse', Boolean(cambioSinAlergenos.cuerpo?.datos?.alergenos_revisados_en));
+  const soloNombre = await admin.peticion('PATCH', `/api/admin/platos/${platoId}`, {
+    descripcion: 'Solo cambia la descripcion.',
+  });
+  comprobar(
+    'tocar otro campo NO invalida la confirmacion',
+    Boolean(soloNombre.cuerpo?.datos?.alergenos_revisados_en)
+  );
+
   // -------------------------------------------------------------- imagenes
   seccion('Imagenes de plato');
 

@@ -1086,3 +1086,40 @@
 }
 
 .portada .btn { flex: 1; cursor: pointer; }
+
+/* ------------------------------------------- revision de alergenos --- */
+
+.revision {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--linea);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.revision__texto {
+  flex: 1 1 16rem;
+}
+
+/* Pendiente en ambar y no en rojo: no es un fallo, es trabajo por hacer.
+   Pero tiene que verse, porque lo que se ve igual se olvida. */
+.revision--pendiente {
+  border-color: #b8860b;
+  background: rgba(184, 134, 11, 0.09);
+}
+
+.revision--ok {
+  border-color: #2f7d4f;
+  background: rgba(47, 125, 79, 0.09);
+}
+
+.revision__error {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--rojo, #b3261e);
+}

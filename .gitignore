@@ -32,3 +32,9 @@ La Basilica/
 # Fotos originales de portada: pesan y son material con derechos.
 fotos/*
 !fotos/LEEME.md
+
+# Originales de los iconos de alergenos: pesan ~9 MB y son material con
+# licencia. Lo que se versiona es el WebP de web/public/alergenos/, que es
+# lo que necesita el build. Para regenerarlos: npm run alergenos --prefix api
+iconos-alergenos/*
+!iconos-alergenos/LEEME.md

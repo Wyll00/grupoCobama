@@ -117,6 +117,7 @@ export const adminApi = {
   crearPlato: (datos) => enviar('POST', '/admin/platos', { cuerpo: datos }),
   editarPlato: (id, datos) => enviar('PATCH', `/admin/platos/${id}`, { cuerpo: datos }),
   desactivarPlato: (id) => enviar('DELETE', `/admin/platos/${id}`),
+  confirmarAlergenos: (id) => enviar('POST', `/admin/platos/${id}/confirmar-alergenos`),
 
   subirImagen: (id, formData) => enviar('POST', `/admin/platos/${id}/imagen`, { formData }),
   quitarImagen: (id) => enviar('DELETE', `/admin/platos/${id}/imagen`),

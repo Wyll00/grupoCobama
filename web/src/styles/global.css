@@ -570,6 +570,9 @@ button {
 }
 
 .filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--borde);
   border-radius: 999px;
@@ -704,12 +707,47 @@ button {
 }
 
 .alergeno {
-  padding: 0.05rem 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.1rem 0.45rem 0.1rem 0.25rem;
   border: 1px solid var(--borde);
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 0.7rem;
   color: var(--texto-suave);
   background: var(--crema-hueso);
+}
+
+/* Sin icono la pastilla es solo texto y el hueco de la izquierda sobra. */
+.alergeno:not(:has(.alergeno__icono)) {
+  padding-left: 0.45rem;
+}
+
+.alergeno__icono {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Los iconos son ilustraciones a color; sobre el rojo del filtro activo se
+   apagan un poco, asi que se les da un disco claro detras. */
+.filtro .alergeno__icono {
+  width: 18px;
+  height: 18px;
+}
+
+.filtro--activo .alergeno__icono {
+  background: #fff;
+  border-radius: 50%;
+  padding: 1px;
+}
+
+.filtros__aviso {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
 }
 
 /* -------------------------------------------------------- reservar --- */

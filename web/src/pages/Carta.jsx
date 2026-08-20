@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
+import IconoAlergeno from '../components/IconoAlergeno.jsx';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
@@ -174,10 +175,16 @@ export default function Carta() {
                     onClick={() => alternarAlergeno(a.slug)}
                     aria-pressed={sinAlergenos.includes(a.slug)}
                   >
-                    {a.nombre}
+                    <IconoAlergeno alergeno={a} tamano={18} />
+                    <span>{a.nombre}</span>
                   </button>
                 ))}
               </div>
+
+              <p className="filtros__aviso">
+                Filtrar esconde platos, no garantiza que el resto sea apto: la cocina es
+                compartida y puede haber contaminacion cruzada. Avisa siempre al personal.
+              </p>
 
               {(hayFiltros || categoria) && (
                 <button

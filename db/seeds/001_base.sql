@@ -81,19 +81,25 @@ INSERT INTO categorias (id, slug, nombre, nombre_en, orden) VALUES
 -- ---------------------------------------------------------------------
 -- alergenos - los 14 de declaracion obligatoria
 -- Reglamento (UE) 1169/2011, Anexo II
+--
+-- icono = fichero dentro de web/public/alergenos/, NULL si todavia no hay
+-- dibujo. NULL a proposito y no un nombre inventado: la web solo pinta la
+-- imagen si el fichero existe, y si aqui hubiera un nombre que no existe
+-- saldria una imagen rota donde va un alergeno. Faltan gluten y mostaza.
+-- Para regenerarlos: npm run alergenos --prefix api
 -- ---------------------------------------------------------------------
 INSERT INTO alergenos (id, slug, nombre, nombre_en, icono) VALUES
-  ( 1, 'gluten',          'Gluten',                        'Gluten',        'wheat'),
-  ( 2, 'crustaceos',      'Crustaceos',                    'Crustaceans',   'shrimp'),
-  ( 3, 'huevos',          'Huevos',                        'Eggs',          'egg'),
-  ( 4, 'pescado',         'Pescado',                       'Fish',          'fish'),
-  ( 5, 'cacahuetes',      'Cacahuetes',                    'Peanuts',       'peanut'),
-  ( 6, 'soja',            'Soja',                          'Soybeans',      'soy'),
-  ( 7, 'lacteos',         'Lacteos',                       'Milk',          'milk'),
-  ( 8, 'frutos-cascara',  'Frutos de cascara',             'Tree nuts',     'nut'),
-  ( 9, 'apio',            'Apio',                          'Celery',        'celery'),
-  (10, 'mostaza',         'Mostaza',                       'Mustard',       'mustard'),
-  (11, 'sesamo',          'Granos de sesamo',              'Sesame',        'sesame'),
-  (12, 'sulfitos',        'Dioxido de azufre y sulfitos',  'Sulphites',     'sulfite'),
-  (13, 'altramuces',      'Altramuces',                    'Lupin',         'lupin'),
-  (14, 'moluscos',        'Moluscos',                      'Molluscs',      'mollusc');
+  ( 1, 'gluten',          'Gluten',                        'Gluten',        NULL),
+  ( 2, 'crustaceos',      'Crustaceos',                    'Crustaceans',   'crustaceos.webp'),
+  ( 3, 'huevos',          'Huevos',                        'Eggs',          'huevos.webp'),
+  ( 4, 'pescado',         'Pescado',                       'Fish',          'pescado.webp'),
+  ( 5, 'cacahuetes',      'Cacahuetes',                    'Peanuts',       'cacahuetes.webp'),
+  ( 6, 'soja',            'Soja',                          'Soybeans',      'soja.webp'),
+  ( 7, 'lacteos',         'Lacteos',                       'Milk',          'lacteos.webp'),
+  ( 8, 'frutos-cascara',  'Frutos de cascara',             'Tree nuts',     'frutos-cascara.webp'),
+  ( 9, 'apio',            'Apio',                          'Celery',        'apio.webp'),
+  (10, 'mostaza',         'Mostaza',                       'Mustard',       NULL),
+  (11, 'sesamo',          'Granos de sesamo',              'Sesame',        'sesamo.webp'),
+  (12, 'sulfitos',        'Dioxido de azufre y sulfitos',  'Sulphites',     'sulfitos.webp'),
+  (13, 'altramuces',      'Altramuces',                    'Lupin',         'altramuces.webp'),
+  (14, 'moluscos',        'Moluscos',                      'Molluscs',      'moluscos.webp');

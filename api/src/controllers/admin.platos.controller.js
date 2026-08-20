@@ -19,6 +19,11 @@ export async function patchPlato(req, res) {
   res.json({ datos: await platos.actualizar(Number(req.params.id), req.body) });
 }
 
+export async function postConfirmarAlergenos(req, res) {
+  const datos = await platos.confirmarAlergenos(Number(req.params.id), req.usuario.id);
+  res.json({ datos });
+}
+
 export async function deletePlato(req, res) {
   const id = Number(req.params.id);
   const resultado = await platos.desactivar(id);

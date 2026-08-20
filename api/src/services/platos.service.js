@@ -6,9 +6,11 @@ const SELECT_PLATO = `
          p.descripcion_en, p.imagen, p.imagen_thumb, p.ancho_cm,
          p.modelo_glb, p.modelo_usdz, p.es_vegetariano,
          p.es_vegano, p.activo, p.created_at, p.updated_at,
+         p.alergenos_revisados_en, u.nombre AS alergenos_revisados_por,
          c.slug AS categoria_slug, c.nombre AS categoria_nombre
     FROM platos p
     JOIN categorias c ON c.id = p.categoria_id
+    LEFT JOIN usuarios u ON u.id = p.alergenos_revisados_por
 `;
 
 const normalizar = (p) => ({
@@ -189,6 +191,15 @@ export async function guardarImagen(id, { imagen, thumb }) {
 
 async function sustituirAlergenos(conn, platoId, alergenos) {
   await conn.execute('DELETE FROM plato_alergenos WHERE plato_id = ?', [platoId]);
+
+  // Cambiar la lista invalida la confirmacion anterior. Cocina firmo unos
+  // alergenos concretos, no el plato: si la lista cambia, esa firma ya no
+  // dice nada sobre lo que hay ahora.
+  await conn.execute(
+    'UPDATE platos SET alergenos_revisados_en = NULL, alergenos_revisados_por = NULL WHERE id = ?',
+    [platoId]
+  );
+
   if (alergenos.length === 0) return;
 
   const unicos = [...new Set(alergenos)];
@@ -197,6 +208,23 @@ async function sustituirAlergenos(conn, platoId, alergenos) {
     `INSERT INTO plato_alergenos (plato_id, alergeno_id) VALUES ${huecos}`,
     unicos.flatMap((a) => [platoId, a])
   );
+}
+
+/**
+ * Deja constancia de que una persona ha comprobado los alergenos del plato.
+ *
+ * Es un acto aparte de editarlos: guardar el formulario no confirma nada,
+ * porque se guarda por mil motivos (cambiar el nombre, la foto). Confirmar
+ * tiene que ser algo que alguien hace a proposito y que se pueda auditar.
+ */
+export async function confirmarAlergenos(id, usuarioId) {
+  const [res] = await pool.execute(
+    `UPDATE platos SET alergenos_revisados_en = NOW(), alergenos_revisados_por = ?
+       WHERE id = ?`,
+    [usuarioId, id]
+  );
+  if (res.affectedRows === 0) throw ApiError.noEncontrado('Ese plato no existe');
+  return obtener(id);
 }
 
 /**

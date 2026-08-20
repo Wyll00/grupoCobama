@@ -72,6 +72,14 @@ adminRouter.patch(
   validarCuerpo(actualizarPlatoSchema),
   asyncHandler(platosCtrl.patchPlato)
 );
+// Confirmar los alergenos: mismo ambito que editarlos. Un encargado puede
+// firmar los platos que solo sirve su local, que son los que conoce.
+adminRouter.post(
+  '/platos/:id/confirmar-alergenos',
+  ambitoPlato,
+  asyncHandler(platosCtrl.postConfirmarAlergenos)
+);
+
 adminRouter.delete('/platos/:id', ambitoPlato, asyncHandler(platosCtrl.deletePlato));
 
 adminRouter.post('/platos/:id/imagen', ambitoPlato, manejarSubida, asyncHandler(platosCtrl.postImagen));
