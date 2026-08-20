@@ -7,6 +7,10 @@
  * `npm run dev`: el --watch de este ultimo reinicia el servidor si algo toca
  * un fichero durante la ejecucion y la prueba muere con ECONNRESET.
  *
+ * No se puede lanzar mas de seis veces en quince minutos: cada ejecucion hace
+ * un login fallido a proposito y acaba topando con el limitador de intentos.
+ * El limitador vive en memoria, asi que reiniciar la API lo pone a cero.
+ *
  * Recorre el flujo completo contra una API ya levantada: login, rotacion de
  * refresco, limites por rol y por local, CRUD de catalogo, carta e historico
  * de precios. No sustituye a una bateria de tests, pero detecta al momento si
@@ -526,22 +530,35 @@ async function main() {
     .jpeg()
     .toBuffer();
 
+  // Subir una portada BORRA la anterior, tambien el fichero del disco. Si La
+  // Basilica ya tiene la suya puesta, la parte de subida se salta: una prueba
+  // no puede llevarse por delante una foto de verdad.
+  const yaTiene = (await fetch(`${BASE}/api/restaurantes/la-basilica`).then((r) => r.json()))
+    .datos?.imagen_portada;
+
+  if (yaTiene) {
+    console.log('  --    La Basilica ya tiene portada, no se toca (se salta la subida)');
+  }
+
   const formPortada = new FormData();
   formPortada.append('imagen', new Blob([portadaJpeg], { type: 'image/jpeg' }), 'portada.jpg');
 
-  const subidaPortada = await fetch(`${BASE}/api/admin/restaurantes/2/portada`, {
+  const subidaPortada = yaTiene ? null : await fetch(`${BASE}/api/admin/restaurantes/2/portada`, {
     method: 'POST',
     headers: { authorization: `Bearer ${basilica.acceso}` },
     body: formPortada,
   });
-  const portadaJson = await subidaPortada.json().catch(() => null);
-  comprobar('el encargado sube la portada de su local (200)', subidaPortada.status === 200);
-  comprobar(
-    'se guarda la ruta',
-    portadaJson?.datos?.imagen_portada?.startsWith('/uploads/portadas/') === true,
-    portadaJson?.datos?.imagen_portada
-  );
-  rastro.portadaLocal = portadaJson?.datos?.imagen_portada;
+  const portadaJson = subidaPortada ? await subidaPortada.json().catch(() => null) : null;
+
+  if (subidaPortada) {
+    comprobar('el encargado sube la portada de su local (200)', subidaPortada.status === 200);
+    comprobar(
+      'se guarda la ruta',
+      portadaJson?.datos?.imagen_portada?.startsWith('/uploads/portadas/') === true,
+      portadaJson?.datos?.imagen_portada
+    );
+    rastro.portadaLocal = portadaJson?.datos?.imagen_portada;
+  }
 
   if (rastro.portadaLocal) {
     const bajada = await fetch(`${BASE}${rastro.portadaLocal}`);
@@ -553,11 +570,13 @@ async function main() {
     );
   }
 
-  const enPublica = await fetch(`${BASE}/api/restaurantes/la-basilica`).then((r) => r.json());
-  comprobar(
-    'la ficha publica la devuelve',
-    enPublica.datos?.imagen_portada === rastro.portadaLocal
-  );
+  if (rastro.portadaLocal) {
+    const enPublica = await fetch(`${BASE}/api/restaurantes/la-basilica`).then((r) => r.json());
+    comprobar(
+      'la ficha publica la devuelve',
+      enPublica.datos?.imagen_portada === rastro.portadaLocal
+    );
+  }
 
   const portadaAjena = await fetch(`${BASE}/api/admin/restaurantes/4/portada`, {
     method: 'POST',
@@ -570,9 +589,11 @@ async function main() {
   });
   comprobar('un encargado no pone la portada de otro local (403)', portadaAjena.status === 403);
 
-  const quitada = await basilica.peticion('DELETE', '/api/admin/restaurantes/2/portada');
-  comprobar('se puede quitar la portada', quitada.cuerpo?.datos?.imagen_portada === null);
-  rastro.portadaLocal = null;
+  if (rastro.portadaLocal) {
+    const quitada = await basilica.peticion('DELETE', '/api/admin/restaurantes/2/portada');
+    comprobar('se puede quitar la portada', quitada.cuerpo?.datos?.imagen_portada === null);
+    rastro.portadaLocal = null;
+  }
 
   // ---------------------------------------------------------------- QR
   seccion('QR de la carta');

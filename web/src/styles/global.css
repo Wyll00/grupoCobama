@@ -318,8 +318,23 @@ button {
 
 .ficha__cabecera--con-foto {
   background-size: cover;
-  background-position: center;
+  /*
+    Hacia arriba, no al centro. La foto se guarda en 1.92:1 y la cabecera es
+    mas apaisada, asi que cover recorta en vertical: centrada se comeria la
+    parte de arriba, que en una foto de edificio o de fachada es justo lo que
+    la hace reconocible.
+  */
+  background-position: center 15%;
   background-repeat: no-repeat;
+
+  /*
+    Con foto la cabecera crece. No es por lucirla: cuanto mas se parezca su
+    proporcion a la de la imagen, menos recorta cover y menos composicion se
+    pierde. Ademas una foto en una franja estrecha no se lee como foto.
+  */
+  min-height: clamp(300px, 40vw, 520px);
+  display: flex;
+  align-items: center;
 }
 
 /*
