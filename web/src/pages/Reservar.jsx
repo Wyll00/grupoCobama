@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
+import { LEGAL, VERSION_POLITICA } from '../datos/legal.js';
 
 /** Hoy en formato AAAA-MM-DD, que es lo que espera <input type="date">. */
 const hoy = () => new Date().toLocaleDateString('en-CA');
@@ -31,6 +32,12 @@ const VACIO = {
   telefono: '',
   email: '',
   observaciones: '',
+  // No es el consentimiento para tratar los datos de la reserva: eso se
+  // apoya en el contrato y no se puede negar sin quedarse sin mesa. Esto es
+  // la prueba de que se informo, que es lo que pide el art. 13 del RGPD.
+  politicaLeida: false,
+  // Consentimiento de verdad: voluntario, aparte y desmarcado.
+  marketing: false,
 };
 
 /**
@@ -84,6 +91,7 @@ export default function Reservar() {
   }, [horasDisponibles, form.hora]);
 
   const cambiar = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }));
+  const marcar = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.checked }));
 
   const local = lista.find((l) => String(l.id) === String(form.restaurante_id));
 
@@ -92,18 +100,28 @@ export default function Reservar() {
     form.fecha &&
     form.hora &&
     form.nombre.trim().length >= 2 &&
-    form.telefono.trim().length >= 6;
+    form.telefono.trim().length >= 6 &&
+    form.politicaLeida;
+
+  // Pedir permiso para mandar novedades a quien no ha dejado email es recoger
+  // un consentimiento que no se puede usar. Solo aparece si hay email.
+  const hayEmail = form.email.trim().length > 0;
 
   const enviar = async (e) => {
     e.preventDefault();
     setEnviando(true);
     setError(null);
     try {
+      const { politicaLeida, marketing, ...campos } = form;
       setHecha(
         await api.crearReserva({
-          ...form,
+          ...campos,
           restaurante_id: Number(form.restaurante_id),
           comensales: Number(form.comensales),
+          // Se manda la version concreta que se le ha ensenado, no un true:
+          // cuando el texto cambie hay que poder saber cual leyo cada uno.
+          politica_version: politicaLeida ? VERSION_POLITICA : '',
+          marketing: Boolean(marketing && hayEmail),
         })
       );
     } catch (err) {
@@ -313,6 +331,55 @@ export default function Reservar() {
                   placeholder="Alergias, trona, celebracion, si venis con perro..."
                 />
               </label>
+
+              <div className="consentimiento">
+                <p className="consentimiento__info">
+                  Tus datos los trata <strong>{LEGAL.razonSocial}</strong> para gestionar
+                  esta reserva y avisarte, porque son necesarios para poder atenderte. Se
+                  guardan {LEGAL.conservacion.reservaMeses} meses y los ve el local y{' '}
+                  {LEGAL.encargados[0]?.nombre}, que nos lleva el libro de reservas. Puedes
+                  acceder a ellos, corregirlos o pedir que los borremos escribiendo a{' '}
+                  <a href={`mailto:${LEGAL.emailPrivacidad}`}>{LEGAL.emailPrivacidad}</a>.
+                  Lo tienes todo detallado en la{' '}
+                  <Link to="/privacidad" target="_blank">
+                    politica de privacidad
+                  </Link>
+                  .
+                </p>
+
+                <label className="consentimiento__casilla">
+                  <input
+                    type="checkbox"
+                    checked={form.politicaLeida}
+                    onChange={marcar('politicaLeida')}
+                    required
+                  />
+                  <span>
+                    He leido y entiendo la{' '}
+                    <Link to="/privacidad" target="_blank">
+                      politica de privacidad
+                    </Link>
+                    .
+                  </span>
+                </label>
+
+                {hayEmail && (
+                  <label className="consentimiento__casilla">
+                    <input
+                      type="checkbox"
+                      checked={form.marketing}
+                      onChange={marcar('marketing')}
+                    />
+                    <span>
+                      Quiero recibir novedades y menus especiales por email.{' '}
+                      <span className="apagado">
+                        Es voluntario, tu reserva funciona igual, y puedes darte de baja
+                        cuando quieras.
+                      </span>
+                    </span>
+                  </label>
+                )}
+              </div>
 
               <button
                 className="boton boton--principal"

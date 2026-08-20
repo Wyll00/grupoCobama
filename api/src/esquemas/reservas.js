@@ -34,13 +34,39 @@ export const crearReservaSchema = z.object({
   hora,
   comensales: z.coerce.number().int().min(1, 'Al menos una persona').max(50),
   observaciones: textoOpcional(500),
+
+  // Confirmacion de haber leido la politica. No es el consentimiento para
+  // tratar los datos de la reserva (esa base es el contrato, art. 6.1.b):
+  // es la prueba de que se informo, que es lo que exige el art. 13.
+  //
+  // Se exige la version, no un true suelto. Un booleano no dice QUE texto
+  // se leyo, y cuando la politica cambie ya no habra forma de saberlo.
+  politica_version: z
+    .string()
+    .trim()
+    .min(1, 'Falta confirmar que has leido la politica de privacidad')
+    .max(20),
+
+  // Consentimiento de verdad, y por eso separado y desmarcado por defecto.
+  // Meterlo en la misma casilla que lo anterior lo invalidaria: el
+  // consentimiento tiene que poder negarse sin perder el servicio.
+  marketing: z.coerce.boolean().optional().default(false),
 });
 
-/** Alta desde el panel: ademas del origen, admite la nota interna. */
-export const crearReservaManualSchema = crearReservaSchema.extend({
-  origen: z.enum(['telefono', 'whatsapp', 'web']).optional().default('telefono'),
-  notas_internas: textoOpcional(500),
-});
+/**
+ * Alta desde el panel: ademas del origen, admite la nota interna.
+ *
+ * politica_version deja de ser obligatoria aqui: al cliente que llama por
+ * telefono no se le puede ensenar una casilla. Se informa de viva voz y el
+ * campo queda a NULL, que es lo honesto. Marcarlo como aceptado sin que
+ * nadie haya leido nada seria fabricar una prueba falsa.
+ */
+export const crearReservaManualSchema = crearReservaSchema
+  .omit({ politica_version: true, marketing: true })
+  .extend({
+    origen: z.enum(['telefono', 'whatsapp', 'web']).optional().default('telefono'),
+    notas_internas: textoOpcional(500),
+  });
 
 export const actualizarReservaSchema = z
   .object({

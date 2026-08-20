@@ -1,5 +1,6 @@
 import { pool } from '../config/db.js';
 import * as reservas from '../services/reservas.service.js';
+import * as sincro from '../services/sincronizacion.service.js';
 import { avisarLocalDeReserva, avisarClienteDeReserva } from '../services/correo.service.js';
 
 /** Publico: horas a las que se puede reservar un dia concreto. */
@@ -57,6 +58,20 @@ export async function postReservaManual(req, res) {
     { origen: req.body.origen, usuarioId: req.usuario.id, esManual: true }
   );
   res.status(201).json({ datos });
+}
+
+/**
+ * Reintenta el envio a CoverManager.
+ *
+ * Responde 200 tanto si sale bien como si vuelve a fallar, con el estado
+ * dentro: que falle el reenvio no es un error de la peticion, es el resultado.
+ * Devolver un 500 haria que el panel ensenara "algo ha ido mal" cuando lo que
+ * ha pasado esta perfectamente descrito en cm_ultimo_error.
+ */
+export async function postReenviarCoverManager(req, res) {
+  const id = Number(req.params.id);
+  await sincro.reintentar(id);
+  res.json({ datos: await reservas.obtener(id) });
 }
 
 export async function patchReserva(req, res) {

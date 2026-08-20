@@ -689,6 +689,8 @@ async function main() {
       hora: tramos.datos.tramos[0],
       comensales: 4,
       observaciones: 'Generada por la prueba de humo',
+      politica_version: '2026-08-21',
+      marketing: false,
     }),
   });
   const reservaJson = await reservaWeb.json();
@@ -700,6 +702,32 @@ async function main() {
     reservaJson.datos?.codigo
   );
   rastro.reservaCodigo = reservaJson.datos?.codigo;
+
+  // ------------------------------------------------------------------ RGPD
+  //
+  // Sin haber informado no se puede recoger el telefono de un cliente. El
+  // servidor tiene que exigirlo: si esto solo lo comprobara la casilla del
+  // formulario, bastaria un curl para saltarselo, y la obligacion del art. 13
+  // es de quien trata los datos, no del navegador.
+  const sinPolitica = await fetch(`${BASE}/api/reservas`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      restaurante_id: 2,
+      nombre: 'Sin politica',
+      telefono: '922000333',
+      fecha: diaReserva,
+      hora: tramos.datos.tramos[0],
+      comensales: 2,
+    }),
+  });
+  const sinPoliticaCuerpo = await sinPolitica.json();
+  comprobar('una reserva sin aceptar la politica se rechaza (400)', sinPolitica.status === 400);
+  comprobar(
+    'el 400 dice que campo falta',
+    sinPoliticaCuerpo?.error?.detalles?.some((d) => d.campo === 'politica_version'),
+    JSON.stringify(sinPoliticaCuerpo?.error?.detalles)
+  );
 
   const fueraHorario = await fetch(`${BASE}/api/reservas`, {
     method: 'POST',

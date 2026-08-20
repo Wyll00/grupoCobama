@@ -1123,3 +1123,51 @@
   margin: 0;
   color: var(--rojo, #b3261e);
 }
+
+/* ------------------------------------------ envio a CoverManager --- */
+
+.cm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.cm__etiqueta {
+  font-weight: 600;
+}
+
+.cm__detalle {
+  max-width: 14rem;
+  color: var(--texto-suave);
+  /* El error de su API puede ser larguisimo: se corta y queda entero en el
+     title, para que no reviente el ancho de la fila. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm--ok .cm__etiqueta {
+  color: #2f7d4f;
+  font-weight: 500;
+}
+
+.cm--pendiente .cm__etiqueta {
+  color: var(--texto-suave);
+  font-weight: 500;
+}
+
+/* Que la reserva no este alli significa que esa mesa no esta bloqueada y se
+   puede vender dos veces. Es lo mas grave que puede ensenar esta tabla. */
+.cm--error {
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(179, 38, 30, 0.1);
+}
+
+.cm--error .cm__etiqueta {
+  color: #b3261e;
+}

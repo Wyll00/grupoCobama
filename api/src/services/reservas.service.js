@@ -1,6 +1,7 @@
 import { randomInt } from 'node:crypto';
 import { pool } from '../config/db.js';
 import { ApiError } from '../utils/ApiError.js';
+import * as sincro from './sincronizacion.service.js';
 import {
   ahoraEnCanarias,
   hoyEnCanarias,
@@ -40,6 +41,8 @@ const SELECT_RESERVA = `
   SELECT r.id, r.codigo, r.restaurante_id, r.nombre, r.telefono, r.email,
          r.fecha, r.hora, r.comensales, r.observaciones, r.notas_internas,
          r.estado, r.origen, r.created_at, r.updated_at,
+         r.politica_version, r.politica_aceptada_en, r.marketing,
+         r.cm_estado, r.cm_id, r.cm_intentos, r.cm_ultimo_error, r.cm_enviada_en,
          re.nombre AS restaurante_nombre, re.slug AS restaurante_slug,
          u.nombre AS usuario_nombre
     FROM reservas r
@@ -160,8 +163,9 @@ export async function crear(datos, { origen = 'web', usuarioId = null, esManual 
     const [res] = await pool.execute(
       `INSERT INTO reservas
          (codigo, restaurante_id, nombre, telefono, email, fecha, hora,
-          comensales, observaciones, notas_internas, estado, origen, usuario_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          comensales, observaciones, notas_internas, estado, origen, usuario_id,
+          politica_version, politica_aceptada_en, marketing, marketing_en)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         codigo,
         datos.restaurante_id,
@@ -178,10 +182,29 @@ export async function crear(datos, { origen = 'web', usuarioId = null, esManual 
         esManual ? 'confirmada' : 'pendiente',
         origen,
         usuarioId,
+        // En el alta por telefono no hay casilla que ensenar, asi que queda
+        // a NULL. Rellenarlo desde el servidor seria inventarse la prueba.
+        datos.politica_version ?? null,
+        datos.politica_version ? new Date() : null,
+        datos.marketing ? 1 : 0,
+        datos.marketing ? new Date() : null,
       ]
     );
     return res.insertId;
   });
+
+  // El envio a CoverManager va DESPUES de guardar y sin esperarlo. Si su API
+  // tarda ocho segundos, el cliente no tiene por que aguantarlos; y si esta
+  // caida, no tiene por que enterarse: la reserva ya existe y el reintentador
+  // la mandara mas tarde.
+  //
+  // El .catch() no es decorativo: sin el, un fallo aqui seria un rechazo sin
+  // capturar, y en Node eso tumba el proceso entero por una reserva que ya
+  // estaba guardada.
+  sincro
+    .marcarParaEnvio(id)
+    .then((estado) => (estado === 'pendiente' ? sincro.intentarUna(id) : null))
+    .catch((e) => console.error(`[covermanager] reserva ${id}:`, e.message));
 
   return obtener(id);
 }

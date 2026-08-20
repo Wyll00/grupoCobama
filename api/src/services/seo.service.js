@@ -156,6 +156,30 @@ export async function metadatosDeRuta(ruta) {
     };
   }
 
+  // Las paginas legales tienen que resolver aqui. Si caen en el comodin, el
+  // prerenderizador responde 404, y un aviso legal que da 404 a los buscadores
+  // es exactamente igual de util que no tenerlo.
+  const LEGALES = {
+    '/privacidad': {
+      titulo: `Politica de privacidad · ${NOMBRE_GRUPO}`,
+      descripcion:
+        'Que datos tratamos, para que, cuanto tiempo los guardamos y como ejercer tus derechos.',
+    },
+    '/aviso-legal': {
+      titulo: `Aviso legal · ${NOMBRE_GRUPO}`,
+      descripcion: 'Titular del sitio, condiciones de uso y responsabilidades.',
+    },
+  };
+
+  if (LEGALES[limpia]) {
+    return {
+      ...LEGALES[limpia],
+      canonica: `${base()}${limpia}`,
+      tipo: 'website',
+      jsonLd: null,
+    };
+  }
+
   const carta = limpia.match(/^\/([a-z0-9-]+)\/carta$/);
   const ficha = limpia.match(/^\/([a-z0-9-]+)$/);
   const slug = carta?.[1] ?? ficha?.[1];
@@ -253,6 +277,9 @@ export async function sitemap() {
       // La carta cambia mas que la ficha: es la que interesa que se reindexe.
       { loc: `${base()}/${l.slug}/carta`, prioridad: '0.9', frecuencia: 'daily' },
     ]),
+    // Prioridad baja: nadie las busca, pero tienen que ser encontrables.
+    { loc: `${base()}/aviso-legal`, prioridad: '0.2', frecuencia: 'yearly' },
+    { loc: `${base()}/privacidad`, prioridad: '0.2', frecuencia: 'yearly' },
   ];
 
   return [

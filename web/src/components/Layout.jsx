@@ -84,6 +84,10 @@ export default function Layout() {
 
           <p className="pie__legal">
             © {new Date().getFullYear()} {GRUPO.nombre} · {GRUPO.sede}
+            {' · '}
+            <Link to="/aviso-legal">Aviso legal</Link>
+            {' · '}
+            <Link to="/privacidad">Privacidad</Link>
           </p>
         </div>
       </footer>

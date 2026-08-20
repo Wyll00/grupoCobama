@@ -623,6 +623,145 @@ desde `api/uploads/`.
 
 ---
 
+## Lo legal (RGPD y LSSI)
+
+### Dos bases legales distintas, y no se pueden mezclar
+
+Es el error más común en formularios de reserva y aquí está separado a propósito:
+
+| Para qué | Base legal | ¿Casilla? |
+| --- | --- | --- |
+| Gestionar la reserva | **Contrato** (art. 6.1.b) | No |
+| Mandar novedades | **Consentimiento** (art. 6.1.a) | Sí, aparte y desmarcada |
+
+No se pide permiso para tratar los datos de la reserva porque **no se puede
+reservar sin dar el teléfono**: un permiso que no se puede negar sin perder el
+servicio no es un permiso, y presentarlo como tal invalida el consentimiento
+entero, también el de marketing. Lo que sí exige el art. 13 es **informar** al
+recoger los datos, y eso es lo que hace el bloque del formulario.
+
+La casilla obligatoria dice «he leído», no «autorizo». La de marketing solo
+aparece si la persona ha dejado email, porque pedir permiso para escribir a
+quien no ha dado dirección es recoger un consentimiento inútil.
+
+### Qué se guarda como prueba
+
+`politica_version` y no un booleano. Cuando el texto de la política cambie, un
+`true` con fecha no dice **qué** leyó esa persona, porque el texto de entonces
+ya no existe. La versión vive en `web/src/datos/legal.js` (`VERSION_POLITICA`)
+y hay que subirla cada vez que se toque el texto.
+
+En las reservas por teléfono el campo queda a `NULL`: no hay casilla que
+enseñar y rellenarlo desde el servidor sería fabricar una prueba falsa.
+
+### Conservación
+
+12 meses, y lo cumple un script:
+
+```bash
+npm run purgar --prefix api -- --sql
+```
+
+**Anonimiza en vez de borrar**: quita nombre, teléfono, email y observaciones,
+y conserva fecha, hora, comensales y estado, que no identifican a nadie y son
+el histórico del negocio. Tiene que ejecutarse a diario; mientras no haya tarea
+programada, hay que acordarse. Sin esto, la política promete un plazo que no se
+cumple, y eso es peor que no prometer ninguno.
+
+### Cookies: no hace falta banner
+
+La web pública **no pone ninguna cookie**. La única del proyecto es la de sesión
+del panel, que es técnica y solo la reciben los usuarios internos. Si algún día
+se añade Google Analytics o un píxel, esto deja de ser cierto y hay que montar
+el banner.
+
+### Lo que falta antes de publicar
+
+`web/src/datos/legal.js` tiene los campos marcados `PENDIENTE` — razón social,
+NIF, domicilio y los proveedores. **Mientras falten, las dos páginas legales
+enseñan un aviso rojo bien visible.** Es feo aposta: un TODO en un comentario no
+lo ve nadie, ese aviso lo ve el primero que abra la página.
+
+Falta también firmar el **contrato de encargado del tratamiento (art. 28)** con
+CoverManager, con el hosting y con el proveedor de correo. Listarlos en la
+política no basta: sin contrato, la cesión es ilícita aunque esté contada.
+
+---
+
+## CoverManager
+
+Las reservas de la web se envían a CoverManager y **además** quedan registradas
+aquí. Ese «además» es el orden: se guarda en local primero y se envía después,
+nunca al revés. Si se enviara primero, un timeout dejaría al cliente sin reserva
+y sin rastro para reclamar.
+
+```
+formulario → reserva guardada aquí → intento de envío
+                     ↓                      ↓
+              el cliente ya                 ok → cm_estado = enviada
+              tiene su código               fallo → reintento con espera creciente
+```
+
+### Estados
+
+| `cm_estado` | Qué significa |
+| --- | --- |
+| `no_aplica` | Ese local no tiene CoverManager, o la integración está apagada |
+| `pendiente` | Hay que enviarla |
+| `enviando` | Intento en curso — es lo que impide mandarla dos veces |
+| `enviada` | Confirmada al otro lado, con su identificador en `cm_id` |
+| `error` | Falló; se reintenta según `cm_proximo_intento` |
+
+Los reintentos esperan 1, 5, 15, 60 y 360 minutos. Un **4xx no se reintenta**:
+si han rechazado los datos o las credenciales están mal, insistir da el mismo
+resultado y solo llena el log. Un 5xx, un 429 o un timeout sí.
+
+En el panel, una reserva en `error` sale en rojo con **«NO está en
+CoverManager»** y un botón de reintentar. No es un aviso técnico: significa que
+esa mesa no está bloqueada en su libro y se puede vender dos veces.
+
+### Configuración
+
+Cada local tiene su cuenta, así que el identificador va en
+`restaurantes.covermanager_id`, no en una variable suelta. Las credenciales sí
+van al entorno:
+
+```
+COVERMANAGER_URL=
+COVERMANAGER_API_KEY=
+```
+
+**Sin esas dos variables la integración está apagada** y la aplicación se
+comporta igual que antes.
+
+### ⚠️ El contrato de su API está sin confirmar
+
+CoverManager no publica su API: la entrega a sus clientes con las credenciales.
+**No he inventado rutas ni nombres de campo.** Un cliente HTTP escrito a ojo
+falla de la peor manera: parece correcto, pasa las pruebas contra un servidor
+falso y en producción pierde reservas de gente que se presenta a cenar.
+
+Lo que falta está en **una sola función**, `PETICION()` en
+`api/src/integraciones/covermanager.js`: la ruta, la autenticación, los nombres
+de los campos y de dónde sale el identificador. Rellenarla son diez líneas.
+
+Todo lo demás —estados, reintentos, reclamo atómico, panel— está montado y
+probado contra un CoverManager falso:
+
+```bash
+npm run cm --prefix api
+```
+
+Esa prueba cubre envío correcto, 500, 422, timeout, local sin integrar, no
+mandar dos veces la misma y el reintento manual.
+
+Una cosa que hay que preguntarles: **cómo evitan un duplicado**. Ahora se manda
+nuestro código de reserva como `external_id` para que un reintento que se cruce
+con un envío que sí llegó no genere dos mesas. Si su API no admite referencia
+del cliente, el problema no desaparece por no tener campo.
+
+---
+
 ## Alérgenos
 
 Los 14 de declaración obligatoria (Reglamento UE 1169/2011, Anexo II) viven en

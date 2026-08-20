@@ -1053,3 +1053,112 @@ button {
   */
   .app > main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
 }
+
+/* ------------------------------------------------ paginas legales --- */
+
+.legal {
+  max-width: 46rem;
+  line-height: 1.65;
+}
+
+.legal h2 {
+  margin-top: 2.2rem;
+  font-size: 1.15rem;
+}
+
+.legal p {
+  margin: 0.7rem 0;
+}
+
+.legal__version {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.legal__datos,
+.legal__lista {
+  margin: 0.7rem 0;
+  padding-left: 1.1rem;
+}
+
+.legal__datos {
+  list-style: none;
+  padding-left: 0;
+}
+
+.legal__datos li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.legal__lista li {
+  margin: 0.35rem 0;
+}
+
+/* La tabla de finalidades es lo mas denso de la pagina y en movil no cabe:
+   se deja desplazar sola en vez de romper el ancho de la pagina. */
+.legal__tabla {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+}
+
+.legal__tabla th,
+.legal__tabla td {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--borde);
+  text-align: left;
+  vertical-align: top;
+  min-width: 11rem;
+}
+
+.legal__tabla th {
+  background: var(--crema-hueso);
+  font-size: 0.82rem;
+}
+
+.legal__pie {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--borde);
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* ------------------------------------ consentimiento en la reserva --- */
+
+.consentimiento {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--crema-hueso);
+}
+
+.consentimiento__info {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+
+.consentimiento__casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.87rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.consentimiento__casilla input {
+  flex: none;
+  margin-top: 0.18rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--mojo-rojo);
+}

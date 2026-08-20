@@ -184,6 +184,14 @@ adminRouter.patch(
   asyncHandler(reservasCtrl.patchReserva)
 );
 
+// Reintento a mano del envio a CoverManager, para cuando sala ve el aviso en
+// el panel y ya se ha arreglado lo que fallaba.
+adminRouter.post(
+  '/reservas/:id/reenviar-covermanager',
+  ambitoReserva,
+  asyncHandler(reservasCtrl.postReenviarCoverManager)
+);
+
 // ---------------------------------------------------------------------------
 // Ocupacion del local
 //

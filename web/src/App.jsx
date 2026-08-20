@@ -4,6 +4,8 @@ import Home from './pages/Home.jsx';
 import Restaurante from './pages/Restaurante.jsx';
 import Carta from './pages/Carta.jsx';
 import Reservar from './pages/Reservar.jsx';
+import Privacidad from './pages/Privacidad.jsx';
+import AvisoLegal from './pages/AvisoLegal.jsx';
 import NoEncontrado from './pages/NoEncontrado.jsx';
 import { rutasAdmin } from './admin/rutas.jsx';
 
@@ -20,6 +22,12 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="reservar" element={<Reservar />} />
+        {/* Antes de :slug a proposito. React Router puntua mas alto un
+            segmento fijo que uno dinamico, asi que /privacidad no cae en la
+            ficha de un local llamado "privacidad"; pero dejarlo escrito en
+            este orden evita que alguien lo reordene sin darse cuenta. */}
+        <Route path="privacidad" element={<Privacidad />} />
+        <Route path="aviso-legal" element={<AvisoLegal />} />
         <Route path=":slug" element={<Restaurante />} />
         <Route path=":slug/carta" element={<Carta />} />
         <Route path="*" element={<NoEncontrado />} />

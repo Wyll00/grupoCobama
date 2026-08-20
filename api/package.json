@@ -18,7 +18,9 @@
     "db:adoptar": "node scripts/db.js adoptar",
     "portadas": "node scripts/subir-portadas.js",
     "alergenos": "node scripts/iconos-alergenos.js",
-    "carta-basilica": "node scripts/cargar-alergenos-basilica.js"
+    "carta-basilica": "node scripts/cargar-alergenos-basilica.js",
+    "purgar": "node scripts/purgar-reservas.js",
+    "cm": "node scripts/probar-covermanager.js"
   },
   "engines": {
     "node": ">=20"

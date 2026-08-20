@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { adminApi, ErrorApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
+import EstadoCoverManager from '../componentes/EstadoCoverManager.jsx';
 import Modal from '../componentes/Modal.jsx';
 import { Aviso, Boton, Campo, Entrada, Seleccion } from '../componentes/Campos.jsx';
 
@@ -223,6 +224,7 @@ export default function Reservas() {
                   <span className={`punto punto--${reserva.estado}`}>
                     {ESTADOS[reserva.estado]}
                   </span>
+                  <EstadoCoverManager reserva={reserva} onCambio={() => reservas.recargar()} />
                 </td>
 
                 <td className="tabla__derecha acciones-reserva">

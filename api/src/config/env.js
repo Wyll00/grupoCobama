@@ -75,6 +75,21 @@ export const env = {
     tamanoMaximoMb: Number(req('UPLOAD_MAX_MB', 8)),
   },
 
+  /**
+   * CoverManager. Sin URL y clave, la integracion esta apagada y la
+   * aplicacion funciona igual que antes: la reserva se guarda aqui y ya.
+   * El identificador de cada local no va aqui, va en restaurantes: son
+   * cuatro cuentas distintas.
+   */
+  coverManager: {
+    activo: Boolean(process.env.COVERMANAGER_URL && process.env.COVERMANAGER_API_KEY),
+    url: process.env.COVERMANAGER_URL ?? '',
+    // Cada cuantos segundos pasa el reintentador. 60 es de sobra: lo urgente
+    // ya se intenta en el momento de crear la reserva; esto es la red de
+    // seguridad para lo que fallo.
+    intervaloSegundos: Number(process.env.COVERMANAGER_INTERVALO_S ?? 60),
+  },
+
   correo: {
     // Sin SMTP los avisos se escriben en api/correos/ en lugar de perderse.
     activo: Boolean(process.env.SMTP_HOST),
