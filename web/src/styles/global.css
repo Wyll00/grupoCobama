@@ -387,11 +387,15 @@ button {
   color: #d8cfc4;
 }
 
+/* Las tres acciones del hero, arriba a la derecha y no debajo del texto.
+   flex-end para que se alineen por la derecha cuando el ancho no da y una
+   se cae de linea: alineadas a la izquierda quedaria una escalera. */
 .hero__acciones {
+  flex: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
+  justify-content: flex-end;
+  gap: 0.7rem;
 }
 
 /* ------------------------------------------------------ tarjetas ----- */
@@ -1597,18 +1601,35 @@ button {
    mesa", que es la accion que da dinero. Dos botones macizos del mismo color
    en la misma pantalla se quitan protagonismo el uno al otro; asi este se
    distingue de los neutros sin competir con aquel. */
-.hero__galeria {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.8rem 1.7rem;
-  border: 1.5px solid var(--ocre-claro);
-  border-radius: 999px;
-  color: var(--ocre-claro);
-  text-decoration: none;
+/* Los tres del hero comparten alto para que la fila quede a nivel. El .boton
+   de base ya trae la forma; aqui solo se iguala la caja. */
+.hero__acciones .boton {
+  padding: 0.8rem 1.6rem;
   font-size: 1.02rem;
-  font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+/* WhatsApp relleno en el verde mojo de la paleta. Es ademas el color con el
+   que se reconoce WhatsApp, asi que el boton se lee antes de leerlo.
+   El tono va fijo y no por variable: el hero es oscuro en los dos temas, y
+   --mojo-verde se aclara de noche; el blanco encima se quedaria en 2,8 de
+   contraste. */
+.hero__whatsapp {
+  background: #4f6b43;
+  border-color: #4f6b43;
+  color: #ffffff;
+}
+
+.hero__whatsapp:hover {
+  background: #5e7d50;
+  border-color: #5e7d50;
+  color: #ffffff;
+}
+
+.hero__galeria {
+  background: transparent;
+  border: 1.5px solid var(--ocre-claro);
+  color: var(--ocre-claro);
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
@@ -1625,11 +1646,15 @@ button {
   outline-offset: 3px;
 }
 
-/* En movil el boton no cabe al lado del titular sin estrujarlo: se baja
-   debajo, que sigue estando arriba del todo y a mano. */
-@media (max-width: 720px) {
-  .hero__fila { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
-  .hero__galeria { order: -1; }
+/* Debajo de 900 px las tres no caben al lado del titular sin estrujarlo, asi
+   que la columna se parte y las acciones vuelven debajo del texto, que es
+   donde el ojo las busca despues de leer. */
+/* Las tres suman unos 570 px. Debajo de 1150 ya no caben al lado del titular
+   sin estrujarlo, asi que la columna se parte y vuelven debajo del texto, que
+   es donde el ojo las busca despues de leer. */
+@media (max-width: 1150px) {
+  .hero__fila { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+  .hero__acciones { justify-content: flex-start; }
 }
 
 /* -------------------------------------------------------- carrusel --- */

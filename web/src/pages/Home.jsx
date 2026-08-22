@@ -23,28 +23,31 @@ export default function Home() {
       <section className="hero">
         <div className="contenedor hero__fila">
           <div className="hero__texto">
-          <h1>Cocina canaria de siempre, en cuatro casas</h1>
-          <p className="hero__entradilla">
-            Guamasa, Candelaria, La Laguna y La Orotava. Misma cocina, mismo trato,
-            cuatro sitios distintos donde sentarse a comer.
-          </p>
+            <h1>Cocina canaria de siempre, en cuatro casas</h1>
+            <p className="hero__entradilla">
+              Guamasa, Candelaria, La Laguna y La Orotava. Misma cocina, mismo trato,
+              cuatro sitios distintos donde sentarse a comer.
+            </p>
+          </div>
+
+          {/* Las tres acciones juntas arriba a la derecha. Cada una con su
+              peso: la reserva rellena en ocre, WhatsApp en el verde mojo
+              (que ademas es el color con el que la gente reconoce WhatsApp)
+              y la galeria contorneada, que es la menos urgente de las tres. */}
           <div className="hero__acciones">
             <Link className="boton boton--principal" to="/reservar">
               Reservar mesa
             </Link>
             <a
-              className="boton boton--secundario"
-              style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
+              className="boton hero__whatsapp"
               href={enlaceWhatsApp('Hola, me gustaria hacer una reserva.')}
             >
               WhatsApp {GRUPO.whatsapp}
             </a>
+            <Link className="boton hero__galeria" to="/galeria">
+              Galeria
+            </Link>
           </div>
-          </div>
-
-          <Link className="hero__galeria" to="/galeria">
-            Galeria
-          </Link>
         </div>
       </section>
 
