@@ -1593,32 +1593,37 @@ button {
 
 .hero__texto { min-width: 0; }
 
+/* Contorneado en ocre y no relleno: el relleno en ocre ya lo lleva "Reservar
+   mesa", que es la accion que da dinero. Dos botones macizos del mismo color
+   en la misma pantalla se quitan protagonismo el uno al otro; asi este se
+   distingue de los neutros sin competir con aquel. */
 .hero__galeria {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.1rem;
-  border: 1px solid rgba(245, 239, 230, 0.28);
+  padding: 0.8rem 1.7rem;
+  border: 1.5px solid var(--ocre-claro);
   border-radius: 999px;
-  color: var(--crema);
+  color: var(--ocre-claro);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 1.02rem;
   font-weight: 600;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  letter-spacing: 0.02em;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .hero__galeria:hover {
+  background: var(--ocre-claro);
   border-color: var(--ocre-claro);
-  background: rgba(245, 239, 230, 0.08);
+  /* Tinta oscura sobre el ocre claro, no blanco: sobre este tono el blanco se
+     queda en 2 de contraste y el texto se pierde justo al pasar por encima. */
+  color: var(--carbon);
 }
 
 .hero__galeria:focus-visible {
   outline: 2px solid var(--ocre-claro);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
-
-.hero__galeria-icono { display: grid; place-items: center; color: var(--ocre-claro); }
 
 /* En movil el boton no cabe al lado del titular sin estrujarlo: se baja
    debajo, que sigue estando arriba del todo y a mano. */

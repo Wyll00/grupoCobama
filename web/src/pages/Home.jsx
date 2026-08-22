@@ -43,13 +43,6 @@ export default function Home() {
           </div>
 
           <Link className="hero__galeria" to="/galeria">
-            <span className="hero__galeria-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
-                <rect x="3" y="5" width="18" height="14" rx="2" />
-                <circle cx="8.5" cy="10" r="1.6" />
-                <path d="M3.5 17l4.8-4.4a1.5 1.5 0 0 1 2 0l3.4 3.1a1.5 1.5 0 0 0 2 0l1.4-1.2a1.5 1.5 0 0 1 2 0l2 1.8" />
-              </svg>
-            </span>
             Galeria
           </Link>
         </div>
