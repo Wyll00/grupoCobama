@@ -1581,3 +1581,157 @@ button {
   .visor { grid-template-columns: 1fr; }
   .visor__figura { grid-column: 1; }
 }
+
+/* --------------------------------- boton de galeria en la portada --- */
+
+.hero__fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.hero__texto { min-width: 0; }
+
+.hero__galeria {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(245, 239, 230, 0.28);
+  border-radius: 999px;
+  color: var(--crema);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.hero__galeria:hover {
+  border-color: var(--ocre-claro);
+  background: rgba(245, 239, 230, 0.08);
+}
+
+.hero__galeria:focus-visible {
+  outline: 2px solid var(--ocre-claro);
+  outline-offset: 2px;
+}
+
+.hero__galeria-icono { display: grid; place-items: center; color: var(--ocre-claro); }
+
+/* En movil el boton no cabe al lado del titular sin estrujarlo: se baja
+   debajo, que sigue estando arriba del todo y a mano. */
+@media (max-width: 720px) {
+  .hero__fila { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+  .hero__galeria { order: -1; }
+}
+
+/* -------------------------------------------------------- carrusel --- */
+
+.seccion__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.carrusel { position: relative; margin-top: 1.5rem; }
+
+.carrusel__mandos {
+  position: absolute;
+  top: -3.4rem;
+  right: 0;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.carrusel__mandos button {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--tinta);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.carrusel__mandos button:hover { border-color: var(--ocre); color: var(--ocre); }
+.carrusel__mandos button:focus-visible { outline: 2px solid var(--ocre); outline-offset: 2px; }
+
+.carrusel__pista {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0 0 0.5rem;
+  list-style: none;
+  overflow-x: auto;
+  /* El desplazamiento nativo con anclaje: el dedo y la rueda funcionan solos,
+     y las flechas no son mas que un scrollBy. */
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.carrusel__pista::-webkit-scrollbar { display: none; }
+
+.carrusel__pista > li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.carrusel__foto {
+  display: block;
+  position: relative;
+  width: clamp(15rem, 30vw, 22rem);
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: var(--superficie);
+  cursor: zoom-in;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.carrusel__foto:hover { border-color: var(--ocre); transform: translateY(-2px); }
+.carrusel__foto:focus-visible { outline: 2px solid var(--ocre); outline-offset: 2px; }
+
+.carrusel__foto img {
+  display: block;
+  width: 100%;
+  /* Aqui SI se recorta a una altura fija, al reves que en la galeria: en una
+     fila horizontal, fotos de altos distintos hacen que la tira baile. */
+  height: clamp(11rem, 22vw, 15rem);
+  object-fit: cover;
+}
+
+.carrusel__pie {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2rem 0.85rem 0.7rem;
+  background: linear-gradient(0deg, rgba(31, 26, 23, 0.9) 0%, rgba(31, 26, 23, 0) 100%);
+  color: #f5efe6;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.carrusel__local {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ocre-claro);
+}
+
+@media (max-width: 600px) {
+  .carrusel__mandos { display: none; }
+  .carrusel__foto { width: 76vw; }
+}

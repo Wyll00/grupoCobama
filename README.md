@@ -830,6 +830,27 @@ ambiente, no una clasificación interna nuestra. En el panel **no** se mezclan,
 porque enseñar fotos que no se pueden tocar solo confunde sobre de quién es
 cada una.
 
+### En la portada
+
+Un botón **Galería** arriba a la derecha del titular, y debajo un carrusel con
+las fotos de las cuatro casas que pasa solo. Si no hay fotos, la sección entera
+no se pinta: no queda un hueco vacío.
+
+El carrusel se mueve con **scroll horizontal nativo y `scroll-snap`**, no con
+`transform` y cuentas de píxeles. Así el arrastre con el dedo, la rueda y el
+teclado funcionan sin escribir nada — que es justo donde fallan los carruseles
+hechos a mano. Las flechas no son más que un `scrollBy`.
+
+Lo importante de uno que pasa solo es **poder pararlo**. Una foto que se va
+justo cuando la estabas mirando es de las cosas que más irritan de una web, así
+que se detiene al pasar el ratón, al llegar el foco con el teclado, al tocarlo,
+y mientras la pestaña no se ve (si no, los temporizadores se acumulan y al
+volver pega un salto de varias fotos). Con el sistema en «menos animaciones» no
+arranca siquiera.
+
+Ahí las fotos **sí** se recortan a un alto fijo, al revés que en la galería: en
+una fila horizontal, fotos de altos distintos hacen que la tira baile.
+
 ### Descripción de la foto
 
 `alt` es lo que oye quien usa un lector de pantalla y lo que lee Google
