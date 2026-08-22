@@ -180,9 +180,25 @@ export async function metadatosDeRuta(ruta) {
     };
   }
 
+  if (limpia === '/galeria') {
+    const [[{ fotos }]] = await pool.execute(
+      'SELECT COUNT(*) AS fotos FROM galeria WHERE activo = 1'
+    );
+    return {
+      titulo: `Galeria · ${NOMBRE_GRUPO}`,
+      descripcion:
+        `${fotos} fotos de los cuatro locales del ${NOMBRE_GRUPO} en Tenerife: ` +
+        'sus platos, sus salas y sus celebraciones.',
+      canonica: `${base()}/galeria`,
+      tipo: 'website',
+      jsonLd: null,
+    };
+  }
+
+  const galeriaLocal = limpia.match(/^\/([a-z0-9-]+)\/galeria$/);
   const carta = limpia.match(/^\/([a-z0-9-]+)\/carta$/);
   const ficha = limpia.match(/^\/([a-z0-9-]+)$/);
-  const slug = carta?.[1] ?? ficha?.[1];
+  const slug = galeriaLocal?.[1] ?? carta?.[1] ?? ficha?.[1];
   if (!slug) return null;
 
   const local = await cargarLocal(slug);
@@ -190,6 +206,34 @@ export async function metadatosDeRuta(ruta) {
 
   const horarios = await horarioSchema(local.id);
   const restaurante = fichaRestaurante(local, horarios);
+
+  if (galeriaLocal) {
+    const [filas] = await pool.execute(
+      `SELECT imagen, COUNT(*) OVER () AS total
+         FROM galeria
+        WHERE activo = 1 AND (restaurante_id = ? OR restaurante_id IS NULL)
+        ORDER BY orden LIMIT 1`,
+      [local.id]
+    );
+    const total = filas[0]?.total ?? 0;
+
+    return {
+      titulo: `Fotos de ${local.nombre} · ${local.municipio} · ${NOMBRE_GRUPO}`,
+      descripcion:
+        `${total} fotos de ${local.nombre}, en ${local.municipio}: sus platos, ` +
+        'la sala y sus celebraciones.',
+      canonica: `${base()}/${local.slug}/galeria`,
+      // La primera foto de la galeria antes que la portada: al compartir el
+      // enlace, lo que se previsualiza es de lo que va la pagina.
+      imagen: filas[0]?.imagen
+        ? `${base()}${filas[0].imagen}`
+        : local.imagen_portada
+          ? `${base()}${local.imagen_portada}`
+          : null,
+      tipo: 'article',
+      jsonLd: restaurante,
+    };
+  }
 
   if (carta) {
     const [[{ platos }]] = await pool.execute(
@@ -276,7 +320,9 @@ export async function sitemap() {
       { loc: `${base()}/${l.slug}`, prioridad: '0.9', frecuencia: 'weekly' },
       // La carta cambia mas que la ficha: es la que interesa que se reindexe.
       { loc: `${base()}/${l.slug}/carta`, prioridad: '0.9', frecuencia: 'daily' },
+      { loc: `${base()}/${l.slug}/galeria`, prioridad: '0.7', frecuencia: 'weekly' },
     ]),
+    { loc: `${base()}/galeria`, prioridad: '0.7', frecuencia: 'weekly' },
     // Prioridad baja: nadie las busca, pero tienen que ser encontrables.
     { loc: `${base()}/aviso-legal`, prioridad: '0.2', frecuencia: 'yearly' },
     { loc: `${base()}/privacidad`, prioridad: '0.2', frecuencia: 'yearly' },

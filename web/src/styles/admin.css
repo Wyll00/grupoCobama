@@ -1205,3 +1205,81 @@
   font-size: 0.82rem;
   color: #2f7d4f;
 }
+
+/* ------------------------------------------------- galeria (panel) --- */
+
+.subir-fotos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.subir-fotos__nota {
+  flex: 1 1 16rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.galeria-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria-admin__ficha {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.galeria-admin__ficha img {
+  display: block;
+  width: 100%;
+  /* Recortada SOLO aqui, en la ficha del panel, para que las tarjetas queden
+     alineadas. En la web publica la foto sale entera. */
+  height: 11rem;
+  object-fit: cover;
+  background: var(--fondo);
+}
+
+.galeria-admin__datos {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.85rem;
+}
+
+.galeria-admin__pendiente {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #b8860b;
+  border-radius: 6px;
+  background: rgba(184, 134, 11, 0.09);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.galeria-admin__acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.galeria-admin__medidas {
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+
+.enlace--peligro { color: #b3261e; }

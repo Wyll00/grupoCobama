@@ -792,6 +792,65 @@ del cliente, el problema no desaparece por no tener campo.
 
 ---
 
+## Galería
+
+Una por local (`/:slug/galeria`) y una del grupo (`/galeria`), con filtro por
+categoría —platos, el local, el equipo, celebraciones— y visor a pantalla
+completa. Se gestiona desde **Galería** en el panel.
+
+### Las fotos conservan su encuadre
+
+Es la diferencia con las fotos de plato, y es deliberada. Un plato va recortado
+a 4:3 porque tiene que cuadrar en una rejilla al lado de un precio. Aplicar ese
+mismo recorte en una galería **decapita a la gente y parte los platos por la
+mitad**, así que aquí se redimensiona sin deformar (1600 px el lado mayor, 600
+la miniatura) y se guardan las medidas resultantes.
+
+Esas medidas van en `width`/`height` de cada `<img>`. Sin ellas el navegador no
+sabe cuánto sitio reservar y la página pega saltos según van cargando las fotos
+— en una galería de treinta, insufrible.
+
+La rejilla usa `columns` y no `grid`: en una rejilla todas las celdas de una
+fila miden lo mismo, así que o se recortan las fotos o quedan huecos.
+
+### De quién es cada foto
+
+`restaurante_id NULL` = foto del grupo. Y ahí hay dos comportamientos distintos
+a propósito:
+
+| | Fotos del local | Fotos del grupo |
+| --- | --- | --- |
+| Galería pública del local | Sí | **Sí** |
+| Galería pública del grupo | Sí | Sí |
+| Panel del local | Sí | No |
+| Quién las gestiona | El encargado | Solo la administración |
+
+En la web se mezclan porque quien entra en la ficha de una casa quiere ver
+ambiente, no una clasificación interna nuestra. En el panel **no** se mezclan,
+porque enseñar fotos que no se pueden tocar solo confunde sobre de quién es
+cada una.
+
+### Descripción de la foto
+
+`alt` es lo que oye quien usa un lector de pantalla y lo que lee Google
+Imágenes — que para un restaurante no es poca cosa. No se exige al subir, para
+no bloquear una tanda de veinte fotos, pero el panel **marca en ámbar las que
+están sin describir**. Mismo criterio que con los alérgenos sin confirmar: lo
+que no se ve, se olvida.
+
+### Borrar borra de verdad
+
+Al revés que con los platos, que se desactivan. Un plato desactivado guarda
+histórico —precios, reservas que lo incluían—; una foto no cuenta nada, y dejar
+los ficheros ocupando disco para siempre no beneficia a nadie. Para esconderla
+sin perderla ya está `activo`.
+
+Los ficheros se borran **después** de que la fila se haya ido: si falla, es
+preferible un fichero huérfano en disco que una fila apuntando a una imagen que
+ya no existe y un hueco roto en la galería.
+
+---
+
 ## Modo oscuro
 
 Lo enciende el **platito** de la esquina de la cabecera: de día el plato está

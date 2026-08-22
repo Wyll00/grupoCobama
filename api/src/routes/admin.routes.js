@@ -9,6 +9,7 @@ import {
   ambitoCartaItem,
   ambitoReserva,
   ambitoPlato,
+  ambitoFoto,
 } from '../middleware/auth.js';
 import { manejarSubida } from '../middleware/subida.js';
 
@@ -36,6 +37,11 @@ import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
+import * as galeriaCtrl from '../controllers/admin.galeria.controller.js';
+import {
+  actualizarFotoSchema,
+  reordenarGaleriaSchema,
+} from '../esquemas/galeria.js';
 import { actualizarLocalSchema } from '../esquemas/locales.js';
 import {
   crearReservaManualSchema,
@@ -146,6 +152,48 @@ adminRouter.delete(
   ambitoLocal(),
   asyncHandler(localesCtrl.deletePortada)
 );
+
+// ---------------------------------------------------------------------------
+// Galeria
+//
+// Un encargado lleva la de su casa. Las fotos del grupo salen en la galeria
+// general Y en las cuatro casas, asi que esas son cosa de la administracion.
+// ---------------------------------------------------------------------------
+adminRouter.get(
+  '/restaurantes/:restauranteId/galeria',
+  ambitoLocal(),
+  asyncHandler(galeriaCtrl.getGaleriaLocal)
+);
+adminRouter.post(
+  '/restaurantes/:restauranteId/galeria',
+  ambitoLocal(),
+  manejarSubida,
+  asyncHandler(galeriaCtrl.postFotoLocal)
+);
+adminRouter.post(
+  '/restaurantes/:restauranteId/galeria/orden',
+  ambitoLocal(),
+  validarCuerpo(reordenarGaleriaSchema),
+  asyncHandler(galeriaCtrl.postOrdenLocal)
+);
+
+adminRouter.get('/galeria', soloAdmin, asyncHandler(galeriaCtrl.getGaleriaGrupo));
+adminRouter.post('/galeria', soloAdmin, manejarSubida, asyncHandler(galeriaCtrl.postFotoGrupo));
+adminRouter.post(
+  '/galeria/orden',
+  soloAdmin,
+  validarCuerpo(reordenarGaleriaSchema),
+  asyncHandler(galeriaCtrl.postOrdenGrupo)
+);
+
+// Por id: el ambito sale de la propia foto, no de la URL.
+adminRouter.patch(
+  '/galeria/:id',
+  ambitoFoto,
+  validarCuerpo(actualizarFotoSchema),
+  asyncHandler(galeriaCtrl.patchFoto)
+);
+adminRouter.delete('/galeria/:id', ambitoFoto, asyncHandler(galeriaCtrl.deleteFoto));
 
 // QR de la carta publica del local, para imprimir o publicar.
 adminRouter.get(

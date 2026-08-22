@@ -159,6 +159,17 @@ export const adminApi = {
   crearReserva: (restauranteId, datos) =>
     enviar('POST', `/admin/restaurantes/${restauranteId}/reservas`, { cuerpo: datos }),
   editarReserva: (id, datos) => enviar('PATCH', `/admin/reservas/${id}`, { cuerpo: datos }),
+  // --- galeria ------------------------------------------------------------
+  galeriaLocal: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/galeria`),
+  galeriaGrupo: () => get('/admin/galeria'),
+  // destino null = foto del grupo
+  subirFoto: (destino, formData) =>
+    enviar('POST', destino === null ? '/admin/galeria' : `/admin/restaurantes/${destino}/galeria`, {
+      formData,
+    }),
+  editarFoto: (id, datos) => enviar('PATCH', `/admin/galeria/${id}`, { cuerpo: datos }),
+  borrarFoto: (id) => enviar('DELETE', `/admin/galeria/${id}`),
+
   editarLocal: (id, datos) => enviar('PATCH', `/admin/restaurantes/${id}`, { cuerpo: datos }),
 
   reenviarCoverManager: (id) =>

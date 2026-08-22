@@ -11,6 +11,7 @@ const CartaLocal = lazy(() => import('./paginas/CartaLocal.jsx'));
 const Platos = lazy(() => import('./paginas/Platos.jsx'));
 const Reservas = lazy(() => import('./paginas/Reservas.jsx'));
 const Ocupacion = lazy(() => import('./paginas/Ocupacion.jsx'));
+const GaleriaAdmin = lazy(() => import('./paginas/Galeria.jsx'));
 const Usuarios = lazy(() => import('./paginas/Usuarios.jsx'));
 
 /**
@@ -32,6 +33,7 @@ export function rutasAdmin() {
         <Route path="platos" element={<Platos />} />
         <Route path="reservas" element={<Reservas />} />
         <Route path="ocupacion" element={<Ocupacion />} />
+        <Route path="galeria" element={<GaleriaAdmin />} />
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
     </Route>

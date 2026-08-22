@@ -31,6 +31,7 @@ export default function AdminLayout() {
             <NavLink to="/admin/reservas">Reservas</NavLink>
             <NavLink to="/admin/carta">Cartas</NavLink>
             <NavLink to="/admin/platos">Catalogo</NavLink>
+            <NavLink to="/admin/galeria">Galeria</NavLink>
             <NavLink to="/admin/ocupacion">Ocupacion</NavLink>
             {esAdmin && <NavLink to="/admin/usuarios">Usuarios</NavLink>}
           </nav>

@@ -70,6 +70,20 @@ export default function Layout() {
             </div>
 
             <div>
+              <h4>Fotos</h4>
+              <ul className="pie__lista">
+                <li>
+                  <Link to="/galeria">Galeria del grupo</Link>
+                </li>
+                {(locales ?? []).map((local) => (
+                  <li key={local.slug}>
+                    <Link to={`/${local.slug}/galeria`}>Fotos de {local.nombre}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
               <h4>Siguenos</h4>
               <ul className="pie__lista">
                 <li>

@@ -4,6 +4,7 @@ import {
   obtenerIdPorSlug,
 } from '../services/restaurantes.service.js';
 import { obtenerCarta } from '../services/catalogo.service.js';
+import * as galeria from '../services/galeria.service.js';
 import { ApiError } from '../utils/ApiError.js';
 
 export async function getRestaurantes(req, res) {
@@ -47,3 +48,29 @@ function listaDeQuery(valor) {
 }
 
 const esVerdadero = (v) => v === '1' || v === 'true';
+
+/**
+ * Galeria publica. Sin slug es la del grupo; con slug, la de esa casa mas las
+ * del grupo, que tambien son fotos de la casa.
+ */
+export async function getGaleria(req, res) {
+  const slug = req.params.slug ?? null;
+
+  if (slug) {
+    // Que el local exista y este activo se comprueba antes de devolver fotos:
+    // si no, /un-local-inventado/galeria responderia 200 con una lista vacia
+    // en vez de un 404.
+    const id = await obtenerIdPorSlug(slug);
+    if (!id) throw ApiError.noEncontrado('Ese local no existe');
+  }
+
+  const [fotos, porCategoria] = await Promise.all([
+    galeria.listarPublica({ slug, categoria: req.consulta?.categoria ?? null }),
+    galeria.contarPorCategoria(slug),
+  ]);
+
+  // Todo dentro de `datos`, igual que la carta: el cliente de la web se queda
+  // con ese campo y descarta el resto del sobre, asi que lo que salga fuera
+  // no llega nunca.
+  res.json({ datos: { total: fotos.length, fotos, categorias: porCategoria } });
+}

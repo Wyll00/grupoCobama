@@ -12,6 +12,14 @@ const RUTA_PUBLICA = `/uploads/${SUBCARPETA}`;
 const SUBCARPETA_PORTADAS = 'portadas';
 const RUTA_PORTADAS = `/uploads/${SUBCARPETA_PORTADAS}`;
 
+const SUBCARPETA_GALERIA = 'galeria';
+const RUTA_GALERIA = `/uploads/${SUBCARPETA_GALERIA}`;
+
+// Lado mayor. No se fija proporcion: en la galeria las fotos conservan su
+// encuadre, que es justo lo que las hace mirables.
+const GALERIA_GRANDE = 1600;
+const GALERIA_THUMB = 600;
+
 // Panoramica: va de fondo en la cabecera del local, detras del nombre.
 const PORTADA = { ancho: 1920, alto: 1000 };
 export const PROPORCION_PORTADA = PORTADA.ancho / PORTADA.alto;
@@ -22,6 +30,7 @@ const MINIATURA = { ancho: 400, alto: 300 };
 
 const directorio = () => join(env.uploads.directorio, SUBCARPETA);
 const directorioPortadas = () => join(env.uploads.directorio, SUBCARPETA_PORTADAS);
+const directorioGaleria = () => join(env.uploads.directorio, SUBCARPETA_GALERIA);
 
 /**
  * Procesa la imagen de un plato y devuelve las rutas publicas.
@@ -137,6 +146,69 @@ export async function borrarPortada(ruta) {
   } catch (err) {
     if (err.code !== 'ENOENT') {
       console.warn(`[imagenes] no se pudo borrar ${ruta}: ${err.message}`);
+    }
+  }
+}
+
+/**
+ * Foto de galeria.
+ *
+ * A diferencia de las de plato y las portadas, esta NO se recorta a una
+ * proporcion: se redimensiona sin deformar y se devuelven las medidas
+ * resultantes. Un plato va a 4:3 porque tiene que cuadrar en una rejilla al
+ * lado de un precio; en una galeria ese mismo recorte decapita a la gente y
+ * parte los platos.
+ *
+ * `withoutEnlargement` para que una foto pequena no se estire: agrandar no
+ * anade detalle, solo peso y una imagen borrosa.
+ */
+export async function procesarImagenGaleria(buffer) {
+  await mkdir(directorioGaleria(), { recursive: true });
+
+  const base = sharp(buffer, { failOn: 'error' }).rotate();
+  const metadatos = await base.metadata().catch(() => null);
+  if (!metadatos?.width || !metadatos?.height) {
+    throw ApiError.peticionInvalida('El fichero no es una imagen valida');
+  }
+
+  const sufijo = `${Date.now()}-${randomBytes(5).toString('hex')}`;
+  const nombreGrande = `foto-${sufijo}.webp`;
+  const nombreThumb = `foto-${sufijo}-thumb.webp`;
+
+  const grande = await base
+    .clone()
+    .resize(GALERIA_GRANDE, GALERIA_GRANDE, { fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toFile(join(directorioGaleria(), nombreGrande));
+
+  await base
+    .clone()
+    .resize(GALERIA_THUMB, GALERIA_THUMB, { fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 78 })
+    .toFile(join(directorioGaleria(), nombreThumb));
+
+  // Las medidas salen de lo que ha escrito sharp, no de un calculo nuestro:
+  // con `inside` el resultado depende de la proporcion de origen y de si se
+  // ha aplicado withoutEnlargement, y equivocarse aqui devuelve una pagina
+  // que da saltos al cargar.
+  return {
+    imagen: `${RUTA_GALERIA}/${nombreGrande}`,
+    thumb: `${RUTA_GALERIA}/${nombreThumb}`,
+    ancho: grande.width,
+    alto: grande.height,
+  };
+}
+
+/** Borra los dos ficheros de una foto de galeria. */
+export async function borrarImagenGaleria(...rutas) {
+  for (const ruta of rutas) {
+    if (!ruta?.startsWith(RUTA_GALERIA)) continue;
+    try {
+      await unlink(join(directorioGaleria(), basename(ruta)));
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        console.warn(`[imagenes] no se pudo borrar ${ruta}: ${err.message}`);
+      }
     }
   }
 }

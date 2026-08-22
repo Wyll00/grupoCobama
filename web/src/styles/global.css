@@ -1421,3 +1421,163 @@ button {
     font-size: 0.82rem;
   }
 }
+
+/* ------------------------------------------------------- galeria --- */
+
+/* Columnas y no rejilla: en una rejilla todas las celdas de una fila miden lo
+   mismo, asi que o se recortan las fotos o quedan huecos. Con columnas cada
+   foto conserva su alto y se apilan sin espacios. */
+.galeria {
+  columns: 3 260px;
+  column-gap: 1rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria__hueco {
+  /* Sin esto una foto se parte por la mitad entre el final de una columna y
+     el principio de la siguiente. */
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+.galeria__foto {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-s);
+  overflow: hidden;
+  background: var(--superficie);
+  cursor: zoom-in;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.galeria__foto:hover {
+  border-color: var(--ocre);
+  transform: translateY(-2px);
+}
+
+.galeria__foto:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+.galeria__foto img {
+  display: block;
+  width: 100%;
+  /* height auto anula el atributo height del HTML para el dibujado, pero el
+     navegador se queda con la proporcion de width/height para reservar el
+     hueco antes de descargar nada. Es lo que evita los saltos. */
+  height: auto;
+}
+
+.galeria__pie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.6rem 0.7rem 0.55rem;
+  background: linear-gradient(0deg, rgba(31, 26, 23, 0.85) 0%, rgba(31, 26, 23, 0) 100%);
+  color: #f5efe6;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+/* --------------------------------------------------------- visor --- */
+
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: clamp(0.5rem, 3vw, 2rem);
+  background: rgba(15, 12, 10, 0.94);
+}
+
+.visor__figura {
+  grid-column: 2;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.visor__figura img {
+  max-width: 100%;
+  /* El alto tambien limitado: si no, una foto vertical se sale de la pantalla
+     y hay que desplazarse dentro del visor para verla entera. */
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radio-s);
+}
+
+.visor__figura figcaption {
+  color: #d8cfc4;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.visor__cerrar,
+.visor__flecha {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(245, 239, 230, 0.25);
+  border-radius: 999px;
+  background: rgba(245, 239, 230, 0.08);
+  color: #f5efe6;
+  cursor: pointer;
+}
+
+.visor__cerrar {
+  position: absolute;
+  top: clamp(0.5rem, 3vw, 1.5rem);
+  right: clamp(0.5rem, 3vw, 1.5rem);
+  width: 2.6rem;
+  height: 2.6rem;
+  font-size: 1rem;
+}
+
+.visor__flecha {
+  width: 2.8rem;
+  height: 2.8rem;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.visor__flecha--atras { grid-column: 1; }
+.visor__flecha--adelante { grid-column: 3; }
+
+.visor__cerrar:hover,
+.visor__flecha:hover {
+  background: rgba(245, 239, 230, 0.18);
+  border-color: var(--ocre-claro);
+}
+
+.visor__cuenta {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(0.5rem, 2vw, 1rem);
+  transform: translateX(-50%);
+  color: #a89d90;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .galeria { columns: 2 140px; column-gap: 0.6rem; }
+  .galeria__hueco { margin-bottom: 0.6rem; }
+  /* Las flechas se comen el ancho de la foto en una pantalla estrecha. En
+     movil se pasa arrastrando, que es lo natural ahi. */
+  .visor__flecha { display: none; }
+  .visor { grid-template-columns: 1fr; }
+  .visor__figura { grid-column: 1; }
+}

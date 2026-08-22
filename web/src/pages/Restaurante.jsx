@@ -65,6 +65,13 @@ export default function Restaurante() {
             >
               Ver la carta
             </Link>
+            <Link
+              className="boton boton--secundario"
+              style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
+              to={`/${local.slug}/galeria`}
+            >
+              Ver fotos
+            </Link>
             <a
               className="boton boton--secundario"
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}

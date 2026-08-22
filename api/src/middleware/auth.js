@@ -169,3 +169,39 @@ export const ambitoCartaItem = asyncHandler(async (req, res, next) => {
   req.restauranteId = item.restaurante_id;
   next();
 });
+
+/**
+ * Ambito de una foto de galeria.
+ *
+ * Una foto sin local es del grupo, y esas solo las toca un admin: salen en la
+ * galeria general y en las cuatro casas, asi que no es cosa de un encargado.
+ * Las de su local, si.
+ */
+export const ambitoFoto = asyncHandler(async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw ApiError.peticionInvalida('Identificador de foto invalido');
+  }
+
+  const [filas] = await pool.execute(
+    'SELECT id, restaurante_id FROM galeria WHERE id = ? LIMIT 1',
+    [id]
+  );
+
+  const foto = filas[0];
+  if (!foto) throw ApiError.noEncontrado('Esa foto no existe');
+
+  if (req.usuario.rol !== 'admin_grupo') {
+    if (foto.restaurante_id === null) {
+      throw ApiError.prohibido('Las fotos del grupo las lleva la administracion');
+    }
+    if (foto.restaurante_id !== req.usuario.restaurante_id) {
+      // Mismo mensaje que si no existiera: no hay por que confirmarle a un
+      // encargado que esa foto existe en otra casa.
+      throw ApiError.noEncontrado('Esa foto no existe');
+    }
+  }
+
+  req.foto = foto;
+  next();
+});

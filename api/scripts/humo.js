@@ -51,6 +51,7 @@ const rastro = {
   reservaCodigo: null,
   platoEncargadoId: null,
   portadaLocal: null,
+  fotosGaleria: [],
 };
 
 function comprobar(descripcion, condicion, detalle) {
@@ -75,12 +76,15 @@ function crearCliente() {
     const cabeceras = {};
     if (cliente.acceso) cabeceras.authorization = `Bearer ${cliente.acceso}`;
     if (cliente.cookie) cabeceras.cookie = cliente.cookie;
-    if (cuerpo !== undefined) cabeceras['content-type'] = 'application/json';
+    // Con FormData NO se pone content-type: lo tiene que poner fetch, porque
+    // lleva el boundary del multipart y ese lo genera el.
+    const esFormData = cuerpo instanceof FormData;
+    if (cuerpo !== undefined && !esFormData) cabeceras['content-type'] = 'application/json';
 
     const res = await fetch(`${BASE}${ruta}`, {
       method: metodo,
       headers: cabeceras,
-      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
+      body: cuerpo === undefined ? undefined : esFormData ? cuerpo : JSON.stringify(cuerpo),
     });
 
     const setCookie = res.headers.getSetCookie?.() ?? [];
@@ -697,6 +701,116 @@ async function main() {
   }
 
   // ---------------------------------------------------------------- QR
+  // -------------------------------------------------------------- galeria
+  seccion('Galeria');
+
+  const hacerFoto = (ancho, alto) =>
+    sharp({ create: { width: ancho, height: alto, channels: 3, background: { r: 120, g: 80, b: 50 } } })
+      .jpeg()
+      .toBuffer();
+
+  const subirFoto = async (cliente, url, { ancho, alto, categoria = 'local', alt }) => {
+    const fd = new FormData();
+    fd.append('imagen', new Blob([await hacerFoto(ancho, alto)], { type: 'image/jpeg' }), 'f.jpg');
+    fd.append('categoria', categoria);
+    if (alt) fd.append('alt', alt);
+    return cliente.peticion('POST', url, fd);
+  };
+
+  const fotoLocal = await subirFoto(admin, '/api/admin/restaurantes/2/galeria', {
+    ancho: 2400,
+    alto: 1600,
+    categoria: 'plato',
+    alt: 'Foto de la prueba de humo',
+  });
+  comprobar('admin sube una foto a un local (201)', fotoLocal.status === 201);
+  if (fotoLocal.cuerpo?.datos?.id) rastro.fotosGaleria.push(fotoLocal.cuerpo.datos.id);
+
+  // Lo que distingue esta galeria de las fotos de plato: aqui NO se recorta.
+  const g = fotoLocal.cuerpo?.datos;
+  comprobar(
+    'la foto conserva su proporcion, no se recorta',
+    g && Math.abs(g.ancho / g.alto - 2400 / 1600) < 0.01,
+    `${g?.ancho}x${g?.alto}`
+  );
+
+  const fotoGrupo = await subirFoto(admin, '/api/admin/galeria', {
+    ancho: 1200,
+    alto: 1600,
+    categoria: 'equipo',
+  });
+  comprobar('admin sube una foto del grupo (201)', fotoGrupo.status === 201);
+  comprobar('la del grupo no tiene local', fotoGrupo.cuerpo?.datos?.restaurante_id === null);
+  if (fotoGrupo.cuerpo?.datos?.id) rastro.fotosGaleria.push(fotoGrupo.cuerpo.datos.id);
+
+  const galeriaBasilica = await (await fetch(`${BASE}/api/restaurantes/la-basilica/galeria`)).json();
+  const idsBasilica = (galeriaBasilica.datos?.fotos ?? []).map((f) => f.id);
+  comprobar('la foto sale en la galeria publica de su local', idsBasilica.includes(g?.id));
+  comprobar(
+    'la del grupo tambien sale en la del local',
+    idsBasilica.includes(fotoGrupo.cuerpo?.datos?.id)
+  );
+
+  const galeriaOtro = await (await fetch(`${BASE}/api/restaurantes/como-en-casa/galeria`)).json();
+  const idsOtro = (galeriaOtro.datos?.fotos ?? []).map((f) => f.id);
+  comprobar('pero la del local NO sale en la de otra casa', !idsOtro.includes(g?.id));
+  comprobar('y la del grupo si', idsOtro.includes(fotoGrupo.cuerpo?.datos?.id));
+
+  const local404 = await fetch(`${BASE}/api/restaurantes/no-existe-xyz/galeria`);
+  comprobar('la galeria de un local inventado da 404', local404.status === 404);
+
+  const catMala = await fetch(`${BASE}/api/galeria?categoria=inventada`);
+  comprobar('una categoria que no existe se rechaza (400)', catMala.status === 400);
+
+  // Permisos
+  const subidaAjena = await subirFoto(basilica, '/api/admin/restaurantes/1/galeria', {
+    ancho: 400,
+    alto: 300,
+  });
+  comprobar('un encargado no sube a otro local (403)', subidaAjena.status === 403);
+
+  const subidaGrupo = await subirFoto(basilica, '/api/admin/galeria', { ancho: 400, alto: 300 });
+  comprobar('un encargado no sube fotos del grupo (403)', subidaGrupo.status === 403);
+
+  const editarGrupo = await basilica.peticion('PATCH', `/api/admin/galeria/${fotoGrupo.cuerpo?.datos?.id}`, {
+    titulo: 'mia',
+  });
+  comprobar('un encargado no edita una foto del grupo (403)', editarGrupo.status === 403);
+
+  const editarSuya = await basilica.peticion('PATCH', `/api/admin/galeria/${g?.id}`, {
+    alt: 'Descripcion cambiada',
+    categoria: 'evento',
+  });
+  comprobar('un encargado si edita la de su casa', editarSuya.cuerpo?.datos?.alt === 'Descripcion cambiada');
+  comprobar('y le cambia la categoria', editarSuya.cuerpo?.datos?.categoria === 'evento');
+
+  // El panel de cada uno ensena solo lo suyo, sin mezclar
+  const panelGrupo = await admin.peticion('GET', '/api/admin/galeria');
+  comprobar(
+    'en el panel, la galeria del grupo solo trae las del grupo',
+    (panelGrupo.cuerpo?.datos ?? []).every((f) => f.restaurante_id === null),
+    JSON.stringify((panelGrupo.cuerpo?.datos ?? []).map((f) => f.restaurante_id))
+  );
+
+  // Borrado: se lleva la fila y los ficheros
+  const rutaFoto = g?.imagen;
+  const antesDeBorrar = await fetch(`${BASE}${rutaFoto}`);
+  comprobar('la imagen se sirve antes de borrar', antesDeBorrar.status === 200);
+
+  const borrado = await basilica.peticion('DELETE', `/api/admin/galeria/${g?.id}`);
+  comprobar('borrar responde 200', borrado.status === 200);
+  rastro.fotosGaleria = rastro.fotosGaleria.filter((id) => id !== g?.id);
+
+  const ficheroTrasBorrar = await fetch(`${BASE}${rutaFoto}`);
+  comprobar(
+    'y el fichero desaparece del disco (404)',
+    ficheroTrasBorrar.status === 404,
+    String(ficheroTrasBorrar.status)
+  );
+
+  const yaNoEsta = await basilica.peticion('PATCH', `/api/admin/galeria/${g?.id}`, { titulo: 'x' });
+  comprobar('la foto borrada ya no existe (404)', yaNoEsta.status === 404);
+
   seccion('QR de la carta');
 
   const qr = await admin.peticion('GET', '/api/admin/restaurantes/4/qr');
@@ -1169,7 +1283,23 @@ async function main() {
 /** Borra lo que haya creado la prueba, haya terminado bien o mal. */
 async function limpiar() {
   const { pool } = await import('../src/config/db.js');
+  const { unlink } = await import('node:fs/promises');
+  const { join, basename } = await import('node:path');
+  const { env } = await import('../src/config/env.js');
   try {
+    // Las fotos: la fila Y los dos ficheros. Borrar solo la fila dejaria los
+    // webp acumulandose en uploads/galeria a cada pasada de la prueba.
+    for (const id of rastro.fotosGaleria) {
+      const [filas] = await pool.execute(
+        'SELECT imagen, imagen_thumb FROM galeria WHERE id = ?',
+        [id]
+      );
+      await pool.execute('DELETE FROM galeria WHERE id = ?', [id]);
+      for (const ruta of [filas[0]?.imagen, filas[0]?.imagen_thumb]) {
+        if (!ruta) continue;
+        await unlink(join(env.uploads.directorio, 'galeria', basename(ruta))).catch(() => {});
+      }
+    }
     if (rastro.itemId) {
       await pool.execute('DELETE FROM historico_precios WHERE carta_item_id = ?', [rastro.itemId]);
       await pool.execute('DELETE FROM carta_items WHERE id = ?', [rastro.itemId]);

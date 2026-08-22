@@ -6,6 +6,7 @@ import Carta from './pages/Carta.jsx';
 import Reservar from './pages/Reservar.jsx';
 import Privacidad from './pages/Privacidad.jsx';
 import AvisoLegal from './pages/AvisoLegal.jsx';
+import Galeria from './pages/Galeria.jsx';
 import NoEncontrado from './pages/NoEncontrado.jsx';
 import { rutasAdmin } from './admin/rutas.jsx';
 
@@ -28,8 +29,10 @@ export default function App() {
             este orden evita que alguien lo reordene sin darse cuenta. */}
         <Route path="privacidad" element={<Privacidad />} />
         <Route path="aviso-legal" element={<AvisoLegal />} />
+        <Route path="galeria" element={<Galeria />} />
         <Route path=":slug" element={<Restaurante />} />
         <Route path=":slug/carta" element={<Carta />} />
+        <Route path=":slug/galeria" element={<Galeria />} />
         <Route path="*" element={<NoEncontrado />} />
       </Route>
     </Routes>
