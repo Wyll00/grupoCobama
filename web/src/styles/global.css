@@ -36,7 +36,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: 5.5rem;
+  /* Va atado a la altura de .cabecera__fila: es sticky, y si no se deja este
+     hueco un enlace a un ancla deja el titulo tapado debajo de la cabecera. */
+  scroll-padding-top: 6.5rem;
 }
 
 body {
@@ -150,20 +152,83 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 4rem;
+  min-height: 5rem;
 }
 
 .marca {
-  font-family: var(--fuente-titulo);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  display: inline-flex;
   text-decoration: none;
   color: var(--carbon);
+}
+
+/* ---- el sello ---- */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  /* El anillo interior en ocre y el exterior heredando el color del texto:
+     asi el mismo sello vale sobre la cabecera clara y sobre fondo oscuro
+     cambiando solo el color del contenedor. */
+  --sello-anillo: var(--ocre);
+}
+
+.logo--apilado {
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.sello {
+  flex: none;
+  display: block;
+}
+
+.logo__texto {
+  display: flex;
+  flex-direction: column;
+  /* Sin esto el nombre y el descriptor no comparten eje optico: el
+     letter-spacing empuja el bloque a la izquierda. */
+  align-items: flex-start;
+}
+
+.logo--apilado .logo__texto {
+  align-items: center;
+}
+
+.logo__nombre {
+  font-family: var(--fuente-titulo);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.11em;
+  /* El letter-spacing anade el hueco tambien despues de la ultima letra.
+     El text-indent lo compensa para que el bloque quede centrado de verdad. */
+  text-indent: 0.11em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.marca span { color: var(--ocre); }
+/* Debajo de 600 px el descriptor no se lee: 8 px con 0.3em de interletraje
+   es decoracion, no texto. Y ademas es lo que mas ancho ocupa del bloque
+   (mas que el propio nombre), asi que quitarlo le devuelve sitio al menu,
+   que en movil se desplaza. */
+@media (max-width: 600px) {
+  .logo__descriptor {
+    display: none;
+  }
+}
+
+.logo__descriptor {
+  margin-top: 0.42rem;
+  font-family: var(--fuente-texto);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  white-space: nowrap;
+}
 
 .nav {
   display: flex;

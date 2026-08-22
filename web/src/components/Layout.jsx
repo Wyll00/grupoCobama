@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
+import Logo from './Logo.jsx';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 
@@ -10,8 +11,8 @@ export default function Layout() {
     <div className="app">
       <header className="cabecera">
         <div className="contenedor cabecera__fila">
-          <Link to="/" className="marca">
-            Grupo <span>Cobama</span>
+          <Link to="/" className="marca" aria-label="Grupo Cobama, ir al inicio">
+            <Logo descriptor="GASTRONOMÍA CANARIA" />
           </Link>
 
           <nav className="nav" aria-label="Locales">

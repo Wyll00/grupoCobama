@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104">
+  <!-- El sello del grupo. Sin las CSS variables del sitio: un favicon se
+       carga suelto, fuera de la pagina, y ahi no hay variables que resolver.
+       Fondo solido porque la pestana puede ser clara u oscura. -->
+  <rect width="104" height="104" rx="16" fill="#1f1a17"/>
+  <circle cx="52" cy="52" r="42" fill="none" stroke="#faf6f0" stroke-width="4"/>
+  <circle cx="52" cy="52" r="34" fill="none" stroke="#c07d2a" stroke-width="2.4"/>
+  <text x="52" y="53" text-anchor="middle" dominant-baseline="central"
+        fill="#faf6f0" font-family="Georgia, 'Times New Roman', serif"
+        font-size="30" letter-spacing="1.2" dx="0.6">CB</text>
+</svg>
