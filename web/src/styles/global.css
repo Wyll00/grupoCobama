@@ -324,52 +324,51 @@ button {
 .nav::-webkit-scrollbar { display: none; }
 
 .nav a {
-  position: relative;
-  padding: 0.4rem 0.7rem 0.5rem;
-  border-radius: var(--radio-s);
-  font-size: 0.9rem;
-  /* Iban en --texto-suave, que es el color del texto secundario. Un menu no
-     es texto secundario: es por donde se mueve la gente. Con 500 y el color
-     normal se leen como navegacion sin gritar. */
-  font-weight: 500;
+  /* Pastilla con borde en vez de texto suelto.
+     El filete que crecia al pasar el raton era demasiado discreto, y en movil
+     directamente no existe: alli no hay hover, asi que los enlaces se veian
+     como texto plano y nadie los tomaba por botones. Un borde visible se nota
+     sin tener que tocar nada, que es de lo que se trata. */
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  font-size: 0.88rem;
+  font-weight: 600;
   text-decoration: none;
-  color: var(--texto);
+  color: var(--tinta);
   white-space: nowrap;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-
-/* Filete de ocre que crece desde el centro. Es el resalte: marca donde estas
-   y responde al pasar por encima, sin meter un recuadro en cada enlace.
-   Va en ::after y no en border-bottom para poder animarlo sin mover el texto:
-   un borde que aparece empuja la linea entera hacia arriba. */
-.nav a::after {
-  content: '';
-  position: absolute;
-  left: 0.7rem;
-  right: 0.7rem;
-  bottom: 0.15rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--ocre);
-  transform: scaleX(0);
-  transition: transform 0.2s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .nav a:hover {
+  border-color: var(--ocre);
+  color: var(--ocre);
   background: var(--crema-hueso);
-  color: var(--tinta);
 }
 
-.nav a:hover::after,
-.nav a:focus-visible::after,
-.nav a.activo::after {
-  transform: scaleX(1);
+/* Donde estas: rellena, no un matiz. Es la unica de las cinco que va llena,
+   asi que se localiza de un vistazo sin leerlas todas.
+
+   Rellena de --tinta y no de ocre. Con ocre el texto encima daba 3,38 de
+   contraste en modo claro, por debajo del 4,5 que hace falta. --tinta y
+   --fondo son inversas la una de la otra en los dos temas, asi que el par
+   pasa de 16 sin depender de que alguien recuerde ajustarlas juntas. */
+.nav a.activo {
+  background: var(--tinta);
+  border-color: var(--tinta);
+  color: var(--fondo);
 }
 
-.nav a.activo { color: var(--tinta); font-weight: 600; }
+.nav a.activo:hover {
+  background: var(--tinta);
+  border-color: var(--ocre);
+  color: var(--fondo);
+}
 
-@media (prefers-reduced-motion: reduce) {
-  .nav a::after { transition: none; }
+.nav a:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
 }
 
 /* ---------------------------------------------------------- hero ----- */
@@ -1401,5 +1400,24 @@ button {
   .platito {
     width: 2.4rem;
     height: 2.4rem;
+  }
+}
+
+/* En movil el menu se desplaza (573 px de pastillas en 119 visibles), y eso
+   esta bien: lo que no puede ser es que no quepa entera NI LA PRIMERA. Una
+   pastilla cortada por la mitad no se lee como "hay mas a la derecha", se
+   lee como que algo esta roto.
+
+   Con estas medidas la primera entra completa y la segunda asoma, que es
+   justo la pista de que aquello se arrastra.
+
+   Va al final del fichero por lo mismo que el platito: la regla base de
+   .nav a esta antes, y con la misma especificidad gana la ultima. */
+@media (max-width: 600px) {
+  .nav a {
+    /* Estrecha para que quepan, pero no baja de alto: 36 px es poco para un
+       dedo. Con esto se queda en 40, que es lo minimo razonable. */
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
   }
 }
