@@ -792,6 +792,65 @@ del cliente, el problema no desaparece por no tener campo.
 
 ---
 
+## Modo oscuro
+
+Lo enciende el **platito** de la esquina de la cabecera: de día el plato está
+entero, de noche le entra una sombra y se queda en cuarto creciente. Es la idea
+de las fases de la luna con la vajilla.
+
+Por defecto sigue al sistema. En cuanto alguien pulsa el plato, manda su
+elección y se recuerda.
+
+### El tema se aplica antes de pintar
+
+Lo pone un `<script>` en línea en `index.html`, no React. Si se aplicara al
+montar el componente, cada carga empezaría con un **fogonazo blanco** — y esto
+es una carta que se abre de noche, sentado en la mesa, con el móvil a media
+pantalla. Va en línea y no en un fichero aparte por lo mismo: un `<script src>`
+es otra petición, y el fogonazo dura lo que tarde en llegar.
+
+El `<html>` es la fuente de verdad (`data-tema`), y el componente lo lee de ahí
+también al pulsar. Leerlo del estado de React hacía que dos pulsaciones seguidas
+vieran el mismo valor viejo y el segundo clic no deshiciera el primero.
+
+### `--carbon` no es «oscuro», es media pareja
+
+La trampa de este cambio. `--carbon` y `--crema` se usan como **pareja de
+contraste**: los bloques de marca (hero, cabecera de ficha, pie) llevan
+`--carbon` de fondo y `--crema` de texto, y **siguen siendo oscuros también de
+noche**. Invertirlas dejaba el título de la ficha en texto oscuro sobre una foto
+oscura.
+
+Pero `--carbon` también se usaba como color de **texto** en titulares, la marca
+y el subrayado de categoría. Dejándolo fijo, esos quedaban invisibles sobre el
+fondo oscuro: medido, **1,07 de contraste**.
+
+Por eso hay tres tokens donde antes había uno:
+
+| Token | Qué es | ¿Cambia de noche? |
+| --- | --- | --- |
+| `--carbon` / `--crema` | pareja de los bloques de marca | **No** |
+| `--tinta` | titulares, marca, subrayados | Sí |
+| `--fondo` | fondo de la página | Sí |
+
+Y dos más que estaban escritos a pelo: `--superficie` (las tarjetas, que eran
+`#fff` en cinco sitios) y `--velo` (el fondo translúcido de las barras
+pegajosas).
+
+### Contraste comprobado, no supuesto
+
+Se midió el contraste real de doce elementos en los dos temas. Todo pasa AA
+salvo una cosa, y **viene de antes**: el botón principal en modo claro es blanco
+sobre ocre, **3,38** frente al 4,5 que pide la norma. Como el ocre es color de
+marca, no lo he tocado por mi cuenta.
+
+De noche el ocre se sube de luminosidad para que no salga sucio sobre el carbón,
+y entonces el blanco encima bajaba a 2,52. Por eso el color que va encima del
+ocre es otra variable (`--sobre-ocre`): blanco en claro, tinta oscura de noche.
+Así el par no se puede descuadrar. Ese botón pasó de **2,52 a 7,35**.
+
+---
+
 ## Reservar fuera de aquí
 
 Cada local decide adónde lleva su botón de reservar, desde **Inicio** en el

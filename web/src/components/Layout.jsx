@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 import Logo from './Logo.jsx';
+import Platito from './Platito.jsx';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 
@@ -29,6 +30,8 @@ export default function Layout() {
               Reservar
             </NavLink>
           </nav>
+
+          <Platito />
         </div>
       </header>
 

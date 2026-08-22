@@ -14,6 +14,26 @@
     />
   </head>
   <body>
+    <script>
+      // Va aqui y no en React a proposito: tiene que ejecutarse ANTES del
+      // primer pintado. Si el tema se aplicara al montar el componente, cada
+      // carga empezaria con un fogonazo blanco, que es lo que peor sienta
+      // abriendo la carta de noche en la mesa.
+      // En linea y sin fichero aparte por lo mismo: un <script src> es otra
+      // peticion, y el fogonazo dura lo que tarde en llegar.
+      (function () {
+        try {
+          var guardado = localStorage.getItem('cobama-tema');
+          var oscuro = guardado
+            ? guardado === 'oscuro'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (oscuro) document.documentElement.dataset.tema = 'oscuro';
+        } catch (e) {
+          // Sin localStorage (navegacion privada) se queda en claro. Que no
+          // se pueda recordar la eleccion no puede impedir que cargue la web.
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

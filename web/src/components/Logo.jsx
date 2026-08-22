@@ -19,6 +19,9 @@ export function Sello({ tamano = 44, className = '' }) {
   return (
     <svg
       className={`sello ${className}`}
+      // El CSS puede sobrescribir estas medidas (en movil el sello baja a
+      // 38 px). Se dejan igualmente porque sin ellas el navegador no reserva
+      // el hueco y la cabecera da un salto al pintar.
       width={tamano}
       height={tamano}
       viewBox="0 0 104 104"

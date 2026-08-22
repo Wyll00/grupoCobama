@@ -6,8 +6,28 @@
 :root {
   --carbon: #1f1a17;
   --carbon-suave: #2e2723;
+  /* --carbon y --crema son pareja de contraste, no "oscuro" y "claro" a
+     secas: los bloques de marca (hero, cabecera de ficha, pie) llevan
+     --carbon de fondo y --crema de texto. Esos bloques siguen siendo oscuros
+     tambien en modo oscuro, asi que estas dos NO cambian. Invertirlas dejaria
+     el titulo de la ficha en texto oscuro sobre una foto oscura. */
   --crema: #faf6f0;
   --crema-hueso: #f2ebe0;
+  /* El fondo de la pagina, que si cambia. Antes era --crema y por eso hacia
+     falta separarlo. */
+  --fondo: #faf6f0;
+  /* Tinta fuerte: titulares, la marca y el subrayado de categoria. Es lo
+     mismo que --carbon en claro, pero --carbon tambien es el FONDO de los
+     bloques oscuros (hero, pie, ficha) y esos siguen siendo oscuros de
+     noche. Sin separarlos, poner --carbon claro volvia el pie blanco, y
+     dejarlo oscuro dejaba los titulares invisibles sobre fondo oscuro. */
+  --tinta: #1f1a17;
+  /* Que color va ENCIMA del ocre. En claro el ocre es oscuro y pide texto
+     blanco; en oscuro se sube la luminosidad del ocre para que no salga
+     sucio, y entonces el blanco encima se queda en 2,5 de contraste. Va como
+     variable para que el par no se pueda descuadrar. */
+  --sobre-ocre: #ffffff;
+  --ocre-hover: #a86a20;
   --ocre: #c07d2a;
   --ocre-claro: #e0a94f;
   --mojo-rojo: #a63a2b;
@@ -15,6 +35,13 @@
   --texto: #2b2622;
   --texto-suave: #6f665e;
   --borde: #e2d9cc;
+  /* Fondo de tarjeta, pestana y demas superficies que en claro son blancas.
+     Estaba escrito #fff en cinco sitios: con eso, en oscuro las tarjetas
+     seguian saliendo blancas. */
+  --superficie: #ffffff;
+  /* Las barras pegajosas (cabecera y barra de reserva) van translucidas con
+     desenfoque detras, asi que necesitan el fondo de la pagina con alfa. */
+  --velo: rgba(250, 246, 240, 0.92);
 
   --radio: 12px;
   --radio-s: 8px;
@@ -25,6 +52,49 @@
 
   --fuente-titulo: 'Georgia', 'Times New Roman', serif;
   --fuente-texto: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------------------------------------------------------- modo oscuro ---
+   El tema lo pone un script en index.html ANTES de que pinte nada, leyendo
+   lo que eligio el usuario o, si no ha elegido, lo que diga el sistema. Si se
+   hiciera desde React, al cargar se veria un fogonazo blanco antes de que
+   monte el componente, que en una carta abierta de noche en la mesa es
+   exactamente lo que molesta.
+
+   No es la paleta clara invertida. Se mantienen el ocre y los mojos, que son
+   la marca, y se levanta un poco su luminosidad: el mismo ocre que se lee
+   bien sobre crema queda apagado sobre carbon. Los fondos no llegan al negro
+   puro, que sobre pantalla OLED da un contraste que cansa al leer una carta
+   entera.
+   ------------------------------------------------------------------------ */
+:root[data-tema='oscuro'] {
+  /* Ojo con lo que NO esta aqui: --carbon y --crema no se tocan. Ver arriba. */
+  --fondo: #17130f;
+  --crema-hueso: #221c16;
+  --superficie: #221c17;
+  --velo: rgba(23, 19, 15, 0.92);
+
+  --texto: #ece5db;
+  --texto-suave: #a89d90;
+  --borde: #3a312a;
+  --tinta: #f2ebe1;
+  --sobre-ocre: #17130f;
+  --ocre-hover: #eab868;
+
+  /* El ocre y los mojos se levantan de luminosidad. El mismo tono que se lee
+     bien sobre crema queda apagado y sucio sobre carbon. */
+  --ocre: #d9954a;
+  --ocre-claro: #eab868;
+  --mojo-rojo: #d05f4c;
+  --mojo-verde: #7e9d6d;
+
+  /* En claro la tarjeta se despega con una sombra. Sobre fondo oscuro una
+     sombra oscura no se ve, asi que hay que cerrarla mas y apoyarse en el
+     borde. */
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Que las barras de scroll y los campos del navegador acompanen. */
+  color-scheme: dark;
 }
 
 *,
@@ -47,7 +117,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--texto);
-  background: var(--crema);
+  background: var(--fondo);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -56,7 +126,7 @@ h1, h2, h3, h4 {
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 0.5em;
-  color: var(--carbon);
+  color: var(--tinta);
 }
 
 h1 { font-size: clamp(1.9rem, 5vw, 3rem); }
@@ -119,14 +189,14 @@ button {
 
 .boton--principal {
   background: var(--ocre);
-  color: #fff;
+  color: var(--sobre-ocre);
 }
-.boton--principal:hover { background: #a86a20; }
+.boton--principal:hover { background: var(--ocre-hover); }
 
 .boton--secundario {
   background: transparent;
   border-color: var(--borde);
-  color: var(--carbon);
+  color: var(--tinta);
 }
 .boton--secundario:hover { background: var(--crema-hueso); }
 
@@ -142,7 +212,7 @@ button {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 246, 240, 0.92);
+  background: var(--velo);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--borde);
 }
@@ -158,7 +228,7 @@ button {
 .marca {
   display: inline-flex;
   text-decoration: none;
-  color: var(--carbon);
+  color: var(--tinta);
 }
 
 /* ---- el sello ---- */
@@ -216,6 +286,20 @@ button {
   .logo__descriptor {
     display: none;
   }
+
+  /* En movil el bloque de marca se comia la mitad del ancho, y entre el y el
+     platito al menu le quedaban 85 px: un solo enlace cortado. Se baja un
+     punto el nombre y el sello para devolverle sitio. Sigue siendo bastante
+     mas grande que el texto suelto que habia antes. */
+  .logo__nombre {
+    font-size: 1.3rem;
+  }
+
+  .sello {
+    width: 38px;
+    height: 38px;
+  }
+
 }
 
 .logo__descriptor {
@@ -249,7 +333,7 @@ button {
 }
 
 .nav a:hover { background: var(--crema-hueso); color: var(--texto); }
-.nav a.activo { color: var(--carbon); font-weight: 600; }
+.nav a.activo { color: var(--tinta); font-weight: 600; }
 
 /* ---------------------------------------------------------- hero ----- */
 
@@ -289,7 +373,7 @@ button {
 .tarjeta {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
@@ -468,7 +552,7 @@ button {
   font-family: var(--fuente-titulo);
   font-size: 1.05rem;
   line-height: 1.35;
-  color: var(--carbon);
+  color: var(--tinta);
 }
 
 .sitio__datos {
@@ -486,7 +570,7 @@ button {
   gap: 0.35rem;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--superficie);
   border: 1px solid var(--borde);
   font-size: 0.8rem;
   font-weight: 600;
@@ -543,7 +627,7 @@ button {
 }
 
 .horario__tramo--hoy {
-  background: #fff;
+  background: var(--superficie);
   box-shadow: 0 1px 2px rgba(31, 26, 23, 0.06);
   font-weight: 600;
 }
@@ -580,7 +664,7 @@ button {
   position: sticky;
   top: 4rem;
   z-index: 40;
-  background: rgba(250, 246, 240, 0.95);
+  background: var(--velo);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--borde);
   padding-block: 0.75rem;
@@ -599,7 +683,7 @@ button {
   padding: 0.4rem 0.9rem;
   border: 1px solid var(--borde);
   border-radius: 999px;
-  background: #fff;
+  background: var(--superficie);
   font-size: 0.875rem;
   color: var(--texto-suave);
   white-space: nowrap;
@@ -617,7 +701,7 @@ button {
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--borde);
   border-radius: var(--radio-s);
-  background: #fff;
+  background: var(--superficie);
   font: inherit;
   font-size: 0.95rem;
 }
@@ -641,7 +725,7 @@ button {
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--borde);
   border-radius: 999px;
-  background: #fff;
+  background: var(--superficie);
   font-size: 0.8rem;
   color: var(--texto-suave);
 }
@@ -687,7 +771,7 @@ button {
   align-items: center;
   gap: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--carbon);
+  border-bottom: 2px solid var(--tinta);
   margin-bottom: 1rem;
 }
 
@@ -803,7 +887,7 @@ button {
 }
 
 .filtro--activo .alergeno__icono {
-  background: #fff;
+  background: var(--superficie);
   border-radius: 50%;
   padding: 1px;
 }
@@ -870,36 +954,6 @@ button {
 
 /* ----------------------------------------------- ver en la mesa ------ */
 
-.plato__ver-mesa {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.5rem;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--borde);
-  border-radius: 999px;
-  background: #fff;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--carbon);
-}
-
-.plato__ver-mesa::before {
-  content: '';
-  width: 0.9rem;
-  height: 0.9rem;
-  border: 1.5px solid var(--ocre);
-  border-radius: 2px;
-  /* Esquinas de encuadre, el icono universal de "apunta con la camara". */
-  clip-path: polygon(
-    0 0, 38% 0, 38% 12%, 12% 12%, 12% 38%, 0 38%,
-    0 62%, 12% 62%, 12% 88%, 38% 88%, 38% 100%, 0 100%,
-    100% 100%, 62% 100%, 62% 88%, 88% 88%, 88% 62%, 100% 62%,
-    100% 38%, 88% 38%, 88% 12%, 62% 12%, 62% 0, 100% 0
-  );
-}
-
-.plato__ver-mesa:hover { background: var(--crema-hueso); }
 
 .mesa__fondo {
   position: fixed;
@@ -1092,7 +1146,7 @@ button {
     display: flex;
     gap: 0.5rem;
     padding: 0.6rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom));
-    background: rgba(250, 246, 240, 0.96);
+    background: var(--velo);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--borde);
   }
@@ -1105,7 +1159,7 @@ button {
 
   .barra-reserva__telefono {
     min-height: 3rem;
-    background: #fff;
+    background: var(--superficie);
   }
 
   /*
@@ -1242,4 +1296,73 @@ button {
 
 .derivacion p {
   margin: 0;
+}
+
+/* ------------------------------------------ platito de modo oscuro --- */
+
+.platito {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.platito:hover {
+  border-color: var(--ocre);
+}
+
+.platito:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+.platito__loza {
+  fill: var(--crema);
+}
+
+.platito__canto,
+.platito__ala {
+  fill: none;
+  stroke: var(--texto-suave);
+}
+
+.platito__canto { stroke-width: 1.6; }
+.platito__ala { stroke-width: 1.1; opacity: 0.75; }
+
+/* La sombra pintada del fondo de la pagina: recorta el plato en vez de
+   mancharlo, asi que sirve igual sobre claro que sobre oscuro. */
+.platito__sombra {
+  fill: var(--superficie);
+  /* Apartada del todo: de dia el plato esta entero.
+     Con 30 la sombra (centro 52, radio 15.2) llegaba hasta el 36.8 y el
+     plato acaba en el 38: se comia un pelo del canto y le dejaba un plano.
+     Con 42 no se tocan. */
+  transform: translate(42px, -18px);
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root[data-tema='oscuro'] .platito__sombra {
+  transform: translate(9px, -5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platito__sombra { transition: none; }
+}
+
+/* Va aqui y no arriba con el resto de ajustes de movil: la regla base de
+   .platito esta al final del fichero, y con la misma especificidad gana la
+   ultima. Puesta antes, esta no hacia nada. */
+@media (max-width: 600px) {
+  .platito {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
 }
