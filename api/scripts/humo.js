@@ -7,9 +7,21 @@
  * `npm run dev`: el --watch de este ultimo reinicia el servidor si algo toca
  * un fichero durante la ejecucion y la prueba muere con ECONNRESET.
  *
- * No se puede lanzar mas de seis veces en quince minutos: cada ejecucion hace
- * un login fallido a proposito y acaba topando con el limitador de intentos.
- * El limitador vive en memoria, asi que reiniciar la API lo pone a cero.
+ * No se puede lanzar muchas veces seguidas: topa con DOS limitadores.
+ *
+ *   login     cada ejecucion hace un login fallido a proposito. Seis por
+ *             cuarto de hora y se acabo.
+ *   reservas  cada ejecucion crea reservas de verdad contra el endpoint
+ *             publico, que tiene su propio limite por IP. Cuando salta,
+ *             fallan "una hora en la que el local no ha abierto se rechaza"
+ *             y "una fecha pasada se rechaza": las dos esperan un 400 y les
+ *             llega un 429. Es enganoso, porque parece que se ha roto la
+ *             validacion de horarios cuando lo que pasa es que no se ha
+ *             llegado a ella.
+ *
+ * Los dos viven en memoria: reiniciar la API los pone a cero. Si fallan esas
+ * dos comprobaciones, reinicia y vuelve a pasarla antes de buscar el fallo
+ * en otro sitio.
  *
  * Recorre el flujo completo contra una API ya levantada: login, rotacion de
  * refresco, limites por rol y por local, CRUD de catalogo, carta e historico
