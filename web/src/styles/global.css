@@ -324,16 +324,53 @@ button {
 .nav::-webkit-scrollbar { display: none; }
 
 .nav a {
-  padding: 0.4rem 0.7rem;
+  position: relative;
+  padding: 0.4rem 0.7rem 0.5rem;
   border-radius: var(--radio-s);
   font-size: 0.9rem;
+  /* Iban en --texto-suave, que es el color del texto secundario. Un menu no
+     es texto secundario: es por donde se mueve la gente. Con 500 y el color
+     normal se leen como navegacion sin gritar. */
+  font-weight: 500;
   text-decoration: none;
-  color: var(--texto-suave);
+  color: var(--texto);
   white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
-.nav a:hover { background: var(--crema-hueso); color: var(--texto); }
+/* Filete de ocre que crece desde el centro. Es el resalte: marca donde estas
+   y responde al pasar por encima, sin meter un recuadro en cada enlace.
+   Va en ::after y no en border-bottom para poder animarlo sin mover el texto:
+   un borde que aparece empuja la linea entera hacia arriba. */
+.nav a::after {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ocre);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.nav a:hover {
+  background: var(--crema-hueso);
+  color: var(--tinta);
+}
+
+.nav a:hover::after,
+.nav a:focus-visible::after,
+.nav a.activo::after {
+  transform: scaleX(1);
+}
+
 .nav a.activo { color: var(--tinta); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav a::after { transition: none; }
+}
 
 /* ---------------------------------------------------------- hero ----- */
 
