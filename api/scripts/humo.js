@@ -23,6 +23,16 @@
  * dos comprobaciones, reinicia y vuelve a pasarla antes de buscar el fallo
  * en otro sitio.
  *
+ * Y "reiniciar" es reiniciar de verdad. Levantando una API aparte para pasar
+ * la prueba (util, porque el --watch del servidor de desarrollo la reinicia a
+ * media ejecucion y muere con ECONNRESET), conviene comprobar que el proceso
+ * viejo ha muerto: si sigue ocupando el puerto, el nuevo se cae con
+ * EADDRINUSE, la prueba habla con el viejo y fallan las mismas dos de siempre.
+ * En Windows, `pkill -f` no basta:
+ *
+ *   netstat -ano | grep ":4101 .*LISTENING"     -> saca el PID
+ *   powershell Stop-Process -Id <PID> -Force
+ *
  * Recorre el flujo completo contra una API ya levantada: login, rotacion de
  * refresco, limites por rol y por local, CRUD de catalogo, carta e historico
  * de precios. No sustituye a una bateria de tests, pero detecta al momento si

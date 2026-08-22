@@ -411,6 +411,9 @@ button {
 }
 
 .tarjeta {
+  /* Ancla de la capa estirada del titulo: sin esto, el ::after se estiraria
+     sobre la pagina entera en vez de sobre la tarjeta. */
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--superficie);
@@ -424,6 +427,38 @@ button {
 .tarjeta:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(31, 26, 23, 0.07), 0 16px 40px rgba(31, 26, 23, 0.1);
+  border-color: var(--ocre);
+}
+
+/* --- toda la tarjeta lleva a la ficha del local --- */
+
+.tarjeta__enlace {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tarjeta__enlace::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Debajo de los botones, que llevan z-index 1: asi la capa recoge el resto
+     de la tarjeta y cada boton sigue haciendo lo suyo. */
+  z-index: 0;
+}
+
+.tarjeta:hover .tarjeta__enlace {
+  color: var(--ocre);
+}
+
+/* El foco del teclado se pinta sobre la tarjeta entera y no sobre las tres
+   palabras del nombre: es la tarjeta lo que se va a activar. */
+.tarjeta:focus-within {
+  outline: 2px solid var(--ocre);
+  outline-offset: 3px;
+}
+
+.tarjeta__enlace:focus-visible {
+  outline: none;
 }
 
 .tarjeta__cuerpo {
@@ -457,6 +492,10 @@ button {
   gap: 0.5rem;
   margin-top: auto;
   padding-top: 1rem;
+  /* Por encima de la capa estirada del titulo. Sin esto, pulsar "Llamar"
+     abriria la ficha del local en vez de llamar. */
+  position: relative;
+  z-index: 1;
 }
 
 .tarjeta__acciones .boton {
