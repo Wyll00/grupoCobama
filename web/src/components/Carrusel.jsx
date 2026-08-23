@@ -80,6 +80,10 @@ export default function Carrusel({
       onBlurCapture={() => setParado(false)}
       onTouchStart={() => setParado(true)}
     >
+      <ul className="carrusel__pista" ref={pista}>
+        {children}
+      </ul>
+
       {total > 1 && (
         <div className="carrusel__mandos">
           <button type="button" onClick={() => mover(-1)} aria-label={`Ver ${queSon} anteriores`}>
@@ -90,10 +94,6 @@ export default function Carrusel({
           </button>
         </div>
       )}
-
-      <ul className="carrusel__pista" ref={pista}>
-        {children}
-      </ul>
     </div>
   );
 }
