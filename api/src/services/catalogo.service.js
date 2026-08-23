@@ -64,7 +64,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
 
   const [items] = await pool.execute(
     `SELECT ci.id           AS carta_item_id,
-            ci.precio, ci.precio_media, ci.unidad, ci.numero_carta,
+            ci.precio, ci.precio_media, ci.unidad, ci.minimo_personas, ci.numero_carta,
             ci.destacado,
             (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
             p.id            AS plato_id,
@@ -119,6 +119,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       // "por kg" se lee como el precio del plato, y la cuenta llega al doble.
       precio_media: item.precio_media === null ? null : Number(item.precio_media),
       unidad: item.unidad,
+      minimo_personas: item.minimo_personas,
       numero_carta: item.numero_carta,
       destacado: Boolean(item.destacado),
       // Se sigue enseñando, marcado. Esconderlo haria que el cliente lo
@@ -176,7 +177,7 @@ async function cargarAlergenos(platoIds) {
 export async function destacadosDeLocal(slug, limite = 12) {
   const [filas] = await pool.execute(
     `SELECT ci.id AS carta_item_id, ci.precio, ci.precio_media, ci.unidad,
-            ci.numero_carta, ci.agotado_hasta,
+            ci.minimo_personas, ci.numero_carta, ci.agotado_hasta,
             p.id, p.nombre, p.nombre_en, p.descripcion, p.descripcion_en,
             p.imagen, p.imagen_thumb, p.es_vegano, p.es_vegetariano,
             c.slug AS categoria_slug, c.nombre AS categoria_nombre
@@ -205,6 +206,7 @@ export async function destacadosDeLocal(slug, limite = 12) {
     precio: Number(f.precio),
     precio_media: f.precio_media === null ? null : Number(f.precio_media),
     unidad: f.unidad,
+    minimo_personas: f.minimo_personas,
     numero_carta: f.numero_carta,
     // Un plato agotado no se recomienda: seria mandar a alguien a pedir algo
     // que no hay.

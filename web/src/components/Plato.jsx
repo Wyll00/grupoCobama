@@ -19,6 +19,21 @@ const UNIDAD = {
   persona: 'por persona',
 };
 
+/**
+ * La linea que va debajo del precio.
+ *
+ * El minimo de comensales va PEGADO al precio, no en una nota al pie de la
+ * seccion. Quien lee "21,00 EUR · por persona" entiende que puede pedirlo
+ * solo, y en la mesa le dicen que no: eso no es informacion incompleta, es
+ * informacion que induce a error.
+ */
+function condiciones(plato) {
+  const partes = [];
+  if (UNIDAD[plato.unidad]) partes.push(UNIDAD[plato.unidad]);
+  if (plato.minimo_personas) partes.push(`min. ${plato.minimo_personas} personas`);
+  return partes.join(' · ');
+}
+
 export default function Plato({ plato }) {
   return (
     <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
@@ -65,7 +80,7 @@ export default function Plato({ plato }) {
           </span>
         )}
         <span className="plato__importe">{formatoPrecio.format(plato.precio)}</span>
-        {UNIDAD[plato.unidad] && <span className="plato__unidad">{UNIDAD[plato.unidad]}</span>}
+        {condiciones(plato) && <span className="plato__unidad">{condiciones(plato)}</span>}
       </div>
     </li>
   );

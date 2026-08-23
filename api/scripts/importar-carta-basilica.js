@@ -75,6 +75,27 @@ const normalizar = (s) =>
 
 const euros = (n) => (n === null || n === undefined ? '—' : `${n.toFixed(2)} €`);
 
+/**
+ * Cuanto se parecen dos nombres, por palabras compartidas.
+ *
+ * Existe por un fallo que costo caro: la carta real dice "al senyoret" y la
+ * transcripcion de los alergenos decia "al senorito". Como no cuadraban, se
+ * creo un plato NUEVO Y VACIO y el viejo -con gluten, crustaceos, pescado y
+ * moluscos- se quedo huerfano. Resultado: un arroz con marisco publicado sin
+ * un solo alergeno.
+ *
+ * Un nombre que no cuadra pero se parece mucho casi nunca es un plato nuevo:
+ * es el mismo escrito de otra forma. Asi que se avisa antes de crearlo.
+ */
+function parecido(a, b) {
+  const pa = new Set(normalizar(a).split(' ').filter((w) => w.length > 3));
+  const pb = new Set(normalizar(b).split(' ').filter((w) => w.length > 3));
+  if (pa.size === 0 || pb.size === 0) return 0;
+  let comunes = 0;
+  for (const w of pa) if (pb.has(w)) comunes += 1;
+  return comunes / Math.max(pa.size, pb.size);
+}
+
 async function main() {
   const aplicar = process.argv.includes('--sql');
 
@@ -95,6 +116,11 @@ async function main() {
   let orden = 0;
 
   for (const seccion of secciones) {
+    // El minimo de comensales sale de la nota de la seccion ("Precio por
+    // persona · minimo 2 personas"), no de una constante aqui: si el local lo
+    // cambia en su carta, se cambia solo al reimportar.
+    const minimo = Number(/m[ií]nimo\s+(\d+)\s+persona/i.exec(seccion.nota ?? '')?.[1]) || null;
+
     const slug = CATEGORIAS[seccion.id] ?? POR_NOMBRE[seccion.nombre];
     const categoriaId = catPorSlug.get(slug);
     if (!categoriaId) {
@@ -116,6 +142,7 @@ async function main() {
         precio: plato.racion ?? null,
         media: plato.media ?? null,
         unidad: plato.unidad ?? 'racion',
+        minimo,
         existente: platoPorNombre.get(normalizar(plato.nombre)) ?? null,
       });
     }
@@ -149,6 +176,43 @@ async function main() {
   console.log(`  se crean:                ${nuevos.length}`);
   console.log();
 
+  // Los que se van a crear pero se parecen mucho a uno que ya existe. Si el
+  // parecido tiene alergenos y el nuevo nace vacio, es un problema de
+  // seguridad, no de duplicados.
+  const [conAlergenos] = await pool.execute(
+    `SELECT p.id, p.nombre,
+            (SELECT GROUP_CONCAT(a.slug ORDER BY a.id)
+               FROM plato_alergenos pa JOIN alergenos a ON a.id = pa.alergeno_id
+              WHERE pa.plato_id = p.id) AS alergenos
+       FROM platos p WHERE p.activo = 1`
+  );
+
+  const sospechosos = [];
+  for (const e of nuevos) {
+    const mejor = conAlergenos
+      .map((p) => ({ ...p, score: parecido(e.nombre, p.nombre) }))
+      .sort((a, b) => b.score - a.score)[0];
+    // 0,55 y no 0,5: los dos casos reales dan 0,67 y 0,75, y a 0,5 saltaba
+    // tambien "Croquetas de pollo" contra "Croquetas de atun", que son platos
+    // distintos. Un aviso que grita en falso deja de leerse, y este avisa de
+    // algo que no se puede permitir pasar por alto.
+    if (mejor && mejor.score >= 0.55) {
+      sospechosos.push({ nuevo: e.nombre, parecido: mejor.nombre, alergenos: mejor.alergenos, score: mejor.score });
+    }
+  }
+
+  if (sospechosos.length > 0) {
+    console.log('OJO: se van a crear platos que se parecen mucho a otros que ya existen.');
+    console.log('Si es el mismo escrito de otra forma, el nuevo nacera SIN alergenos:');
+    for (const s of sospechosos) {
+      console.log(`  "${s.nuevo}"`);
+      console.log(`    se parece a "${s.parecido}" (${Math.round(s.score * 100)}%)`);
+      console.log(`    que declara: ${s.alergenos ?? 'ningun alergeno'}`);
+    }
+    console.log('  Renombra en la fuente o en el catalogo para que cuadren, y reimporta.');
+    console.log();
+  }
+
   console.log(`Lineas de comida que tiene ahora el local: ${actuales.length}`);
   console.log(`  se quedan y se les pone el precio real: ${actuales.length - aRetirar.length}`);
   console.log(`  se retiran (son de relleno):            ${aRetirar.length}`);
@@ -162,6 +226,13 @@ async function main() {
   console.log(`Con media racion: ${conMedia.length}`);
   for (const e of conMedia) console.log(`    ${e.nombre.padEnd(42)} media ${euros(e.media)} / racion ${euros(e.precio)}`);
   console.log();
+  const conMinimo = entrantes.filter((e) => e.minimo);
+  if (conMinimo.length > 0) {
+    console.log(`Con minimo de comensales: ${conMinimo.length}`);
+    for (const e of conMinimo) console.log(`    ${e.nombre.padEnd(42)} minimo ${e.minimo} personas`);
+    console.log();
+  }
+
   console.log(`Con precio por unidad: ${conUnidad.length}`);
   for (const e of conUnidad) console.log(`    ${e.nombre.padEnd(42)} ${euros(e.precio)} por ${e.unidad}`);
   console.log();
@@ -233,17 +304,18 @@ async function main() {
       if (existeLinea[0]) {
         await cx.execute(
           `UPDATE carta_items
-              SET precio = ?, precio_media = ?, unidad = ?, numero_carta = ?,
-                  orden = ?, activo = 1
+              SET precio = ?, precio_media = ?, unidad = ?, minimo_personas = ?,
+                  numero_carta = ?, orden = ?, activo = 1
             WHERE id = ?`,
-          [e.precio, e.media, e.unidad, e.numero, e.orden, existeLinea[0].id]
+          [e.precio, e.media, e.unidad, e.minimo, e.numero, e.orden, existeLinea[0].id]
         );
       } else {
         await cx.execute(
           `INSERT INTO carta_items
-             (restaurante_id, plato_id, precio, precio_media, unidad, numero_carta, orden, activo)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-          [LOCAL_ID, platoId, e.precio, e.media, e.unidad, e.numero, e.orden]
+             (restaurante_id, plato_id, precio, precio_media, unidad,
+              minimo_personas, numero_carta, orden, activo)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+          [LOCAL_ID, platoId, e.precio, e.media, e.unidad, e.minimo, e.numero, e.orden]
         );
       }
     }

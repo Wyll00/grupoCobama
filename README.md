@@ -812,11 +812,21 @@ cada plato.
 ### El medallón
 
 De 171 platos, **uno** tiene foto. Una tarjeta diseñada alrededor de una foto y
-sin foto es un hueco, así que cuando no la hay se pinta el **número de la carta
-de papel** en un disco. No es relleno: es exactamente lo que hace falta para
-pedirlo en la mesa («ponme el 54»), así que la tarjeta sigue sirviendo de algo.
-Si el plato no tiene número —las otras tres casas aún no lo tienen— va la
-inicial. Cuando haya foto, manda la foto.
+sin foto es un hueco, así que mientras no la haya va un dibujo de plato con
+cubiertos. Cuando haya foto, manda la foto.
+
+Los cubiertos son lo que lo hace legible: **un plato solo, visto desde arriba,
+son dos círculos concéntricos — que es exactamente el sello de la marca**, y se
+confundirían. Y las tres púas del tenedor van dibujadas por separado porque en
+bloque se convierten en una mancha por debajo de 40 px.
+
+### El precio dice sus condiciones
+
+El mínimo de comensales va **pegado al precio**, no en una nota al pie: quien
+lee «21,00 € · por persona» entiende que puede pedirlo solo, y en la mesa le
+dicen que no. El dato sale de la nota de sección de la carta de papel
+(«Precio por persona · mínimo 2 personas»), así que si el local la cambia se
+actualiza al reimportar.
 
 ### Un plato agotado no se recomienda
 
