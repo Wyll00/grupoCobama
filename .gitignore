@@ -38,3 +38,8 @@ fotos/*
 # lo que necesita el build. Para regenerarlos: npm run alergenos --prefix api
 iconos-alergenos/*
 !iconos-alergenos/LEEME.md
+
+# Cartas en PDF: pesan y son material del grupo. Lo que se versiona es lo
+# que se extrae de ellas, no el original.
+cartas/*
+!cartas/LEEME.md
