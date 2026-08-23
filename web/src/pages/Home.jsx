@@ -131,15 +131,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="seccion" style={{ paddingTop: 0 }}>
-        <div className="contenedor">
-          <div className="aviso">
-            <strong>Alergias e intolerancias.</strong> En la carta de cada local puedes
-            filtrar los platos por alergeno. Aun asi, avisa siempre al personal de sala:
-            trabajamos con cocina compartida.
-          </div>
-        </div>
-      </section>
     </>
   );
 }
