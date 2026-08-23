@@ -388,13 +388,18 @@ button {
 }
 
 /* Las tres acciones del hero, arriba a la derecha y no debajo del texto.
-   flex-end para que se alineen por la derecha cuando el ancho no da y una
-   se cae de linea: alineadas a la izquierda quedaria una escalera. */
+
+   Rejilla y no flex. Con flex, poner Galeria a lo ancho de la fila de arriba
+   no tiene solucion limpia: flex-basis 100% la estira al contenedor, pero el
+   contenedor lo define ella misma, asi que acababa mas ancha que las dos de
+   arriba y sobresaliendo por la izquierda. Con dos columnas de ancho
+   automatico, las de arriba mandan y Galeria ocupa las dos: los bordes
+   cuadran solos, midan lo que midan los textos. */
 .hero__acciones {
   flex: none;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: end;
   gap: 0.7rem;
 }
 
@@ -1665,7 +1670,15 @@ button {
   color: #ffffff;
 }
 
+/* Galeria baja a su propia linea y ocupa el ancho de las dos de arriba.
+   Las tres en fila sumaban 570 px y estrujaban el titular; en dos lineas el
+   bloque queda mas compacto y con forma de rectangulo, y de paso el titular
+   respira. flex-basis 100% es lo que fuerza el salto: no hace falta meter un
+   separador ni un contenedor extra. */
 .hero__galeria {
+  /* Ocupa las dos columnas: exactamente el ancho de las dos de arriba. */
+  grid-column: 1 / -1;
+  justify-content: center;
   background: transparent;
   border: 1.5px solid var(--ocre-claro);
   color: var(--ocre-claro);
@@ -1688,12 +1701,15 @@ button {
 /* Debajo de 900 px las tres no caben al lado del titular sin estrujarlo, asi
    que la columna se parte y las acciones vuelven debajo del texto, que es
    donde el ojo las busca despues de leer. */
-/* Las tres suman unos 570 px. Debajo de 1150 ya no caben al lado del titular
-   sin estrujarlo, asi que la columna se parte y vuelven debajo del texto, que
-   es donde el ojo las busca despues de leer. */
-@media (max-width: 1150px) {
+/* Con Galeria en su propia linea el bloque baja de 570 a unos 430 px, asi que
+   aguanta al lado del titular hasta bastante mas abajo. Por debajo se parte la
+   columna y las acciones vuelven debajo del texto, que es donde el ojo las
+   busca despues de leer. */
+@media (max-width: 1000px) {
   .hero__fila { flex-direction: column; align-items: stretch; gap: 1.5rem; }
-  .hero__acciones { justify-content: flex-start; }
+  /* Una debajo de otra y del ancho del texto: en movil una fila de botones
+     medio cortados no la usa nadie. */
+  .hero__acciones { grid-template-columns: 1fr; justify-content: stretch; }
 }
 
 /* -------------------------------------------------------- carrusel --- */
