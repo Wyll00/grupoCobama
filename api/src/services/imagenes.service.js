@@ -1,4 +1,4 @@
-import { mkdir, unlink } from 'node:fs/promises';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import sharp from 'sharp';
@@ -20,8 +20,12 @@ const RUTA_GALERIA = `/uploads/${SUBCARPETA_GALERIA}`;
 const GALERIA_GRANDE = 1600;
 const GALERIA_THUMB = 600;
 
-// Panoramica: va de fondo en la cabecera del local, detras del nombre.
-const PORTADA = { ancho: 1920, alto: 1000 };
+// 16:9, que es la proporcion en la que vienen las ilustraciones y en la que
+// se genera casi todo hoy. Antes era 1920x1000 (1,92:1), y recortar un 16:9
+// a esa medida ya se comia un 7% del alto ANTES de que el navegador recorte
+// lo suyo para la cabecera. Dos recortes encadenados sobre la misma imagen es
+// como se pierde la aguja de una torre sin que nadie decida perderla.
+const PORTADA = { ancho: 1920, alto: 1080 };
 export const PROPORCION_PORTADA = PORTADA.ancho / PORTADA.alto;
 
 // 4:3, que es la proporcion con la que se muestran las fichas de plato.
@@ -130,12 +134,67 @@ export async function procesarPortada(restauranteId, buffer, recorte) {
 
   const nombre = `local-${restauranteId}-${Date.now()}-${randomBytes(4).toString('hex')}.webp`;
 
-  await pipeline
+  const procesada = await pipeline
     .resize(PORTADA.ancho, PORTADA.alto, { fit: 'cover', position: 'attention' })
     .webp({ quality: 70 })
-    .toFile(join(directorioPortadas(), nombre));
+    .toBuffer();
 
-  return { portada: `${RUTA_PORTADAS}/${nombre}` };
+  await writeFile(join(directorioPortadas(), nombre), procesada);
+
+  return {
+    portada: `${RUTA_PORTADAS}/${nombre}`,
+    clara: await zonaDelTextoEsClara(procesada),
+  };
+}
+
+/**
+ * Mira si la zona donde cae el nombre del local es clara y pareja.
+ *
+ * La cabecera lleva un velo encima para que el texto se lea. Sobre una foto
+ * oscura toca velo negro y letra crema; sobre una ilustracion luminosa, al
+ * reves, porque el velo negro la apaga entera y ademas no hace falta.
+ *
+ * Se mide en vez de preguntarse. Un interruptor mas en el panel es un
+ * interruptor que alguien no toca al cambiar la foto, y entonces el nombre
+ * desaparece sobre el cielo.
+ *
+ * Dos condiciones, no una:
+ *
+ *   clara   la media tiene que ser alta, o la tinta oscura no contrasta.
+ *   pareja  y ademas poco dispersa. Solo con la media, la foto de la torre
+ *           daba 0,64 y pasaba por clara: es cielo brillante CON una torre
+ *           oscura recortada dentro, asi que el texto encima caeria mitad
+ *           sobre cielo y mitad sobre piedra.
+ *
+ * Medido: la ilustracion da 0,87 de media y 0,15 de dispersion; la foto,
+ * 0,64 y 0,25. Los umbrales dejan margen a los dos lados.
+ *
+ * Se mira la caja donde va el texto, no la imagen entera: esta ilustracion
+ * tiene crema a la izquierda y azul intenso a la derecha, y de media saldria
+ * un gris que no describe ninguna de las dos.
+ */
+async function zonaDelTextoEsClara(buffer) {
+  const caja = {
+    left: Math.round(PORTADA.ancho * 0.08),
+    top: Math.round(PORTADA.alto * 0.34),
+    width: Math.round(PORTADA.ancho * 0.3),
+    height: Math.round(PORTADA.alto * 0.44),
+  };
+
+  // El recorte se materializa ANTES de pedir las estadisticas. stats() mira
+  // la imagen de ENTRADA e ignora el resize y el extract que lleve encima la
+  // tuberia: sin este toBuffer(), la medida sale de la imagen entera y da
+  // igual que caja se pida.
+  const trozo = await sharp(buffer).extract(caja).toBuffer();
+  const { channels } = await sharp(trozo).stats();
+  const [r, g, b] = channels;
+
+  // Luminancia percibida: el ojo no pesa igual los tres canales, y una media
+  // simple da "claro" a un azul saturado que en pantalla se ve oscuro.
+  const luz = (0.2126 * r.mean + 0.7152 * g.mean + 0.0722 * b.mean) / 255;
+  const dispersion = (0.2126 * r.stdev + 0.7152 * g.stdev + 0.0722 * b.stdev) / 255;
+
+  return luz > 0.72 && dispersion < 0.2;
 }
 
 /** Borra una portada sustituida. Igual que con los platos, fallar no es grave. */

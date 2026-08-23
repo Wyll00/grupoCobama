@@ -40,7 +40,16 @@ export default function Restaurante() {
         en una cabecera.
       */}
       <section
-        className={`ficha__cabecera ${local.imagen_portada ? 'ficha__cabecera--con-foto' : ''}`}
+        className={[
+          'ficha__cabecera',
+          local.imagen_portada && 'ficha__cabecera--con-foto',
+          // Lo decide la imagen, no una persona: al procesar la portada se
+          // mide si la zona del texto es clara y pareja. Ver
+          // zonaDelTextoEsClara en imagenes.service.js.
+          local.portada_clara && 'ficha__cabecera--clara',
+        ]
+          .filter(Boolean)
+          .join(' ')}
         style={
           local.imagen_portada
             ? { backgroundImage: `url(${local.imagen_portada})` }

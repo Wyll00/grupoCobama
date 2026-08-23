@@ -565,7 +565,7 @@ button {
     proporcion a la de la imagen, menos recorta cover y menos composicion se
     pierde. Ademas una foto en una franja estrecha no se lee como foto.
   */
-  min-height: clamp(300px, 40vw, 520px);
+  min-height: clamp(320px, 46vw, 620px);
   display: flex;
   align-items: center;
 }
@@ -1978,4 +1978,82 @@ button {
   font-weight: 600;
   letter-spacing: 0.03em;
   color: var(--ocre);
+}
+
+/* ------------------------------------------ cabecera sobre imagen clara --- */
+
+/*
+  Cuando la portada es una ilustracion luminosa, el velo negro de la cabecera
+  la apaga entera: la de La Basilica pasaba de mar turquesa y flores a un
+  marron turbio. Y ademas sobra, porque esa ilustracion tiene el lado
+  izquierdo en crema justo donde va el nombre.
+
+  Aqui se le da la vuelta: velo claro y muy suave, y tinta oscura. Lo activa
+  `portada_clara`, que lo mide el procesador de imagenes, no una persona.
+*/
+.ficha__cabecera--clara {
+  color: var(--carbon);
+  background-color: var(--crema);
+}
+
+.ficha__cabecera--clara::before {
+  /* Solo un desvanecido por la izquierda, lo justo para que el texto se
+     apoye. Nada por abajo: ahi estan las flores y el mar, que es lo que
+     hay que ver. */
+  background: linear-gradient(
+    90deg,
+    rgba(247, 243, 234, 0.88) 0%,
+    rgba(247, 243, 234, 0.55) 42%,
+    rgba(247, 243, 234, 0) 72%
+  );
+}
+
+.ficha__cabecera--clara h1,
+.ficha__cabecera--clara .tarjeta__municipio {
+  color: var(--carbon);
+}
+
+.ficha__cabecera--clara p,
+.ficha__cabecera--clara .estado-apertura {
+  color: #4a423a;
+}
+
+/* Los botones secundarios de la cabecera llevan el borde y el texto en claro
+   escritos a mano en el JSX, porque estan pensados para el fondo oscuro. Aqui
+   hay que ganarles. */
+.ficha__cabecera--clara .boton--secundario {
+  border-color: rgba(31, 26, 23, 0.28) !important;
+  color: var(--carbon) !important;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.ficha__cabecera--clara .boton--secundario:hover {
+  border-color: var(--ocre) !important;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/*
+  En movil la cabecera es mas alta que ancha, asi que de una imagen 16:9 solo
+  cabe una franja vertical: centrada, se veian el mar y las montanas y la
+  basilica se quedaba fuera. Se desplaza el encuadre a la derecha, que es
+  donde esta el edificio.
+
+  Y ahi el texto ya no ocupa una esquina, ocupa la cabecera entera: el
+  desvanecido lateral no basta, hace falta un velo parejo. La ilustracion
+  queda de fondo tenue, que en una pantalla de movil es lo unico que cabe
+  sin comerse lo que hay que leer.
+*/
+@media (max-width: 700px) {
+  .ficha__cabecera--clara {
+    background-position: 74% center;
+  }
+
+  .ficha__cabecera--clara::before {
+    background: linear-gradient(
+      180deg,
+      rgba(247, 243, 234, 0.9) 0%,
+      rgba(247, 243, 234, 0.82) 60%,
+      rgba(247, 243, 234, 0.88) 100%
+    );
+  }
 }
