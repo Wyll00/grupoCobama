@@ -974,6 +974,64 @@ la cabecera es del grupo, no de un local, así que ese sigue yendo al formulario
 
 ---
 
+## La carta real de La Basílica
+
+Ya está cargada. La fuente es `La Basilica/assets/carta.js` — la carta que está
+publicada en basilicacarta.pages.dev, transcrita del papel de la mesa — y se
+importa con:
+
+```bash
+npm run carta-real --prefix api           # ensayo
+npm run carta-real --prefix api -- --sql  # aplicarlo
+```
+
+**67 platos** en siete secciones, con precios, descripciones y nombres en
+inglés. Es idempotente: vuelve a ejecutarse para actualizar precios.
+
+### Lo que el importador NO trae, y por qué
+
+| | Motivo |
+| --- | --- |
+| Sección «Fuera de carta» | Está marcada `borrador`; sus cinco platos son inventados |
+| Bebidas | `bebidas.js` entero está en borrador, precios sin confirmar por el local |
+| Alérgenos | La carta web no los lleva a propósito; ya están cargados desde la transcripción |
+
+Ese último punto es el que hace que las dos piezas encajen: **64 de los 67
+platos ya tenían sus alérgenos** cargados de la transcripción de las fotos, y
+cuelgan del plato, así que al importar la carta se enganchan solos.
+
+Los otros tres eran errores míos de transcripción que la carta real corrige:
+«Huevos **gomeros**» (no *someros*), «al **senyoret**» (no *señorito*) y
+«**Pimienta**» (no *Pimientos*).
+
+### Media ración, kilo y persona
+
+La carta real trae tres cosas que la tabla no sabía guardar, y las tres cambian
+lo que paga el cliente:
+
+- **`precio_media`** — nueve platos van en media y en ración a precios distintos
+- **`unidad`** — los chuletones van **a peso** y los arroces **por persona**
+- **`numero_carta`** — el número del papel, para pedir «ponme el 35»
+
+Lo de la unidad es lo importante: un chuletón a `47,00 €` a secas no es un
+precio incompleto, es un **precio equivocado** — quien lo lee entiende que ese
+es el plato y le llega una cuenta al doble. En la carta sale «47,00 € · el
+kilo».
+
+### Dos platos en la sección equivocada
+
+El importador mueve un plato de sección solo si lo sirve **nada más que La
+Basílica**. La sección vive en el plato, no en la línea de carta, así que
+moverla en un plato compartido se la cambia también a las otras casas — y esa
+no es una decisión que pueda tomar un importador de una sola carta.
+
+Quedan dos así, y el script los avisa al terminar:
+
+- **Carne fiesta** está en Carnes; en el papel va en Entrantes
+- **Langostinos al ajillo** está en Entrantes; en el papel va en Pescados
+
+---
+
 ## Alérgenos
 
 Los 14 de declaración obligatoria (Reglamento UE 1169/2011, Anexo II) viven en
@@ -1049,12 +1107,10 @@ filtros, que es donde está mirando quien filtra por alergia.
 
 ## Datos de prueba
 
-> ⚠️ **Los platos y precios de `db/seeds/002_carta.sql` son PROVISIONALES.**
-> Son cocina canaria verosímil, no las cartas reales del grupo. Ese fichero se
-> reemplaza entero cuando se extraiga el contenido de los cuatro PDF de Google
-> Drive. **No enseñar esos precios a cliente final.** Lo mismo vale para los
-> alérgenos: son una estimación y tiene que validarlos cocina antes de publicar,
-> porque es obligación legal.
+> ⚠️ **Los platos y precios de `db/seeds/002_carta.sql` son PROVISIONALES**, con
+> una excepción: **La Basílica ya tiene su carta real** (ver más abajo). Las
+> otras tres casas siguen con cocina canaria verosímil, no con sus cartas.
+> **No enseñar esos precios a cliente final.**
 
 En la carta de bebidas (`db/seeds/004_bebidas.sql`) las marcas y las
 denominaciones de origen **sí son reales** — el catálogo de Coca-Cola, las

@@ -21,7 +21,8 @@
     "carta-basilica": "node scripts/cargar-alergenos-basilica.js",
     "purgar": "node scripts/purgar-reservas.js",
     "cm": "node scripts/probar-covermanager.js",
-    "cm-check": "node scripts/cm-diagnostico.js"
+    "cm-check": "node scripts/cm-diagnostico.js",
+    "carta-real": "node scripts/importar-carta-basilica.js"
   },
   "engines": {
     "node": ">=20"

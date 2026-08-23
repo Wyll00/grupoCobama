@@ -64,7 +64,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
 
   const [items] = await pool.execute(
     `SELECT ci.id           AS carta_item_id,
-            ci.precio,
+            ci.precio, ci.precio_media, ci.unidad, ci.numero_carta,
             ci.destacado,
             (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
             p.id            AS plato_id,
@@ -115,6 +115,11 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       // pide luego el visor a /api/platos/:id/ar.
       ver_en_mesa: Boolean(item.modelo_glb || (item.imagen && item.ancho_cm)),
       precio: item.precio,
+      // La media racion y la unidad no son adorno: un chuleton a 47 sin el
+      // "por kg" se lee como el precio del plato, y la cuenta llega al doble.
+      precio_media: item.precio_media === null ? null : Number(item.precio_media),
+      unidad: item.unidad,
+      numero_carta: item.numero_carta,
       destacado: Boolean(item.destacado),
       // Se sigue enseñando, marcado. Esconderlo haria que el cliente lo
       // pidiera igual porque lo vio ayer; verlo tachado le ahorra la pregunta

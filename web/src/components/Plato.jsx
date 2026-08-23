@@ -5,11 +5,28 @@ const formatoPrecio = new Intl.NumberFormat('es-ES', {
   currency: 'EUR',
 });
 
+/**
+ * Que significa el precio.
+ *
+ * Lo mas importante de la ficha despues del numero. Un chuleton a 47,00 EUR
+ * sin el "por kg" no es un precio incompleto: es un precio equivocado, porque
+ * quien lo lee entiende que ese es el plato y le llega una cuenta al doble.
+ * Igual con los arroces, que van por persona y con un minimo de dos.
+ */
+const UNIDAD = {
+  kg: 'el kilo',
+  ud: 'la unidad',
+  persona: 'por persona',
+};
+
 export default function Plato({ plato }) {
   return (
     <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
       <div className="plato__info">
         <div className="plato__nombre">
+          {/* El numero del papel. En sala se pide "ponme el 35", asi que
+              tenerlo en el movil evita tener que describir el plato entero. */}
+          {plato.numero_carta && <span className="plato__numero">{plato.numero_carta}</span>}
           <span>{plato.nombre}</span>
           {/* Se sigue enseñando en lugar de esconderlo: si desaparece, el
               cliente lo pide igual porque lo vio ayer. */}
@@ -41,7 +58,15 @@ export default function Plato({ plato }) {
         )}
       </div>
 
-      <div className="plato__precio">{formatoPrecio.format(plato.precio)}</div>
+      <div className="plato__precio">
+        {plato.precio_media !== null && plato.precio_media !== undefined && (
+          <span className="plato__media">
+            media {formatoPrecio.format(plato.precio_media)}
+          </span>
+        )}
+        <span className="plato__importe">{formatoPrecio.format(plato.precio)}</span>
+        {UNIDAD[plato.unidad] && <span className="plato__unidad">{UNIDAD[plato.unidad]}</span>}
+      </div>
     </li>
   );
 }

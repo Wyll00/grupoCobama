@@ -1804,3 +1804,47 @@ button {
   .carrusel__mandos { display: none; }
   .carrusel__foto { width: 76vw; }
 }
+
+/* ------------------------------- precio con media, unidad y numero --- */
+
+.plato__precio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  line-height: 1.25;
+}
+
+.plato__importe { font-weight: 700; }
+
+/* La media va ENCIMA y mas pequena: el precio grande tiene que seguir siendo
+   el de la racion, que es lo que pide casi todo el mundo. */
+.plato__media {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.plato__unidad {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ocre);
+  white-space: nowrap;
+}
+
+/* El numero de la carta de papel, delante del nombre. */
+.plato__numero {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.25rem;
+  border: 1px solid var(--borde);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
