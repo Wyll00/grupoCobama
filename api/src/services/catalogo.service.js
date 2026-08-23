@@ -163,3 +163,55 @@ async function cargarAlergenos(platoIds) {
 
   return mapa;
 }
+
+/**
+ * Los platos que el local quiere ensenar primero.
+ *
+ * Salen de `carta_items.destacado`, el mismo interruptor que ya pinta la
+ * etiqueta "De la casa" en la carta. No se inventa un mecanismo nuevo: si el
+ * encargado marca un plato como destacado, aparece aqui, y si lo desmarca
+ * desaparece. Un segundo sitio donde marcarlo acabaria contradiciendo al
+ * primero.
+ */
+export async function destacadosDeLocal(slug, limite = 12) {
+  const [filas] = await pool.execute(
+    `SELECT ci.id AS carta_item_id, ci.precio, ci.precio_media, ci.unidad,
+            ci.numero_carta, ci.agotado_hasta,
+            p.id, p.nombre, p.nombre_en, p.descripcion, p.descripcion_en,
+            p.imagen, p.imagen_thumb, p.es_vegano, p.es_vegetariano,
+            c.slug AS categoria_slug, c.nombre AS categoria_nombre
+       FROM carta_items ci
+       JOIN platos p ON p.id = ci.plato_id
+       JOIN categorias c ON c.id = p.categoria_id
+       JOIN restaurantes r ON r.id = ci.restaurante_id
+      WHERE r.slug = ? AND r.activo = 1
+        AND ci.destacado = 1 AND ci.activo = 1 AND p.activo = 1
+      ORDER BY c.orden, ci.orden
+      LIMIT ${Number(limite)}`,
+    [slug]
+  );
+
+  const ahora = new Date();
+
+  return filas.map((f) => ({
+    carta_item_id: f.carta_item_id,
+    id: f.id,
+    nombre: f.nombre,
+    nombre_en: f.nombre_en,
+    descripcion: f.descripcion,
+    descripcion_en: f.descripcion_en,
+    imagen: f.imagen,
+    imagen_thumb: f.imagen_thumb,
+    precio: Number(f.precio),
+    precio_media: f.precio_media === null ? null : Number(f.precio_media),
+    unidad: f.unidad,
+    numero_carta: f.numero_carta,
+    // Un plato agotado no se recomienda: seria mandar a alguien a pedir algo
+    // que no hay.
+    agotado: f.agotado_hasta !== null && new Date(f.agotado_hasta) > ahora,
+    es_vegano: Boolean(f.es_vegano),
+    es_vegetariano: Boolean(f.es_vegetariano),
+    categoria_slug: f.categoria_slug,
+    categoria_nombre: f.categoria_nombre,
+  })).filter((p) => !p.agotado);
+}

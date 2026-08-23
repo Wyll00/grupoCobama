@@ -1864,3 +1864,101 @@ button {
   color: var(--texto-suave);
   font-variant-numeric: tabular-nums;
 }
+
+/* ------------------------------------- recomendaciones de la casa --- */
+
+.seccion--recomendados {
+  background: var(--crema-hueso);
+  border-block: 1px solid var(--borde);
+}
+
+.carrusel--fichas .carrusel__pista { align-items: stretch; }
+.carrusel--fichas .carrusel__pista > li { display: flex; }
+
+.ficha-plato {
+  display: flex;
+  flex-direction: column;
+  width: clamp(15rem, 26vw, 19rem);
+  padding: 1.5rem 1.35rem 1.25rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ficha-plato:hover { border-color: var(--ocre); transform: translateY(-2px); }
+
+/* El medallon. Con foto manda la foto; sin ella, el numero de la carta en un
+   disco calido, que es lo que hace falta para pedirlo en la mesa. */
+.ficha-plato__medallon {
+  display: grid;
+  place-items: center;
+  width: 6.5rem;
+  height: 6.5rem;
+  margin: 0 auto 1.25rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, var(--ocre-claro), var(--ocre) 70%);
+}
+
+.ficha-plato__medallon img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-plato__numero {
+  font-family: var(--fuente-titulo);
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--carbon);
+  font-variant-numeric: tabular-nums;
+}
+
+.ficha-plato__seccion {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ocre);
+}
+
+.ficha-plato__nombre {
+  margin: 0 0 0.55rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.ficha-plato__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.ficha-plato__pie {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  /* margin-top auto pega el precio abajo: con descripciones de distinto largo,
+     si no, cada tarjeta lo pone a una altura y la fila queda desordenada. */
+  margin-top: auto;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--borde);
+}
+
+.ficha-plato__precio {
+  font-family: var(--fuente-titulo);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.ficha-plato__extra {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .ficha-plato { width: 76vw; }
+}

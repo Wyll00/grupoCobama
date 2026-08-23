@@ -66,7 +66,33 @@ export default function Home() {
               </Link>
             </div>
 
-            <Carrusel fotos={fotos} onAbrir={setAbierta} />
+            <Carrusel total={fotos.length} queSon="fotos">
+              {fotos.map((foto, i) => (
+                <li key={foto.id}>
+                  <button
+                    type="button"
+                    className="carrusel__foto"
+                    onClick={() => setAbierta(i)}
+                    aria-label={`Ampliar: ${foto.alt ?? foto.titulo ?? 'foto'}`}
+                  >
+                    <img
+                      src={foto.imagen_thumb}
+                      alt={foto.alt ?? ''}
+                      width={foto.ancho}
+                      height={foto.alto}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span className="carrusel__pie">
+                      {foto.titulo && <strong>{foto.titulo}</strong>}
+                      {foto.restaurante_nombre && (
+                        <span className="carrusel__local">{foto.restaurante_nombre}</span>
+                      )}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </Carrusel>
           </div>
         </section>
       )}

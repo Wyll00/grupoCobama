@@ -8,6 +8,7 @@ import {
   getRestaurante,
   getCarta,
   getGaleria,
+  getDestacados,
 } from '../controllers/restaurantes.controller.js';
 import { getCategorias, getAlergenos } from '../controllers/catalogo.controller.js';
 import { getAr } from '../controllers/ar.controller.js';
@@ -22,6 +23,7 @@ router.get('/health', asyncHandler(async (req, res) => {
 router.get('/restaurantes', asyncHandler(getRestaurantes));
 router.get('/restaurantes/:slug', asyncHandler(getRestaurante));
 router.get('/restaurantes/:slug/carta', asyncHandler(getCarta));
+router.get('/restaurantes/:slug/destacados', asyncHandler(getDestacados));
 router.get('/restaurantes/:slug/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGaleria));
 
 // Galeria del grupo: todas las fotos, de las cuatro casas y las sueltas.

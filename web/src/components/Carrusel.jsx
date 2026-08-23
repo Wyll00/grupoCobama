@@ -13,10 +13,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * asi que se detiene al pasar el raton, al llegar el foco con el teclado, al
  * tocarlo, y mientras la pestana no se ve. Y con el sistema puesto en "menos
  * animaciones" no arranca siquiera: ahi el usuario ya ha dicho que no quiere.
+ *
+ * Recibe los <li> ya hechos en vez de una lista de fotos: lo que aporta este
+ * componente es el movimiento y la pausa, no saber que hay dentro. Asi la
+ * galeria y las recomendaciones del local usan el mismo, y arreglar la pausa
+ * una vez la arregla en los dos sitios.
  */
 const ESPERA_MS = 4500;
 
-export default function Carrusel({ fotos, onAbrir }) {
+export default function Carrusel({
+  children,
+  total = 0,
+  className = '',
+  // Las flechas tienen que decir de que van: "siguientes" a secas no le dice
+  // nada a quien navega con lector de pantalla.
+  queSon = 'elementos',
+}) {
   const pista = useRef(null);
   const [parado, setParado] = useState(false);
 
@@ -25,8 +37,9 @@ export default function Carrusel({ fotos, onAbrir }) {
     if (!nodo) return;
 
     // El ancho de la tarjeta se mide, no se supone: cambia con el tamano de
-    // la pantalla y con el gap, y una constante aqui se descuadra sola.
-    const tarjeta = nodo.querySelector('.carrusel__foto');
+    // la pantalla y con el gap, y una constante aqui se descuadra sola. Se
+    // mide el <li>, que existe en los dos usos, y no una clase concreta.
+    const tarjeta = nodo.querySelector('li');
     const paso = tarjeta ? tarjeta.getBoundingClientRect().width + 16 : nodo.clientWidth * 0.8;
 
     const finDeCarrera = nodo.scrollLeft + nodo.clientWidth >= nodo.scrollWidth - 4;
@@ -41,7 +54,7 @@ export default function Carrusel({ fotos, onAbrir }) {
   }, []);
 
   useEffect(() => {
-    if (parado || fotos.length < 2) return;
+    if (parado || total < 2) return;
 
     const menosAnimacion = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (menosAnimacion.matches) return;
@@ -54,56 +67,32 @@ export default function Carrusel({ fotos, onAbrir }) {
     }, ESPERA_MS);
 
     return () => clearInterval(reloj);
-  }, [parado, fotos.length, mover]);
+  }, [parado, total, mover]);
 
-  if (fotos.length === 0) return null;
+  if (total === 0) return null;
 
   return (
     <div
-      className="carrusel"
+      className={`carrusel ${className}`}
       onMouseEnter={() => setParado(true)}
       onMouseLeave={() => setParado(false)}
       onFocusCapture={() => setParado(true)}
       onBlurCapture={() => setParado(false)}
       onTouchStart={() => setParado(true)}
     >
-      {fotos.length > 1 && (
+      {total > 1 && (
         <div className="carrusel__mandos">
-          <button type="button" onClick={() => mover(-1)} aria-label="Fotos anteriores">
+          <button type="button" onClick={() => mover(-1)} aria-label={`Ver ${queSon} anteriores`}>
             ‹
           </button>
-          <button type="button" onClick={() => mover(1)} aria-label="Fotos siguientes">
+          <button type="button" onClick={() => mover(1)} aria-label={`Ver ${queSon} siguientes`}>
             ›
           </button>
         </div>
       )}
 
       <ul className="carrusel__pista" ref={pista}>
-        {fotos.map((foto, i) => (
-          <li key={foto.id}>
-            <button
-              type="button"
-              className="carrusel__foto"
-              onClick={() => onAbrir?.(i)}
-              aria-label={`Ampliar: ${foto.alt ?? foto.titulo ?? 'foto'}`}
-            >
-              <img
-                src={foto.imagen_thumb}
-                alt={foto.alt ?? ''}
-                width={foto.ancho}
-                height={foto.alto}
-                loading="lazy"
-                decoding="async"
-              />
-              <span className="carrusel__pie">
-                {foto.titulo && <strong>{foto.titulo}</strong>}
-                {foto.restaurante_nombre && (
-                  <span className="carrusel__local">{foto.restaurante_nombre}</span>
-                )}
-              </span>
-            </button>
-          </li>
-        ))}
+        {children}
       </ul>
     </div>
   );

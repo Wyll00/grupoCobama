@@ -3,7 +3,7 @@ import {
   obtenerRestaurantePorSlug,
   obtenerIdPorSlug,
 } from '../services/restaurantes.service.js';
-import { obtenerCarta } from '../services/catalogo.service.js';
+import { obtenerCarta, destacadosDeLocal } from '../services/catalogo.service.js';
 import * as galeria from '../services/galeria.service.js';
 import { ApiError } from '../utils/ApiError.js';
 
@@ -73,4 +73,11 @@ export async function getGaleria(req, res) {
   // con ese campo y descarta el resto del sobre, asi que lo que salga fuera
   // no llega nunca.
   res.json({ datos: { total: fotos.length, fotos, categorias: porCategoria } });
+}
+
+/** Recomendaciones del local: lo que la casa quiere ensenar primero. */
+export async function getDestacados(req, res) {
+  const id = await obtenerIdPorSlug(req.params.slug);
+  if (!id) throw ApiError.noEncontrado('Ese local no existe');
+  res.json({ datos: await destacadosDeLocal(req.params.slug) });
 }

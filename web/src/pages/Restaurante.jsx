@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import BotonReservar from '../components/BotonReservar.jsx';
+import Recomendados from '../components/Recomendados.jsx';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
@@ -18,6 +19,9 @@ export default function Restaurante() {
     (opts) => api.restaurante(slug, opts),
     [slug]
   );
+  // Aparte de la ficha y sin bloquearla: si el local no ha marcado ninguno,
+  // la seccion no se pinta y la pagina sigue estando entera.
+  const destacados = useApi((opts) => api.destacados(slug, opts), [slug]);
 
   useMetadatos({
     titulo: local ? `${local.nombre} · ${local.municipio} · Grupo Cobama` : undefined,
@@ -178,6 +182,8 @@ export default function Restaurante() {
           </div>
         </section>
       )}
+
+      <Recomendados local={local} platos={destacados.datos ?? []} />
 
       <BarraReserva local={local} />
     </>

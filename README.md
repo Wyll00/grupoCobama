@@ -792,6 +792,43 @@ del cliente, el problema no desaparece por no tener campo.
 
 ---
 
+## Lo que recomienda la casa
+
+En la ficha de cada local, un carrusel de fichas con los platos que esa casa
+quiere enseñar primero. En La Basílica están marcados **los seis arroces y las
+seis carnes premium** (los tres chuletones a peso, los dos ibéricos y el
+solomillo de vaca canaria).
+
+### No hay interruptor nuevo
+
+Salen de `carta_items.destacado`, **el mismo** que ya pintaba la etiqueta «De
+la casa» en la carta, y que el panel ya dejaba marcar. Un segundo sitio donde
+marcar lo mismo acaba contradiciendo al primero: se marca en la carta del local
+y aparece aquí.
+
+Para cambiar la selección: **Cartas** en el panel, interruptor «Destacado» en
+cada plato.
+
+### El medallón
+
+De 171 platos, **uno** tiene foto. Una tarjeta diseñada alrededor de una foto y
+sin foto es un hueco, así que cuando no la hay se pinta el **número de la carta
+de papel** en un disco. No es relleno: es exactamente lo que hace falta para
+pedirlo en la mesa («ponme el 54»), así que la tarjeta sigue sirviendo de algo.
+Si el plato no tiene número —las otras tres casas aún no lo tienen— va la
+inicial. Cuando haya foto, manda la foto.
+
+### Un plato agotado no se recomienda
+
+El endpoint filtra los que están marcados como agotados. Enseñar en portada
+algo que hoy no hay es mandar a alguien a pedir lo que no puedes servirle.
+
+El carrusel es el mismo componente que la galería: lo que aporta es el
+movimiento y la pausa, no saber qué lleva dentro, así que recibe las fichas ya
+hechas. Arreglar la pausa una vez la arregla en los dos sitios.
+
+---
+
 ## Galería
 
 Una por local (`/:slug/galeria`) y una del grupo (`/galeria`), con filtro por
