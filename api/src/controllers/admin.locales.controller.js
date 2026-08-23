@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError.js';
 
 async function obtener(id) {
   const [filas] = await pool.execute(
-    'SELECT id, slug, nombre, imagen_portada FROM restaurantes WHERE id = ? LIMIT 1',
+    'SELECT id, slug, nombre, imagen_portada, imagen_portada_movil FROM restaurantes WHERE id = ? LIMIT 1',
     [id]
   );
   if (!filas[0]) throw ApiError.noEncontrado('Ese local no existe');
@@ -57,15 +57,22 @@ export async function postPortada(req, res) {
     recorte = parseado.data;
   }
 
-  const { portada, clara } = await procesarPortada(req.restauranteId, req.file.buffer, recorte);
+  const { portada, portadaMovil, clara } = await procesarPortada(
+    req.restauranteId,
+    req.file.buffer,
+    recorte
+  );
 
   await pool.execute(
-    'UPDATE restaurantes SET imagen_portada = ?, portada_clara = ? WHERE id = ?',
-    [portada, clara ? 1 : 0, req.restauranteId]
+    `UPDATE restaurantes
+        SET imagen_portada = ?, imagen_portada_movil = ?, portada_clara = ?
+      WHERE id = ?`,
+    [portada, portadaMovil, clara ? 1 : 0, req.restauranteId]
   );
 
   // Solo despues de que la nueva este guardada en base de datos.
   await borrarPortada(anterior.imagen_portada);
+  await borrarPortada(anterior.imagen_portada_movil);
 
   res.json({ datos: await obtener(req.restauranteId) });
 }

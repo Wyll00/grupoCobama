@@ -2057,3 +2057,35 @@ button {
     );
   }
 }
+
+/* ------------------------------------------------- la ficha en movil --- */
+
+/*
+  La mayoria de las visitas de esta web son desde el movil, asi que aqui no se
+  trata de "que quepa": es la pantalla normal.
+
+  Dos cosas se quitan de la cabecera:
+
+  Reservar y el telefono, porque la barra fija de abajo ya los lleva y esta
+  siempre a la vista. Repetirlos costaba 175 px de botones apilados en la
+  pantalla mas pequena, empujaba la carta fuera de la primera pantalla y
+  ademas obligaba a elegir entre cinco cosas para hacer dos. Al quitarlos,
+  "Ver la carta" queda el primero, que es a lo que viene la gente.
+
+  La imagen grande, porque en 375 px se pintaba a una quinta parte de tamano
+  y bajo un velo del 85%: 122 KB de datos moviles para un fondo que casi no
+  se ve. La de 960 pesa 48.
+*/
+.ficha__cabecera--con-foto {
+  background-image: var(--portada);
+}
+
+@media (max-width: 700px) {
+  .ficha__cabecera--con-foto {
+    background-image: var(--portada-movil, var(--portada));
+  }
+
+  .ficha__accion--duplicada {
+    display: none;
+  }
+}

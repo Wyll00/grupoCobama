@@ -591,6 +591,38 @@ desactivar el último admin activo ni el propio usuario.
 
 ---
 
+## El movil es la pantalla normal
+
+La mayoría de las visitas llegan desde el móvil, así que ahí no se trata de
+«que quepa». Lo que se hace en consecuencia:
+
+### La portada se sirve en dos tamaños
+
+1920 px de ancho para escritorio, **960 para móvil**. En una pantalla de 375
+la grande se pintaba a una quinta parte de su tamaño y encima bajo un velo del
+85%: 122 KB de datos móviles para un fondo que casi no se ve. La pequeña pesa
+**48 KB**.
+
+La de móvil se genera **a partir de la grande ya recortada**, no del original.
+Recortando las dos por separado, `position: attention` podría elegir encuadres
+distintos y la foto daría un salto al girar el teléfono.
+
+Las dos rutas van al DOM como **variables CSS**, no como `backgroundImage`: un
+estilo en línea gana a cualquier regla de la hoja, así que con `backgroundImage`
+ninguna media query podría elegir la de móvil.
+
+### En el móvil no se repiten los botones
+
+La barra fija de abajo ya lleva **Reservar** y **Llamar**, y está siempre a la
+vista. La cabecera los repetía: 175 px de botones apilados en la pantalla más
+pequeña, la carta empujada fuera de la primera pantalla, y cinco opciones para
+hacer dos cosas.
+
+En móvil esos dos se ocultan de la cabecera. **«Ver la carta» queda el primero**,
+que es a lo que viene la gente. La cabecera baja de 534 a 471 px.
+
+---
+
 ## Foto de portada de cada local
 
 La cabecera de la ficha de un local puede llevar una foto de fondo, atenuada,

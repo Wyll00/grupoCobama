@@ -26,6 +26,11 @@ const GALERIA_THUMB = 600;
 // lo suyo para la cabecera. Dos recortes encadenados sobre la misma imagen es
 // como se pierde la aguja de una torre sin que nadie decida perderla.
 const PORTADA = { ancho: 1920, alto: 1080 };
+
+// La mayoria de las visitas son desde el movil, asi que 1920 es el caso raro.
+// A 960 se ve igual de bien en una pantalla de 375 (incluso al doble de
+// densidad) y pesa la tercera parte.
+const PORTADA_MOVIL = { ancho: 960, alto: 540 };
 export const PROPORCION_PORTADA = PORTADA.ancho / PORTADA.alto;
 
 // 4:3, que es la proporcion con la que se muestran las fichas de plato.
@@ -141,8 +146,18 @@ export async function procesarPortada(restauranteId, buffer, recorte) {
 
   await writeFile(join(directorioPortadas(), nombre), procesada);
 
+  // La de movil sale de la grande YA RECORTADA, no del original: si se
+  // recortaran las dos por separado, `position: attention` podria elegir
+  // encuadres distintos y la foto daria un salto al girar el telefono.
+  const nombreMovil = nombre.replace('.webp', '-movil.webp');
+  await sharp(procesada)
+    .resize(PORTADA_MOVIL.ancho, PORTADA_MOVIL.alto)
+    .webp({ quality: 68 })
+    .toFile(join(directorioPortadas(), nombreMovil));
+
   return {
     portada: `${RUTA_PORTADAS}/${nombre}`,
+    portadaMovil: `${RUTA_PORTADAS}/${nombreMovil}`,
     clara: await zonaDelTextoEsClara(procesada),
   };
 }

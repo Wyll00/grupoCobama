@@ -50,9 +50,16 @@ export default function Restaurante() {
         ]
           .filter(Boolean)
           .join(' ')}
+        // Las dos imagenes van como variables CSS y no como backgroundImage
+        // directo: un estilo en linea gana a cualquier regla de la hoja, asi
+        // que con backgroundImage no habria forma de que una media query
+        // eligiera la de movil.
         style={
           local.imagen_portada
-            ? { backgroundImage: `url(${local.imagen_portada})` }
+            ? {
+                '--portada': `url(${local.imagen_portada})`,
+                '--portada-movil': `url(${local.imagen_portada_movil ?? local.imagen_portada})`,
+              }
             : undefined
         }
       >
@@ -70,7 +77,7 @@ export default function Restaurante() {
             gente, pero deja de ser el unico camino.
           */}
           <div className="ficha__acciones">
-            <BotonReservar local={local} />
+            <BotonReservar local={local} className="boton boton--principal ficha__accion--duplicada" />
             <Link
               className="boton boton--secundario"
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
@@ -94,7 +101,7 @@ export default function Restaurante() {
             </a>
             {local.telefono && (
               <a
-                className="boton boton--secundario"
+                className="boton boton--secundario ficha__accion--duplicada"
                 style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
                 href={enlaceTelefono(local.telefono)}
               >
