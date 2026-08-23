@@ -1722,22 +1722,24 @@ button {
   gap: 1rem;
 }
 
-.carrusel { position: relative; margin-top: 1.5rem; }
+.carrusel { position: relative; }
+.carrusel .carrusel__pista { margin-top: 1.5rem; }
 
-/* Debajo de la tira y no flotando arriba a la derecha.
-   Estaban en position:absolute con top negativo, o sea metidas en la fila de
-   la cabecera, que es justo donde ya vive el boton de "Ver la carta entera":
-   los dos pegados al mismo borde derecho, pisandose 84 px.
-
-   Se podria haber corregido subiendolas mas, pero eso depende de que la
-   cabecera mida dos lineas: con un titulo mas corto o una descripcion mas
-   larga vuelve a descuadrarse. Abajo no compiten con nada, midan lo que
-   midan el titulo y el boton. */
+/* Arriba a la derecha, en la misma fila que el titulo y el boton.
+   Van DENTRO de esa fila y no flotando encima con un desplazamiento
+   negativo: asi el navegador las coloca solo, y si el titulo crece o el
+   boton cambia de texto siguen cuadrando. Antes, en position:absolute, se
+   solapaban 84 px con el boton. */
 .carrusel__mandos {
+  flex: none;
   display: flex;
-  justify-content: flex-end;
   gap: 0.4rem;
-  margin-top: 0.9rem;
+}
+
+/* El titulo empuja al resto a la derecha, para que el boton y las flechas
+   queden juntos en la esquina en vez de repartidos por la fila. */
+.seccion__cabecera > :first-child {
+  margin-right: auto;
 }
 
 .carrusel__mandos button {

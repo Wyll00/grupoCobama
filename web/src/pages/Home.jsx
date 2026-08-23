@@ -54,19 +54,23 @@ export default function Home() {
       {fotos.length > 0 && (
         <section className="seccion seccion--fotos">
           <div className="contenedor">
-            <div className="seccion__cabecera">
-              <div>
-                <h2>Asi se ve por dentro</h2>
-                <p className="apagado" style={{ maxWidth: '52ch' }}>
-                  Los platos, las salas y lo que se cuece en las cuatro casas.
-                </p>
-              </div>
-              <Link className="boton boton--secundario" to="/galeria">
-                Ver toda la galeria
-              </Link>
-            </div>
-
-            <Carrusel total={fotos.length} queSon="fotos">
+            <Carrusel
+              total={fotos.length}
+              queSon="fotos"
+              cabecera={
+                <>
+                  <div>
+                    <h2>Asi se ve por dentro</h2>
+                    <p className="apagado" style={{ maxWidth: '52ch' }}>
+                      Los platos, las salas y lo que se cuece en las cuatro casas.
+                    </p>
+                  </div>
+                  <Link className="boton boton--secundario" to="/galeria">
+                    Ver toda la galeria
+                  </Link>
+                </>
+              }
+            >
               {fotos.map((foto, i) => (
                 <li key={foto.id}>
                   <button

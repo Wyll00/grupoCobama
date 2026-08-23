@@ -25,6 +25,12 @@ export default function Carrusel({
   children,
   total = 0,
   className = '',
+  // La cabecera de la seccion (titulo, entradilla y su boton) se pasa aqui
+  // en vez de pintarla fuera: las flechas van arriba a la derecha, o sea en
+  // esa misma fila, y si no comparten contenedor hay que colocarlas con un
+  // desplazamiento negativo a ojo. Eso solo cuadra mientras la cabecera mida
+  // exactamente lo que medía el dia que se ajusto.
+  cabecera = null,
   // Las flechas tienen que decir de que van: "siguientes" a secas no le dice
   // nada a quien navega con lector de pantalla.
   queSon = 'elementos',
@@ -80,20 +86,25 @@ export default function Carrusel({
       onBlurCapture={() => setParado(false)}
       onTouchStart={() => setParado(true)}
     >
+      {(cabecera || total > 1) && (
+        <div className="seccion__cabecera">
+          {cabecera}
+          {total > 1 && (
+            <div className="carrusel__mandos">
+              <button type="button" onClick={() => mover(-1)} aria-label={`Ver ${queSon} anteriores`}>
+                ‹
+              </button>
+              <button type="button" onClick={() => mover(1)} aria-label={`Ver ${queSon} siguientes`}>
+                ›
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <ul className="carrusel__pista" ref={pista}>
         {children}
       </ul>
-
-      {total > 1 && (
-        <div className="carrusel__mandos">
-          <button type="button" onClick={() => mover(-1)} aria-label={`Ver ${queSon} anteriores`}>
-            ‹
-          </button>
-          <button type="button" onClick={() => mover(1)} aria-label={`Ver ${queSon} siguientes`}>
-            ›
-          </button>
-        </div>
-      )}
     </div>
   );
 }

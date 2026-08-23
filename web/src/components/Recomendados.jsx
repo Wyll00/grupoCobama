@@ -62,19 +62,24 @@ export default function Recomendados({ local, platos }) {
   return (
     <section className="seccion seccion--recomendados">
       <div className="contenedor">
-        <div className="seccion__cabecera">
-          <div>
-            <h2>Lo que recomienda la casa</h2>
-            <p className="apagado" style={{ maxWidth: '54ch' }}>
-              Los arroces y las carnes que mejor salen de esta cocina.
-            </p>
-          </div>
-          <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
-            Ver la carta entera
-          </Link>
-        </div>
-
-        <Carrusel total={platos.length} queSon="recomendaciones" className="carrusel--fichas">
+        <Carrusel
+          total={platos.length}
+          queSon="recomendaciones"
+          className="carrusel--fichas"
+          cabecera={
+            <>
+              <div>
+                <h2>Lo que recomienda la casa</h2>
+                <p className="apagado" style={{ maxWidth: '54ch' }}>
+                  Los arroces y las carnes que mejor salen de esta cocina.
+                </p>
+              </div>
+              <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
+                Ver la carta entera
+              </Link>
+            </>
+          }
+        >
           {platos.map((plato) => (
             <li key={plato.carta_item_id}>
               <article className="ficha-plato">
