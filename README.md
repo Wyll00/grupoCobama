@@ -1112,6 +1112,16 @@ filtros, que es donde está mirando quien filtra por alergia.
 > otras tres casas siguen con cocina canaria verosímil, no con sus cartas.
 > **No enseñar esos precios a cliente final.**
 
+Las bebidas **no llevan etiqueta de dieta**, y `0` ahí significa «no consta»,
+no «lleva animal». El seed las marcaba todas como vegetarianas y casi todas
+como veganas, en bloque y sin comprobar nada. En los **vinos era falso**:
+muchos se clarifican con clara de huevo, caseína o cola de pescado, así que un
+vino no es vegano por defecto — lo es si la bodega lo dice. Es el mismo error
+que el propio `carta.js` de La Basílica describe para los alérgenos: afirmar
+sin comprobar. En el resto era ruido, y una etiqueta que sale en las 59 líneas
+entrena a la gente a no mirarlas — y entonces tampoco las mira en los platos,
+que es donde sí importan.
+
 En la carta de bebidas (`db/seeds/004_bebidas.sql`) las marcas y las
 denominaciones de origen **sí son reales** — el catálogo de Coca-Cola, las
 cervezas canarias y las nueve D.O. del archipiélago. Los precios no: están para

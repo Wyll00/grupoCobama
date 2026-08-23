@@ -41,34 +41,45 @@ UPDATE categorias SET activo = 0 WHERE id = 7;
 -- ---------------------------------------------------------------------
 -- Refrescos - catalogo de Coca-Cola
 -- ---------------------------------------------------------------------
+-- es_vegetariano y es_vegano van a 0 en TODAS las bebidas, y 0 aqui
+-- significa "no consta", no "lleva animal".
+--
+-- En los vinos ponerlo a 1 era falso: muchos se clarifican con clara de
+-- huevo, caseina o cola de pescado, asi que un vino no es vegano por defecto,
+-- lo es si la bodega lo dice. Marcarlos en bloque es decirle a un vegano que
+-- puede beberselos.
+--
+-- En el resto es ruido: nadie se pregunta si una Coca-Cola es vegetariana, y
+-- una etiqueta que sale en las 59 lineas entrena a la gente a no mirarlas, y
+-- entonces tampoco las mira en los platos, que es donde si importan.
 INSERT INTO platos (id, categoria_id, nombre, descripcion, es_vegetariano, es_vegano) VALUES
-  (100, 10, 'Coca-Cola',                  'Botellin 20 cl.', 1, 1),
-  (101, 10, 'Coca-Cola Zero Azucar',      'Botellin 20 cl.', 1, 1),
-  (102, 10, 'Coca-Cola Zero Zero',        'Sin azucar y sin cafeina. Botellin 20 cl.', 1, 1),
-  (103, 10, 'Fanta Naranja',              'Botellin 20 cl.', 1, 1),
-  (104, 10, 'Fanta Limon',                'Botellin 20 cl.', 1, 1),
-  (105, 10, 'Sprite',                     'Botellin 20 cl.', 1, 1),
-  (106, 10, 'Nestea Limon',               'Botellin 25 cl.', 1, 1),
-  (107, 10, 'Nestea Maracuya',            'Botellin 25 cl.', 1, 1),
-  (108, 10, 'Aquarius Limon',             'Botellin 33 cl.', 1, 1),
-  (109, 10, 'Aquarius Naranja',           'Botellin 33 cl.', 1, 1),
-  (110, 10, 'Appletiser',                 'Zumo de manzana con gas. 27,5 cl.', 1, 1),
-  (111, 10, 'Royal Bliss Tonica',         'Botellin 20 cl.', 1, 1),
-  (112, 10, 'Royal Bliss Ginger Ale',     'Botellin 20 cl.', 1, 1),
-  (113, 10, 'Powerade',                   'Bebida isotonica. 50 cl.', 1, 1),
-  (114, 10, 'Agua mineral 50 cl',         'Natural o con gas.', 1, 1),
-  (115, 10, 'Zumo de naranja natural',    'Exprimido al momento.', 1, 1),
-  (116, 10, 'Bitter sin alcohol',         'Botellin 20 cl.', 1, 1),
+  (100, 10, 'Coca-Cola',                  'Botellin 20 cl.', 0, 0),
+  (101, 10, 'Coca-Cola Zero Azucar',      'Botellin 20 cl.', 0, 0),
+  (102, 10, 'Coca-Cola Zero Zero',        'Sin azucar y sin cafeina. Botellin 20 cl.', 0, 0),
+  (103, 10, 'Fanta Naranja',              'Botellin 20 cl.', 0, 0),
+  (104, 10, 'Fanta Limon',                'Botellin 20 cl.', 0, 0),
+  (105, 10, 'Sprite',                     'Botellin 20 cl.', 0, 0),
+  (106, 10, 'Nestea Limon',               'Botellin 25 cl.', 0, 0),
+  (107, 10, 'Nestea Maracuya',            'Botellin 25 cl.', 0, 0),
+  (108, 10, 'Aquarius Limon',             'Botellin 33 cl.', 0, 0),
+  (109, 10, 'Aquarius Naranja',           'Botellin 33 cl.', 0, 0),
+  (110, 10, 'Appletiser',                 'Zumo de manzana con gas. 27,5 cl.', 0, 0),
+  (111, 10, 'Royal Bliss Tonica',         'Botellin 20 cl.', 0, 0),
+  (112, 10, 'Royal Bliss Ginger Ale',     'Botellin 20 cl.', 0, 0),
+  (113, 10, 'Powerade',                   'Bebida isotonica. 50 cl.', 0, 0),
+  (114, 10, 'Agua mineral 50 cl',         'Natural o con gas.', 0, 0),
+  (115, 10, 'Zumo de naranja natural',    'Exprimido al momento.', 0, 0),
+  (116, 10, 'Bitter sin alcohol',         'Botellin 20 cl.', 0, 0),
 
 -- ---------------------------------------------------------------------
 -- Cervezas - las canarias de siempre
 -- ---------------------------------------------------------------------
-  (120, 11, 'Dorada Especial (botellin)', 'Cerveza de Tenerife. 25 cl.', 1, 1),
-  (121, 11, 'Dorada Pilsen (botellin)',   'Cerveza de Tenerife. 25 cl.', 1, 1),
-  (122, 11, 'Dorada sin alcohol',         'Botellin 25 cl.', 1, 1),
-  (123, 11, 'Tropical (botellin)',        'Cerveza de Gran Canaria. 25 cl.', 1, 1),
-  (124, 11, 'Jarra de cerveza 50 cl',     'De barril.', 1, 1),
-  (125, 11, 'Clara con limon',            'Cerveza con refresco de limon.', 1, 1),
+  (120, 11, 'Dorada Especial (botellin)', 'Cerveza de Tenerife. 25 cl.', 0, 0),
+  (121, 11, 'Dorada Pilsen (botellin)',   'Cerveza de Tenerife. 25 cl.', 0, 0),
+  (122, 11, 'Dorada sin alcohol',         'Botellin 25 cl.', 0, 0),
+  (123, 11, 'Tropical (botellin)',        'Cerveza de Gran Canaria. 25 cl.', 0, 0),
+  (124, 11, 'Jarra de cerveza 50 cl',     'De barril.', 0, 0),
+  (125, 11, 'Clara con limon',            'Cerveza con refresco de limon.', 0, 0),
 
 -- ---------------------------------------------------------------------
 -- Vinos - por denominacion de origen
@@ -77,40 +88,40 @@ INSERT INTO platos (id, categoria_id, nombre, descripcion, es_vegetariano, es_ve
 -- reales de Canarias y sirven de plantilla. Cada local sustituye la linea por
 -- la botella concreta que trabaja, con su bodega y su foto.
 -- ---------------------------------------------------------------------
-  (130, 12, 'Tinto joven D.O. Tacoronte-Acentejo',  'Listan negro y negramoll. Botella 75 cl.', 1, 1),
-  (131, 12, 'Tinto barrica D.O. Tacoronte-Acentejo','Crianza en roble. Botella 75 cl.', 1, 1),
-  (132, 12, 'Blanco seco D.O. Ycoden-Daute-Isora',  'Listan blanco y marmajuelo. Botella 75 cl.', 1, 1),
-  (133, 12, 'Tinto D.O. Valle de la Orotava',       'Listan negro de cordon trenzado. Botella 75 cl.', 1, 1),
-  (134, 12, 'Blanco D.O. Valle de la Orotava',      'Listan blanco. Botella 75 cl.', 1, 1),
-  (135, 12, 'Blanco seco D.O. Valle de Guimar',     'Listan blanco y gual. Botella 75 cl.', 1, 1),
-  (136, 12, 'Blanco D.O. Abona',                    'Listan blanco de vinedo de altura. Botella 75 cl.', 1, 1),
-  (137, 12, 'Malvasia volcanica seco D.O. Lanzarote','Vinedo en hoyos de picon. Botella 75 cl.', 1, 1),
-  (138, 12, 'Malvasia dulce D.O. Lanzarote',        'Para el postre. Botella 50 cl.', 1, 1),
-  (139, 12, 'Blanco D.O. La Palma',                 'Albillo criollo. Botella 75 cl.', 1, 1),
-  (140, 12, 'Tinto D.O. La Palma',                  'Negramoll. Botella 75 cl.', 1, 1),
-  (141, 12, 'Blanco D.O. El Hierro',                'Verdello y vijariego. Botella 75 cl.', 1, 1),
-  (142, 12, 'Tinto D.O. Gran Canaria',              'Listan negro y tintilla. Botella 75 cl.', 1, 1),
-  (143, 12, 'Rosado D.O.P. Islas Canarias',         'Botella 75 cl.', 1, 1),
-  (144, 12, 'Vino blanco de la casa (copa)',        NULL, 1, 1),
-  (145, 12, 'Vino tinto de la casa (copa)',         NULL, 1, 1),
-  (146, 12, 'Vino rosado de la casa (copa)',        NULL, 1, 1),
-  (147, 12, 'Sangria (jarra 1 L)',                  'Minimo dos personas.', 1, 1),
-  (148, 12, 'Tinto de verano',                      'Vaso.', 1, 1),
+  (130, 12, 'Tinto joven D.O. Tacoronte-Acentejo',  'Listan negro y negramoll. Botella 75 cl.', 0, 0),
+  (131, 12, 'Tinto barrica D.O. Tacoronte-Acentejo','Crianza en roble. Botella 75 cl.', 0, 0),
+  (132, 12, 'Blanco seco D.O. Ycoden-Daute-Isora',  'Listan blanco y marmajuelo. Botella 75 cl.', 0, 0),
+  (133, 12, 'Tinto D.O. Valle de la Orotava',       'Listan negro de cordon trenzado. Botella 75 cl.', 0, 0),
+  (134, 12, 'Blanco D.O. Valle de la Orotava',      'Listan blanco. Botella 75 cl.', 0, 0),
+  (135, 12, 'Blanco seco D.O. Valle de Guimar',     'Listan blanco y gual. Botella 75 cl.', 0, 0),
+  (136, 12, 'Blanco D.O. Abona',                    'Listan blanco de vinedo de altura. Botella 75 cl.', 0, 0),
+  (137, 12, 'Malvasia volcanica seco D.O. Lanzarote','Vinedo en hoyos de picon. Botella 75 cl.', 0, 0),
+  (138, 12, 'Malvasia dulce D.O. Lanzarote',        'Para el postre. Botella 50 cl.', 0, 0),
+  (139, 12, 'Blanco D.O. La Palma',                 'Albillo criollo. Botella 75 cl.', 0, 0),
+  (140, 12, 'Tinto D.O. La Palma',                  'Negramoll. Botella 75 cl.', 0, 0),
+  (141, 12, 'Blanco D.O. El Hierro',                'Verdello y vijariego. Botella 75 cl.', 0, 0),
+  (142, 12, 'Tinto D.O. Gran Canaria',              'Listan negro y tintilla. Botella 75 cl.', 0, 0),
+  (143, 12, 'Rosado D.O.P. Islas Canarias',         'Botella 75 cl.', 0, 0),
+  (144, 12, 'Vino blanco de la casa (copa)',        NULL, 0, 0),
+  (145, 12, 'Vino tinto de la casa (copa)',         NULL, 0, 0),
+  (146, 12, 'Vino rosado de la casa (copa)',        NULL, 0, 0),
+  (147, 12, 'Sangria (jarra 1 L)',                  'Minimo dos personas.', 0, 0),
+  (148, 12, 'Tinto de verano',                      'Vaso.', 0, 0),
 
 -- ---------------------------------------------------------------------
 -- Cafes y licores
 -- ---------------------------------------------------------------------
-  (150, 13, 'Cafe solo',                  NULL, 1, 1),
-  (151, 13, 'Cafe cortado',               NULL, 1, 0),
-  (152, 13, 'Cafe con leche',             NULL, 1, 0),
-  (153, 13, 'Cafe descafeinado',          'De maquina o de sobre.', 1, 0),
-  (154, 13, 'Carajillo',                  'Con ron, coneac o whisky.', 1, 1),
-  (155, 13, 'Ron miel canario (copa)',    NULL, 1, 0),
-  (156, 13, 'Ron anejo canario (copa)',   NULL, 1, 1),
-  (157, 13, 'Licor 43 (copa)',            NULL, 1, 1),
-  (158, 13, 'Hierbas canarias (copa)',    NULL, 1, 1),
-  (159, 13, 'Orujo (copa)',               'Blanco o de hierbas.', 1, 1),
-  (160, 13, 'Infusion',                   'Manzanilla, poleo, tila o te.', 1, 1);
+  (150, 13, 'Cafe solo',                  NULL, 0, 0),
+  (151, 13, 'Cafe cortado',               NULL, 0, 0),
+  (152, 13, 'Cafe con leche',             NULL, 0, 0),
+  (153, 13, 'Cafe descafeinado',          'De maquina o de sobre.', 0, 0),
+  (154, 13, 'Carajillo',                  'Con ron, coneac o whisky.', 0, 0),
+  (155, 13, 'Ron miel canario (copa)',    NULL, 0, 0),
+  (156, 13, 'Ron anejo canario (copa)',   NULL, 0, 0),
+  (157, 13, 'Licor 43 (copa)',            NULL, 0, 0),
+  (158, 13, 'Hierbas canarias (copa)',    NULL, 0, 0),
+  (159, 13, 'Orujo (copa)',               'Blanco o de hierbas.', 0, 0),
+  (160, 13, 'Infusion',                   'Manzanilla, poleo, tila o te.', 0, 0);
 
 -- ---------------------------------------------------------------------
 -- Alergenos
