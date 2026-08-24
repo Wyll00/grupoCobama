@@ -59,21 +59,11 @@ export async function obtenerRestaurantePorSlug(slug) {
     [restaurante.id]
   );
 
-  const [menus] = await pool.execute(
-    `SELECT id, nombre, nombre_en, descripcion, descripcion_en,
-            precio_por_persona, minimo_comensales
-       FROM menus_grupo
-      WHERE restaurante_id = ? AND activo = 1
-      ORDER BY precio_por_persona`,
-    [restaurante.id]
-  );
-
   return {
     ...normalizar(restaurante),
     abierto_ahora: estaAbiertoAhora(horarios),
     horarios: resumirHorarios(horarios),
     horarios_detalle: horarios,
-    menus_grupo: menus,
   };
 }
 

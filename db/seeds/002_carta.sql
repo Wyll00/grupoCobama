@@ -197,12 +197,3 @@ INSERT INTO carta_items (restaurante_id, plato_id, precio, orden, destacado) VAL
   (4, 42,  3.00, 700, 0), (4, 43, 15.00, 710, 0), (4, 44,  2.30, 720, 0),
   (4, 45,  2.50, 730, 0), (4, 46,  2.50, 740, 0), (4, 47,  2.80, 750, 0);
 
--- ---------------------------------------------------------------------
--- menus_grupo - tambien provisional
--- ---------------------------------------------------------------------
-INSERT INTO menus_grupo (restaurante_id, nombre, descripcion, precio_por_persona, minimo_comensales) VALUES
-  (1, 'Menu Guachinche',   'Entrantes al centro, carne fiesta o costillas, postre casero, bebida incluida.', 24.00, 10),
-  (1, 'Menu Celebracion',  'Entrantes al centro, arroz o brasa a elegir, postre, bebida y cafe.',            32.00, 12),
-  (2, 'Menu Brasa',        'Entrantes al centro, parrillada de carnes, postre, bebida y cafe.',              34.00, 10),
-  (3, 'Menu Casona',       'Menu degustacion de siete pases. Solo cena y con reserva previa.',               42.00,  8),
-  (4, 'Menu Arrocero',     'Entrantes al centro, arroz a elegir, postre, bebida y cafe.',                    30.00, 10);

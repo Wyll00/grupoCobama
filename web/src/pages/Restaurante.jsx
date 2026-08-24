@@ -175,32 +175,6 @@ export default function Restaurante() {
         </div>
       </section>
 
-      {local.menus_grupo.length > 0 && (
-        <section className="seccion" style={{ paddingTop: 0 }}>
-          <div className="contenedor">
-            <h2>Menus para grupos</h2>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {local.menus_grupo.map((menu) => (
-                <li key={menu.id} className="plato">
-                  <div className="plato__info">
-                    <div className="plato__nombre">{menu.nombre}</div>
-                    <p className="plato__descripcion">
-                      {menu.descripcion} Minimo {menu.minimo_comensales} personas.
-                    </p>
-                  </div>
-                  <div className="plato__precio">
-                    {formatoPrecio.format(menu.precio_por_persona)}
-                    <span className="apagado" style={{ fontSize: '0.75rem', display: 'block', textAlign: 'right' }}>
-                      por persona
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
       <Recomendados local={local} platos={destacados.datos ?? []} />
 
       <BarraReserva local={local} />
