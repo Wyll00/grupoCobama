@@ -552,10 +552,16 @@ button {
 .ficha__cabecera--con-foto {
   background-size: cover;
   /*
-    Hacia arriba, no al centro. La foto se guarda en 1.92:1 y la cabecera es
-    mas apaisada, asi que cover recorta en vertical: centrada se comeria la
-    parte de arriba, que en una foto de edificio o de fachada es justo lo que
-    la hace reconocible.
+    Hacia arriba, no al centro. La foto se guarda en 16:9 y la cabecera es mas
+    apaisada, asi que cover recorta en vertical: centrada se comeria la parte
+    de arriba, que en una foto de edificio o de fachada es justo lo que la
+    hace reconocible.
+
+    Lo que se pierde no es poco y crece con la pantalla: a 1440 se ve del 3,5%
+    al 80% del alto, y a 2560 solo del 8,5% al 52%. En movil pasa al reves,
+    la cabecera es mas alta que ancha y solo se ve el 42-45% central del
+    ancho. La interseccion de las dos -el centro, arriba- es lo unico que ve
+    todo el mundo, y es donde tiene que caer el motivo de la ilustracion.
   */
   background-position: center 15%;
   background-repeat: no-repeat;
