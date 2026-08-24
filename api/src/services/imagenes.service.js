@@ -158,58 +158,63 @@ export async function procesarPortada(restauranteId, buffer, recorte) {
   return {
     portada: `${RUTA_PORTADAS}/${nombre}`,
     portadaMovil: `${RUTA_PORTADAS}/${nombreMovil}`,
-    clara: await zonaDelTextoEsClara(procesada),
+    estilo: await estiloDelTexto(procesada),
   };
 }
 
 /**
- * Mira si la zona donde cae el nombre del local es clara y pareja.
+ * Decide como tratar el texto sobre la portada.
  *
- * La cabecera lleva un velo encima para que el texto se lea. Sobre una foto
- * oscura toca velo negro y letra crema; sobre una ilustracion luminosa, al
- * reves, porque el velo negro la apaga entera y ademas no hace falta.
+ * Devuelve 'oscuro', 'claro' o 'claro-centrado'. Se mide en vez de
+ * preguntarse: un interruptor mas en el panel es un interruptor que alguien
+ * no toca al cambiar la foto, y entonces el nombre desaparece sobre el cielo.
  *
- * Se mide en vez de preguntarse. Un interruptor mas en el panel es un
- * interruptor que alguien no toca al cambiar la foto, y entonces el nombre
- * desaparece sobre el cielo.
+ * Se miran DOS zonas, porque las ilustraciones no reparten el hueco igual:
  *
- * Dos condiciones, no una:
+ *   izquierda  donde va el texto normalmente. Si esta clara y pareja ->
+ *              'claro' (La Basilica: crema a la izquierda, iglesia a la
+ *              derecha).
+ *   centro     si la izquierda no vale pero el centro si -> 'claro-centrado'
+ *              (Como en Casa: cielo crema en medio, barril y uvas a la
+ *              izquierda).
  *
- *   clara   la media tiene que ser alta, o la tinta oscura no contrasta.
- *   pareja  y ademas poco dispersa. Solo con la media, la foto de la torre
- *           daba 0,64 y pasaba por clara: es cielo brillante CON una torre
- *           oscura recortada dentro, asi que el texto encima caeria mitad
- *           sobre cielo y mitad sobre piedra.
+ * Si ninguna vale, 'oscuro': velo negro y letra crema, que es lo que pide
+ * una foto o una ilustracion oscura.
  *
- * Medido: la ilustracion da 0,87 de media y 0,15 de dispersion; la foto,
- * 0,64 y 0,25. Los umbrales dejan margen a los dos lados.
- *
- * Se mira la caja donde va el texto, no la imagen entera: esta ilustracion
- * tiene crema a la izquierda y azul intenso a la derecha, y de media saldria
- * un gris que no describe ninguna de las dos.
+ * Dos condiciones y no una. Solo con la media, la foto de la torre daba 0,64
+ * y pasaba por clara: es cielo brillante CON una torre oscura recortada
+ * dentro, asi que el texto caeria mitad sobre cielo y mitad sobre piedra.
+ * Medido: La Basilica 0,87 y 0,15 de dispersion; el centro de Como en Casa
+ * 0,90 y 0,003; la foto de la torre 0,64 y 0,25.
  */
-async function zonaDelTextoEsClara(buffer) {
-  const caja = {
-    left: Math.round(PORTADA.ancho * 0.08),
-    top: Math.round(PORTADA.alto * 0.34),
-    width: Math.round(PORTADA.ancho * 0.3),
-    height: Math.round(PORTADA.alto * 0.44),
+async function estiloDelTexto(buffer) {
+  const zona = async (x0, x1, y0, y1) => {
+    const caja = {
+      left: Math.round(PORTADA.ancho * x0),
+      top: Math.round(PORTADA.alto * y0),
+      width: Math.round(PORTADA.ancho * (x1 - x0)),
+      height: Math.round(PORTADA.alto * (y1 - y0)),
+    };
+
+    // El recorte se materializa ANTES de pedir las estadisticas. stats() mira
+    // la imagen de ENTRADA e ignora el resize y el extract que lleve encima
+    // la tuberia: sin este toBuffer(), la medida sale de la imagen entera y
+    // da igual que caja se pida.
+    const trozo = await sharp(buffer).extract(caja).toBuffer();
+    const { channels } = await sharp(trozo).stats();
+    const [r, g, b] = channels;
+
+    // Luminancia percibida: el ojo no pesa igual los tres canales, y una
+    // media simple da "claro" a un azul saturado que en pantalla se ve oscuro.
+    const luz = (0.2126 * r.mean + 0.7152 * g.mean + 0.0722 * b.mean) / 255;
+    const dispersion = (0.2126 * r.stdev + 0.7152 * g.stdev + 0.0722 * b.stdev) / 255;
+
+    return luz > 0.72 && dispersion < 0.2;
   };
 
-  // El recorte se materializa ANTES de pedir las estadisticas. stats() mira
-  // la imagen de ENTRADA e ignora el resize y el extract que lleve encima la
-  // tuberia: sin este toBuffer(), la medida sale de la imagen entera y da
-  // igual que caja se pida.
-  const trozo = await sharp(buffer).extract(caja).toBuffer();
-  const { channels } = await sharp(trozo).stats();
-  const [r, g, b] = channels;
-
-  // Luminancia percibida: el ojo no pesa igual los tres canales, y una media
-  // simple da "claro" a un azul saturado que en pantalla se ve oscuro.
-  const luz = (0.2126 * r.mean + 0.7152 * g.mean + 0.0722 * b.mean) / 255;
-  const dispersion = (0.2126 * r.stdev + 0.7152 * g.stdev + 0.0722 * b.stdev) / 255;
-
-  return luz > 0.72 && dispersion < 0.2;
+  if (await zona(0.08, 0.38, 0.34, 0.78)) return 'claro';
+  if (await zona(0.35, 0.65, 0.15, 0.6)) return 'claro-centrado';
+  return 'oscuro';
 }
 
 /** Borra una portada sustituida. Igual que con los platos, fallar no es grave. */

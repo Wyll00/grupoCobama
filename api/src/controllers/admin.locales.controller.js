@@ -57,7 +57,7 @@ export async function postPortada(req, res) {
     recorte = parseado.data;
   }
 
-  const { portada, portadaMovil, clara } = await procesarPortada(
+  const { portada, portadaMovil, estilo } = await procesarPortada(
     req.restauranteId,
     req.file.buffer,
     recorte
@@ -65,9 +65,9 @@ export async function postPortada(req, res) {
 
   await pool.execute(
     `UPDATE restaurantes
-        SET imagen_portada = ?, imagen_portada_movil = ?, portada_clara = ?
+        SET imagen_portada = ?, imagen_portada_movil = ?, portada_estilo = ?
       WHERE id = ?`,
-    [portada, portadaMovil, clara ? 1 : 0, req.restauranteId]
+    [portada, portadaMovil, estilo, req.restauranteId]
   );
 
   // Solo despues de que la nueva este guardada en base de datos.

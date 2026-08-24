@@ -2089,3 +2089,49 @@ button {
     display: none;
   }
 }
+
+/*
+  Tercer caso: la ilustracion deja el hueco en el CENTRO y tiene la izquierda
+  cargada (Como en Casa: cielo crema en medio, barril y uvas a un lado). Con
+  velo negro se volvia un barro gris; con velo claro y texto a la izquierda,
+  el nombre caia sobre el barril.
+
+  Texto centrado sobre el hueco, y el velo deja de ser una franja lateral
+  para ser un halo redondo debajo del texto: asi la ilustracion se ve entera
+  por los cuatro lados y solo se aclara lo justo donde hace falta leer.
+*/
+.ficha__cabecera--centrada .contenedor {
+  text-align: center;
+}
+
+.ficha__cabecera--centrada .ficha__acciones,
+.ficha__cabecera--centrada .estado {
+  justify-content: center;
+}
+
+.ficha__cabecera--centrada h1,
+.ficha__cabecera--centrada p {
+  margin-inline: auto;
+}
+
+.ficha__cabecera--clara.ficha__cabecera--centrada::before {
+  background: radial-gradient(
+    46% 58% at 50% 42%,
+    rgba(247, 243, 234, 0.82) 0%,
+    rgba(247, 243, 234, 0.45) 55%,
+    rgba(247, 243, 234, 0) 100%
+  );
+}
+
+/* En movil el texto ocupa la cabecera entera, asi que el halo no llega: hace
+   falta velo parejo, igual que en el caso claro normal. */
+@media (max-width: 700px) {
+  .ficha__cabecera--clara.ficha__cabecera--centrada::before {
+    background: linear-gradient(
+      180deg,
+      rgba(247, 243, 234, 0.9) 0%,
+      rgba(247, 243, 234, 0.82) 60%,
+      rgba(247, 243, 234, 0.88) 100%
+    );
+  }
+}

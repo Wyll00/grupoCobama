@@ -44,9 +44,11 @@ export default function Restaurante() {
           'ficha__cabecera',
           local.imagen_portada && 'ficha__cabecera--con-foto',
           // Lo decide la imagen, no una persona: al procesar la portada se
-          // mide si la zona del texto es clara y pareja. Ver
-          // zonaDelTextoEsClara en imagenes.service.js.
-          local.portada_clara && 'ficha__cabecera--clara',
+          // miden la zona izquierda y la central. Ver estiloDelTexto en
+          // imagenes.service.js.
+          local.portada_estilo === 'claro' && 'ficha__cabecera--clara',
+          local.portada_estilo === 'claro-centrado' &&
+            'ficha__cabecera--clara ficha__cabecera--centrada',
         ]
           .filter(Boolean)
           .join(' ')}

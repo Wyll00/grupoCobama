@@ -3,7 +3,7 @@ import { estaAbiertoAhora, resumirHorarios } from '../utils/horarios.js';
 
 const CAMPOS_LISTADO = `
   r.id, r.slug, r.nombre, r.municipio, r.direccion, r.telefono, r.email,
-  r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.imagen_portada, r.imagen_portada_movil, r.portada_clara,
+  r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.imagen_portada, r.imagen_portada_movil, r.portada_estilo,
   r.tiene_parking, r.orden, r.url_reservas
 `;
 
@@ -90,7 +90,6 @@ function normalizar(r) {
   return {
     ...r,
     tiene_parking: Boolean(r.tiene_parking),
-    portada_clara: Boolean(r.portada_clara),
     lat: r.lat === null ? null : Number(r.lat),
     lng: r.lng === null ? null : Number(r.lng),
   };
