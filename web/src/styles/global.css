@@ -722,6 +722,35 @@ button {
   opacity: 0.5;
 }
 
+/*
+  Abierto/cerrado, al final de la fila de datos del local.
+
+  Empujado a la derecha con margen automatico y no con un hueco fijo: los dos
+  datos de la izquierda cambian de ancho segun el local -"Parking propio" o
+  "Sin parking propio", y municipios de largos distintos-, asi que cualquier
+  medida escrita a mano se descuadra en cuanto cambia uno.
+
+  El punto de color lo pone .estado con su propio color, y la pastilla la
+  pone esta fila. Por eso el <span> va DENTRO del <li> en vez de llevar las
+  dos clases: si compartieran elemento, `.sitio__datos li` -clase mas
+  elemento- le ganaria el color a `.estado--abierto` y el verde de "abierto"
+  saldria gris.
+*/
+.sitio__ahora {
+  margin-left: auto;
+}
+
+/*
+  En movil la fila se parte y el estado cae a su propio renglon: ahi el margen
+  automatico lo dejaria solo y pegado al borde derecho, que parece un descuido.
+  Suelto a la izquierda, en fila con los demas.
+*/
+@media (max-width: 560px) {
+  .sitio__ahora {
+    margin-left: 0;
+  }
+}
+
 .sitio__llegar { width: 100%; }
 
 /*
@@ -783,7 +812,6 @@ button {
 
 .horario__horas--cerrado { color: var(--texto-suave); }
 
-.horario__pie { margin: 0.75rem 0 0; }
 
 /* --------------------------------------------------------- carta ----- */
 

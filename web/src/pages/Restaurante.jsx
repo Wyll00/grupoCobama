@@ -132,6 +132,25 @@ export default function Restaurante() {
                   {local.tiene_parking ? 'Parking propio' : 'Sin parking propio'}
                 </li>
                 <li className="sitio__dato--si">{local.municipio}</li>
+
+                {/*
+                  Abierto o cerrado, al final de esta misma fila.
+
+                  Estaba debajo de la tabla de horarios, que es donde uno lo
+                  escribe pensando "va con los horarios". Pero quien quiere
+                  saber si puede ir ahora no se pone a leer siete tramos: mira
+                  los datos rapidos del local. Aqui esta con el parking y el
+                  municipio, que son las otras dos cosas que se miran de un
+                  vistazo.
+
+                  Envuelto en el <li> en vez de llevar sus clases: asi la
+                  pastilla la pinta la fila y el color del estado lo pinta el
+                  <span>, sin que una regla le gane a la otra por
+                  especificidad.
+                */}
+                <li className="sitio__ahora">
+                  <EstadoApertura abierto={local.abierto_ahora} />
+                </li>
               </ul>
 
               <a
@@ -170,9 +189,6 @@ export default function Restaurante() {
               ))}
             </ul>
 
-            <p className="horario__pie">
-              <EstadoApertura abierto={local.abierto_ahora} />
-            </p>
           </div>
         </div>
       </section>
