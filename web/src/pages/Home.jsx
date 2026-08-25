@@ -9,6 +9,37 @@ import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 
 const Visor = lazy(() => import('../components/Visor.jsx'));
 
+/**
+ * Reloj para el reclamo de cocina ininterrumpida.
+ *
+ * Dibujado y no un emoji: hereda el color del texto, se ve nitido a cualquier
+ * tamano y no depende de como pinte los emoji cada sistema -en Windows el de
+ * reloj sale azul, que aqui no pinta nada-.
+ *
+ * Las agujas marcan las cinco y algo: la hora a la que en la isla casi todas
+ * las cocinas estan cerradas, que es de lo que va el cartel.
+ */
+function RelojAbierto() {
+  return (
+    <svg
+      className="jornada__icono"
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const { datos: locales, cargando, error } = useApi((opts) => api.restaurantes(opts), []);
   const galeria = useApi((opts) => api.galeria(null, null, opts), []);
@@ -123,6 +154,31 @@ export default function Home() {
             <h2>Nuestros locales</h2>
             <p className="apagado">
               Cada casa tiene su carta y su caracter. Elige la que te pille mas cerca.
+            </p>
+
+            {/*
+              Cocina ininterrumpida.
+
+              Es el dato que decide una visita a las cinco de la tarde, que es
+              justo cuando la mayoria de los sitios de la isla tienen la cocina
+              cerrada. Por eso va aqui arriba y no escondido entre los horarios
+              de cada ficha.
+
+              NO es un boton aunque resalte: por eso lleva las esquinas del
+              resto de paneles y no las de pastilla, que en esta web son
+              siempre algo que se pulsa. Un cartel con forma de boton se acaba
+              pulsando, y no lleva a ningun sitio.
+
+              La frase de debajo explica que significa: "ininterrumpida" lo
+              entiende el que ya lo busca, y el resto necesita que le digan que
+              puede comer a las cinco.
+            */}
+            <p className="jornada">
+              <RelojAbierto />
+              <strong className="jornada__titular">Cocina ininterrumpida</strong>
+              <span className="jornada__detalle">
+                No cerramos entre la comida y la cena, en las cuatro casas
+              </span>
             </p>
           </div>
 

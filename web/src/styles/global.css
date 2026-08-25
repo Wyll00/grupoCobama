@@ -1211,13 +1211,36 @@ button {
 .pie a { color: #d8cfc4; text-decoration: none; }
 .pie a:hover { color: var(--ocre); text-decoration: underline; }
 
+/*
+  Los titulos de columna del pie, resaltados.
+
+  En ocre y con una regla corta debajo. La regla no es un adorno inventado:
+  es lo mismo que hacen los titulos de categoria de la carta, que tambien
+  abren un bloque de cosas. Corta y no de ancho completo porque aqui son tres
+  columnas seguidas y tres rayas de lado a lado se leerian como una tabla.
+
+  Va --ocre-claro y no --ocre: sobre el carbon del pie el ocre normal se queda
+  corto de contraste, y el claro es el mismo tono subido de luz que ya se usa
+  para eso mismo en modo oscuro.
+*/
 .pie h4 {
-  color: var(--crema);
+  color: var(--ocre-claro);
   font-family: var(--fuente-texto);
   font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.7rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.9rem;
+}
+
+.pie h4::after {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 2px;
+  margin-top: 0.5rem;
+  background: var(--ocre);
+  border-radius: 2px;
 }
 
 .pie__rejilla {
@@ -2169,4 +2192,88 @@ button {
 .seccion__intro > p {
   max-width: 60ch;
   margin-inline: auto;
+}
+
+/*
+  El cartel de cocina ininterrumpida, bajo la entradilla de "Nuestros locales".
+
+  Tiene que destacar sin parecer un boton. En esta web las esquinas de
+  pastilla -999px- son siempre algo que se pulsa, asi que este lleva el radio
+  normal de panel: un cartel con forma de boton se acaba pulsando y no lleva a
+  ningun sitio.
+
+  El ocre va en el icono, el borde y el fondo; el titular va en tinta. Puesto
+  el titular en ocre tambien quedaba mas vistoso, pero sobre crema el ocre da
+  3,4 de contraste y el minimo para texto normal es 4,5. Que resalte no puede
+  costar que no se lea.
+
+  El fondo y el borde van en ocre con alfa y no en un color fijo: asi el mismo
+  tinte funciona sobre el crema del modo claro y sobre el carbon del oscuro
+  sin escribir la pareja dos veces.
+*/
+/* El selector lleva el padre a proposito. `.jornada` a secas pierde contra
+   `.seccion__intro > p`, que es mas especifico -clase + elemento-, y entonces
+   el cartel se queda con el ancho de parrafo de 60ch y parte la frase en dos.
+   Medido: 518 px de ancho y 83 de alto en vez de una linea. */
+.seccion__intro > .jornada,
+.jornada {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.75rem;
+
+  margin: 1.6rem auto 0;
+  padding: 0.75rem 1.5rem;
+
+  border: 1px solid rgba(192, 125, 42, 0.42);
+  border-radius: var(--radio);
+  background: rgba(192, 125, 42, 0.1);
+
+  /* Gana al `max-width: 60ch` de la entradilla, que es para leer parrafos
+     largos y aqui solo serviria para partir la frase antes de tiempo. */
+  max-width: none;
+}
+
+.jornada__icono {
+  color: var(--ocre);
+  flex-shrink: 0;
+}
+
+.jornada__titular {
+  font-family: var(--fuente-titulo);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.jornada__detalle {
+  font-size: 0.92rem;
+  color: var(--texto-suave);
+}
+
+/* Separador entre el titular y la explicacion. Un punto medio en vez de una
+   barra o un guion: es el mismo que ya separa la direccion del parking en las
+   tarjetas, asi que la web sigue puntuando igual en todos lados. */
+.jornada__detalle::before {
+  content: '·';
+  margin-right: 0.75rem;
+  color: rgba(192, 125, 42, 0.75);
+}
+
+/*
+  En movil la explicacion cae a su propia linea, y ahi el punto de separacion
+  sobra: separaba dos cosas que ya no estan seguidas y se quedaba flotando al
+  principio del renglon.
+*/
+@media (max-width: 560px) {
+  .jornada {
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.9rem 1.2rem;
+  }
+
+  .jornada__detalle::before {
+    content: none;
+  }
 }
