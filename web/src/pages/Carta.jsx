@@ -236,6 +236,63 @@ export default function Carta() {
             ))
           )}
 
+          {/*
+            La leyenda de alergenos, al final de la carta.
+
+            Hace falta desde que los alergenos con dibujo salen SOLO con el
+            dibujo junto al nombre del plato. Un icono que nadie sabe leer no
+            informa de nada, y esto no es decoracion: es lo que mira alguien
+            que no puede comer algo.
+
+            Van los catorce, no solo los que aparecen en esta carta. Quien
+            busca "no puedo tomar apio" quiere confirmar que el apio no esta,
+            y una lista de la que faltan cosas no permite confirmar nada.
+          */}
+          {(alergenos.datos ?? []).length > 0 && (
+            <section className="leyenda" aria-labelledby="leyenda-alergenos">
+              <h2 id="leyenda-alergenos" className="leyenda__titulo">
+                Que significa cada icono
+              </h2>
+
+              <ul className="leyenda__lista">
+                {alergenos.datos
+                  .filter((a) => a.icono)
+                  .map((a) => (
+                    <li key={a.id} className="leyenda__item">
+                      <IconoAlergeno alergeno={a} tamano={30} />
+                      <span>{a.nombre}</span>
+                    </li>
+                  ))}
+              </ul>
+
+              {/*
+                Los que todavia no tienen dibujo se nombran, no se callan. Si
+                alguien solo ve doce iconos y sabe que los alergenos son
+                catorce, lo que necesita saber es que los otros dos estan en
+                la carta escritos, no que se nos han olvidado.
+
+                La lista se calcula, no se escribe a mano: el dia que se suba
+                el dibujo del gluten, esta frase desaparece sola.
+              */}
+              {alergenos.datos.some((a) => !a.icono) && (
+                <p className="leyenda__pie">
+                  {/* En minuscula y con la primera en mayuscula al final: en la
+                      base estan como "Gluten" y "Mostaza" porque alli son
+                      etiquetas, pero a media frase son nombres comunes y
+                      "Gluten y Mostaza salen escritos" se lee raro. */}
+                  {(() => {
+                    const frase = alergenos.datos
+                      .filter((a) => !a.icono)
+                      .map((a) => a.nombre.toLowerCase())
+                      .join(' y ');
+                    return frase.charAt(0).toUpperCase() + frase.slice(1);
+                  })()}{' '}
+                  salen escritos en la carta, todavia no tienen dibujo.
+                </p>
+              )}
+            </section>
+          )}
+
           <div className="aviso" style={{ marginTop: '2rem' }}>
             <strong>Alergias e intolerancias.</strong> La informacion de alergenos es
             orientativa y la cocina es compartida, por lo que no se puede descartar la

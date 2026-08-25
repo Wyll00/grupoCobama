@@ -2460,3 +2460,79 @@ button {
     content: none;
   }
 }
+
+/* ------------------------------------------- leyenda de alergenos ----- */
+
+/*
+  Al final de la carta, para poder leer los iconos.
+
+  Existe porque los alergenos con dibujo salen SOLO con el dibujo junto al
+  nombre del plato: sin esta tabla, doce de los catorce serian adivinanzas.
+
+  Se pinta como un panel y no como una lista suelta: cierra la carta, y quien
+  baja hasta el final tiene que ver que ha llegado a algo, no que se le ha
+  quedado texto colgando.
+*/
+.leyenda {
+  margin-top: 2.5rem;
+  padding: 1.25rem 1.25rem 1.4rem;
+  background: var(--crema-hueso);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.leyenda__titulo {
+  font-family: var(--fuente-texto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--texto-suave);
+  margin: 0 0 1rem;
+}
+
+/*
+  Rejilla que se llena sola. `auto-fill` con un minimo de 8rem reparte los
+  doce en las columnas que quepan, asi que la misma regla vale en un movil
+  -dos columnas- y en un portatil -seis-. Con un numero fijo de columnas
+  habria que escribir un salto por cada tamano de pantalla y siempre se queda
+  alguno feo por el medio.
+
+  El minimo es 8rem y no 9 por el movil: la lista mide 301 px ahi, y con 9rem
+  -144 px- solo entraba UNA columna, o sea los doce en fila india y 430 px de
+  scroll para una leyenda. Con 8rem entran dos y baja a la mitad. El unico
+  nombre que no cabe de una linea es "Dioxido de azufre y sulfitos", que parte
+  en dos sin que el dibujo se encoja.
+*/
+.leyenda__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.6rem 1rem;
+}
+
+.leyenda__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--texto);
+  /* El dibujo no encoge aunque el nombre sea largo: "Dioxido de azufre y
+     sulfitos" parte en dos lineas y el icono tiene que seguir entero. */
+  min-width: 0;
+}
+
+.leyenda__item .alergeno__icono {
+  width: 30px;
+  height: 30px;
+}
+
+.leyenda__pie {
+  margin: 1rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--borde);
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
