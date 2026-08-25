@@ -2536,3 +2536,95 @@ button {
   font-size: 0.78rem;
   color: var(--texto-suave);
 }
+
+/* -------------------------------------------------- idioma de la carta --- */
+
+/*
+  Las banderas van arriba a la derecha de la cabecera de la carta, en la misma
+  fila que el nombre del local y el titulo.
+
+  `align-items: flex-start` y no `center`: el bloque de la izquierda son dos
+  lineas y el de la derecha una, y centrado vertical las banderas quedaban a
+  la altura del hueco entre el municipio y "Carta", que no es la altura de
+  nada.
+*/
+.carta__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.idiomas {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.idioma {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid rgba(250, 246, 240, 0.28);
+  border-radius: var(--radio-s);
+  background: rgba(250, 246, 240, 0.08);
+  color: var(--crema);
+  font-family: var(--fuente-texto);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.idioma:hover:not(:disabled) {
+  background: rgba(250, 246, 240, 0.16);
+  border-color: rgba(250, 246, 240, 0.5);
+}
+
+/*
+  Mientras no traduzcan: apagados y con el cursor de "aqui no".
+
+  Se quedan a la vista y no escondidos para poder cuadrar el hueco ahora, sin
+  recolocar nada el dia que se enciendan. 0,45 de opacidad es bastante para
+  que se lea que hay algo y poco para que nadie lo intente pulsar.
+*/
+.idioma:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.idioma__bandera {
+  width: 22px;
+  height: 11px;
+  /* El borde separa la bandera del fondo oscuro: el blanco de la del Reino
+     Unido y el negro de la alemana se comen el canto contra la cabecera. */
+  outline: 1px solid rgba(250, 246, 240, 0.35);
+  outline-offset: -1px;
+  border-radius: 1px;
+  flex: none;
+}
+
+/*
+  En movil se quedan las banderas y se va el codigo. La cabecera es estrecha y
+  "EN"/"DE" al lado del dibujo no anade nada que el dibujo no diga ya.
+*/
+@media (max-width: 560px) {
+  .idioma__codigo {
+    display: none;
+  }
+
+  /*
+    Sin el codigo el boton se quedaba en 37x24, que para un dedo es poco: lo
+    razonable son 44. Hoy da igual porque estan apagados, pero el tamano del
+    blanco no es algo que uno se acuerde de revisar el dia que los enciende,
+    y para entonces ya esta publicado.
+  */
+  .idioma {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0.35rem 0.4rem;
+  }
+}

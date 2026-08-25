@@ -4,6 +4,7 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import IconoAlergeno from '../components/IconoAlergeno.jsx';
+import Idiomas from '../components/Idiomas.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
@@ -90,14 +91,19 @@ export default function Carta() {
   return (
     <>
       <section className="ficha__cabecera" style={{ paddingBlock: '2rem' }}>
-        <div className="contenedor">
-          <p className="tarjeta__municipio">
-            <Link to={`/${slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-              {local.datos.nombre}
-            </Link>{' '}
-            · {local.datos.municipio}
-          </p>
-          <h1 style={{ marginBottom: '0.35rem' }}>Carta</h1>
+        <div className="contenedor carta__cabecera">
+          <div>
+            <p className="tarjeta__municipio">
+              <Link to={`/${slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {local.datos.nombre}
+              </Link>{' '}
+              · {local.datos.municipio}
+            </p>
+            <h1 style={{ marginBottom: '0.35rem' }}>Carta</h1>
+          </div>
+
+          {/* Las banderas todavia NO traducen: ver el comentario de Idiomas.jsx. */}
+          <Idiomas />
         </div>
       </section>
 
