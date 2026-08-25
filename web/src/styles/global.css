@@ -1034,6 +1034,29 @@ button {
   object-fit: contain;
 }
 
+/*
+  Los alergenos, ahora en la linea del nombre del plato.
+
+  Pegados a la derecha del nombre y con un poco de aire por delante, para que
+  no se lean como parte del titulo.
+*/
+.plato__nombre .alergenos {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Solo el dibujo: la pastilla se cierra alrededor del icono. Se mantiene el
+   borde y el fondo para que se lea como una ficha de alergeno y no como una
+   ilustracion suelta del plato. */
+.alergeno--dibujo {
+  padding: 0.1rem;
+  gap: 0;
+}
+
 /* Los iconos son ilustraciones a color; sobre el rojo del filtro activo se
    apagan un poco, asi que se les da un disco claro detras. */
 .filtro .alergeno__icono {
@@ -1937,7 +1960,8 @@ button {
   */
   align-items: baseline;
   justify-content: flex-end;
-  gap: 0.75rem;
+  /* Bastante mas que antes: pegadas se leian como una sola cifra partida. */
+  gap: 1.5rem;
   line-height: 1.25;
 }
 
@@ -1969,6 +1993,25 @@ button {
     align-items: flex-end;
     gap: 0.1rem;
   }
+
+  /* Apiladas no forman columnas, asi que el ancho minimo solo serviria para
+     robarle sitio al nombre del plato. */
+  .plato__media,
+  .plato__cifras {
+    min-width: 0;
+  }
+
+  .plato__media {
+    font-size: 0.78rem;
+  }
+
+}
+
+/* Con cabezal encima, repetir la palabra en cada renglon sobra. */
+@media (min-width: 561px) {
+  .plato__media-palabra {
+    display: none;
+  }
 }
 
 .plato__importe { font-weight: 700; }
@@ -1977,10 +2020,85 @@ button {
    racion, que es lo que pide casi todo el mundo. La palabra "media" delante
    es lo que las distingue, asi que va siempre y no se abrevia. */
 .plato__media {
-  font-size: 0.72rem;
+  /* Sube de 0,72 a 0,92: sigue por debajo del importe -1,1rem-, que tiene que
+     seguir mandando, pero ya se lee como un precio y no como una nota al pie.
+     El ancho minimo es lo que hace que la columna exista: sin el, cada
+     renglon empieza donde le toca y el cabezal no cae encima de nada. */
+  font-size: 0.92rem;
   font-weight: 500;
   color: var(--texto-suave);
   white-space: nowrap;
+  min-width: 4.6rem;
+  text-align: right;
+}
+
+.plato__cifras {
+  min-width: 4.4rem;
+}
+
+/*
+  Cabezal de las columnas de precio.
+
+  Mismas medidas que el renglon de precio -misma separacion y mismos anchos
+  minimos- y no valores escritos aparte: si se ajustan a mano acaban
+  descuadrandose en cuanto cambie el cuerpo de letra de una de las dos cifras.
+*/
+.carta__columnas {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px dashed var(--borde);
+}
+
+.carta__columna {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.carta__columna:first-child { min-width: 4.6rem; }
+.carta__columna:last-child { min-width: 4.4rem; }
+
+/*
+  En movil no hay columnas que encabezar -las dos cifras van apiladas-, asi
+  que el cabezal sobra.
+
+  Esta regla va AQUI y no en el bloque de movil de mas arriba: alli quedaba
+  antes de definir .carta__columnas, con la misma especificidad, y en un
+  empate gana la ultima que se lee. Se veia el cabezal en el movil aunque la
+  regla existiera.
+*/
+@media (max-width: 560px) {
+  .carta__columnas {
+    display: none;
+  }
+
+  /*
+    Y de paso, la condicion deja de ir en una sola linea.
+
+    "por persona · min. 2 personas" en nowrap mide 183 px: el 53% del ancho de
+    la fila en una pantalla de 375, con lo que al nombre del plato le quedaban
+    144 y "Arroz o fideua cremoso de verduras" caia en cuatro renglones. Es un
+    fallo que ya estaba; lo que ha cambiado es que ahora se ve, porque los
+    dibujos de alergeno tambien van en esa columna.
+  */
+  /* Con el padre delante a proposito. `.plato__unidad` a secas empata en
+     especificidad con la regla de arriba que pone nowrap, y esa se lee
+     DESPUES en el fichero, asi que ganaba ella y la condicion seguia sin
+     partirse. Con el padre son dos clases y gana esta, este donde este. */
+  .plato__precio .plato__unidad {
+    white-space: normal;
+  }
+
+  .plato__precio {
+    max-width: 38%;
+  }
 }
 
 .plato__unidad {

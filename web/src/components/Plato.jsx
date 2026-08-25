@@ -54,23 +54,53 @@ export default function Plato({ plato }) {
           ) : plato.es_vegetariano ? (
             <span className="etiqueta etiqueta--veg">Vegetariano</span>
           ) : null}
+
+          {/*
+            Los alergenos, junto al nombre y no debajo de la descripcion.
+
+            Los que tienen dibujo van SOLO con el dibujo: doce de los catorce
+            lo tienen y con el nombre al lado ocupaban tres renglones bajo
+            cada plato. El nombre no se pierde, se mueve al alt y al title,
+            asi que un lector de pantalla lo dice y el raton por encima lo
+            enseña.
+
+            Gluten y mostaza siguen sin dibujo -y gluten sale en 38 platos,
+            que no es poco-, asi que esos van escritos. Si un dibujo falta, el
+            alergeno se ve igual: es lo unico que no se puede negociar aqui.
+
+            Y si es TRAZA, el texto se queda aunque haya dibujo. "Contiene" y
+            "puede contener trazas" no son lo mismo para quien tiene la
+            alergia, y esa diferencia un dibujo no la sabe decir.
+          */}
+          {plato.alergenos.length > 0 && (
+            <span
+              className="alergenos"
+              role="list"
+              aria-label={`Alergenos de ${plato.nombre}`}
+            >
+              {plato.alergenos.map((a) => {
+                const soloDibujo = Boolean(a.icono) && !a.trazas;
+                return (
+                  <span
+                    key={a.id}
+                    role="listitem"
+                    className={`alergeno ${soloDibujo ? 'alergeno--dibujo' : ''}`}
+                  >
+                    <IconoAlergeno alergeno={a} nombre={soloDibujo ? a.nombre : null} />
+                    {!soloDibujo && (
+                      <span>
+                        {a.nombre}
+                        {a.trazas && ' (trazas)'}
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
+            </span>
+          )}
         </div>
 
         {plato.descripcion && <p className="plato__descripcion">{plato.descripcion}</p>}
-
-        {plato.alergenos.length > 0 && (
-          <ul className="alergenos" aria-label={`Alergenos de ${plato.nombre}`}>
-            {plato.alergenos.map((a) => (
-              <li key={a.id} className="alergeno">
-                <IconoAlergeno alergeno={a} />
-                <span>
-                  {a.nombre}
-                  {a.trazas && ' (trazas)'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       {/*
@@ -88,7 +118,12 @@ export default function Plato({ plato }) {
       <div className="plato__precio">
         {plato.precio_media !== null && plato.precio_media !== undefined && (
           <span className="plato__media">
-            media {formatoPrecio.format(plato.precio_media)}
+            {/* La palabra solo hace falta cuando no hay cabezal de columna,
+                o sea en movil, donde las dos cifras van apiladas. Arriba, con
+                "Media racion" escrito sobre la columna, repetirla en cada
+                renglon es ruido. */}
+            <span className="plato__media-palabra">media </span>
+            {formatoPrecio.format(plato.precio_media)}
           </span>
         )}
         <span className="plato__cifras">

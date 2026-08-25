@@ -215,6 +215,18 @@ export default function Carta() {
                 <h2 id={c.slug} data-cuenta={`${c.platos.length} platos`}>
                   {c.nombre}
                 </h2>
+
+                {/* Cabezal de las dos columnas de precio. Solo si en esta
+                    seccion hay alguna media racion: en Bebidas o en Postres no
+                    hay ninguna, y un encabezado sobre una columna vacia hace
+                    buscar algo que no esta. */}
+                {c.platos.some((p) => p.precio_media !== null && p.precio_media !== undefined) && (
+                  <div className="carta__columnas" aria-hidden="true">
+                    <span className="carta__columna">Media racion</span>
+                    <span className="carta__columna">Racion</span>
+                  </div>
+                )}
+
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {c.platos.map((plato) => (
                     <Plato key={plato.carta_item_id} plato={plato} />
