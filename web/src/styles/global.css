@@ -586,15 +586,52 @@ button {
   content: '';
   position: absolute;
   inset: 0;
+  /*
+    Un halo centrado, no una franja lateral. El velo tiene que ir donde va el
+    texto: mientras el nombre estaba a la izquierda, el degradado apagaba esa
+    mitad y dejaba ver la ilustracion por la derecha. Con el texto centrado
+    ese reparto queda justo al reves -lo tapado es lo que no se lee y lo
+    despejado es donde hay que leer-, asi que el velo se centra tambien.
+
+    Y al ser radial, la ilustracion respira por los cuatro bordes en vez de
+    por un lado solo.
+  */
   background:
-    linear-gradient(90deg, rgba(31, 26, 23, 0.94) 0%, rgba(31, 26, 23, 0.82) 45%, rgba(31, 26, 23, 0.6) 100%),
-    linear-gradient(0deg, rgba(31, 26, 23, 0.55) 0%, rgba(31, 26, 23, 0) 55%);
+    radial-gradient(
+      54% 64% at 50% 46%,
+      rgba(31, 26, 23, 0.92) 0%,
+      rgba(31, 26, 23, 0.78) 52%,
+      rgba(31, 26, 23, 0.42) 100%
+    ),
+    linear-gradient(0deg, rgba(31, 26, 23, 0.45) 0%, rgba(31, 26, 23, 0) 45%);
 }
 
 /* El contenido, por encima de la capa. */
 .ficha__cabecera > .contenedor {
   position: relative;
   z-index: 1;
+}
+
+/*
+  Centrado en las cuatro casas. Antes solo lo estaba Como en Casa, porque su
+  ilustracion tenia el hueco en medio; las otras tres iban a la izquierda.
+  Cuatro cabeceras con el texto en dos sitios distintos no se leen como la
+  misma web, y el centro funciona en las cuatro: medido, la franja central de
+  las cuatro portadas se parte limpia en dos claras -0,83 de luz- y dos
+  oscuras -0,24 y 0,30-, sin casos dudosos.
+*/
+.ficha__cabecera--con-foto > .contenedor {
+  text-align: center;
+}
+
+.ficha__cabecera--con-foto .ficha__acciones,
+.ficha__cabecera--con-foto .estado {
+  justify-content: center;
+}
+
+.ficha__cabecera--con-foto h1,
+.ficha__cabecera--con-foto > .contenedor > p {
+  margin-inline: auto;
 }
 
 .ficha__cabecera h1 { color: var(--crema); }
@@ -2003,14 +2040,14 @@ button {
 }
 
 .ficha__cabecera--clara::before {
-  /* Solo un desvanecido por la izquierda, lo justo para que el texto se
-     apoye. Nada por abajo: ahi estan las flores y el mar, que es lo que
-     hay que ver. */
-  background: linear-gradient(
-    90deg,
-    rgba(247, 243, 234, 0.88) 0%,
-    rgba(247, 243, 234, 0.55) 42%,
-    rgba(247, 243, 234, 0) 72%
+  /* El mismo halo que en la oscura, en crema. Mas suave por fuera: sobre una
+     ilustracion luminosa un velo claro pesado la deja lavada, y aqui lo que
+     hay que ver son el mar y las flores. */
+  background: radial-gradient(
+    52% 62% at 50% 46%,
+    rgba(247, 243, 234, 0.86) 0%,
+    rgba(247, 243, 234, 0.58) 55%,
+    rgba(247, 243, 234, 0) 100%
   );
 }
 
@@ -2053,15 +2090,6 @@ button {
   .ficha__cabecera--clara {
     background-position: 74% center;
   }
-
-  .ficha__cabecera--clara::before {
-    background: linear-gradient(
-      180deg,
-      rgba(247, 243, 234, 0.9) 0%,
-      rgba(247, 243, 234, 0.82) 60%,
-      rgba(247, 243, 234, 0.88) 100%
-    );
-  }
 }
 
 /* ------------------------------------------------- la ficha en movil --- */
@@ -2097,42 +2125,25 @@ button {
 }
 
 /*
-  Tercer caso: la ilustracion deja el hueco en el CENTRO y tiene la izquierda
-  cargada (Como en Casa: cielo crema en medio, barril y uvas a un lado). Con
-  velo negro se volvia un barro gris; con velo claro y texto a la izquierda,
-  el nombre caia sobre el barril.
+  En movil el halo no sirve en ninguna de las dos.
 
-  Texto centrado sobre el hueco, y el velo deja de ser una franja lateral
-  para ser un halo redondo debajo del texto: asi la ilustracion se ve entera
-  por los cuatro lados y solo se aclara lo justo donde hace falta leer.
+  La cabecera pasa a ser mas alta que ancha y el texto la ocupa entera, asi
+  que un circulo en el medio deja el municipio arriba y los botones abajo sin
+  velo, justo sobre la ilustracion sin atenuar. Hace falta velo parejo de
+  arriba abajo, un poco mas flojo en el centro para que la ilustracion no
+  desaparezca del todo.
 */
-.ficha__cabecera--centrada .contenedor {
-  text-align: center;
-}
-
-.ficha__cabecera--centrada .ficha__acciones,
-.ficha__cabecera--centrada .estado {
-  justify-content: center;
-}
-
-.ficha__cabecera--centrada h1,
-.ficha__cabecera--centrada p {
-  margin-inline: auto;
-}
-
-.ficha__cabecera--clara.ficha__cabecera--centrada::before {
-  background: radial-gradient(
-    46% 58% at 50% 42%,
-    rgba(247, 243, 234, 0.82) 0%,
-    rgba(247, 243, 234, 0.45) 55%,
-    rgba(247, 243, 234, 0) 100%
-  );
-}
-
-/* En movil el texto ocupa la cabecera entera, asi que el halo no llega: hace
-   falta velo parejo, igual que en el caso claro normal. */
 @media (max-width: 700px) {
-  .ficha__cabecera--clara.ficha__cabecera--centrada::before {
+  .ficha__cabecera--con-foto::before {
+    background: linear-gradient(
+      180deg,
+      rgba(31, 26, 23, 0.88) 0%,
+      rgba(31, 26, 23, 0.8) 55%,
+      rgba(31, 26, 23, 0.88) 100%
+    );
+  }
+
+  .ficha__cabecera--clara::before {
     background: linear-gradient(
       180deg,
       rgba(247, 243, 234, 0.9) 0%,

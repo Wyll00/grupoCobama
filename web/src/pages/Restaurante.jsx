@@ -44,11 +44,9 @@ export default function Restaurante() {
           'ficha__cabecera',
           local.imagen_portada && 'ficha__cabecera--con-foto',
           // Lo decide la imagen, no una persona: al procesar la portada se
-          // miden la zona izquierda y la central. Ver estiloDelTexto en
-          // imagenes.service.js.
+          // mide la franja central, que es donde cae el texto. Ver
+          // estiloDelTexto en imagenes.service.js.
           local.portada_estilo === 'claro' && 'ficha__cabecera--clara',
-          local.portada_estilo === 'claro-centrado' &&
-            'ficha__cabecera--clara ficha__cabecera--centrada',
         ]
           .filter(Boolean)
           .join(' ')}
@@ -68,7 +66,11 @@ export default function Restaurante() {
         <div className="contenedor">
           <p className="tarjeta__municipio">{local.municipio}</p>
           <h1>{local.nombre}</h1>
-          <EstadoApertura abierto={local.abierto_ahora} />
+          {/* El "abierto/cerrado ahora" NO va aqui. Lo primero que ve alguien
+              al abrir la ficha no puede ser un cartel de cerrado: corta el
+              impulso justo donde estan Reservar y Ver la carta, y ademas es
+              informacion de horario, que ya esta -y con la tabla entera al
+              lado- mas abajo en su bloque. */}
           <p style={{ marginTop: '1rem' }}>{local.descripcion}</p>
 
           {/*

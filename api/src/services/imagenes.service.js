@@ -165,56 +165,52 @@ export async function procesarPortada(restauranteId, buffer, recorte) {
 /**
  * Decide como tratar el texto sobre la portada.
  *
- * Devuelve 'oscuro', 'claro' o 'claro-centrado'. Se mide en vez de
- * preguntarse: un interruptor mas en el panel es un interruptor que alguien
- * no toca al cambiar la foto, y entonces el nombre desaparece sobre el cielo.
+ * Devuelve 'claro' u 'oscuro': que color tiene que tener el velo -y por tanto
+ * la tinta- para que el nombre se lea. Se mide en vez de preguntarse: un
+ * interruptor mas en el panel es un interruptor que alguien no toca al
+ * cambiar la foto, y entonces el nombre desaparece sobre el cielo.
  *
- * Se miran DOS zonas, porque las ilustraciones no reparten el hueco igual:
- *
- *   izquierda  donde va el texto normalmente. Si esta clara y pareja ->
- *              'claro' (La Basilica: crema a la izquierda, iglesia a la
- *              derecha).
- *   centro     si la izquierda no vale pero el centro si -> 'claro-centrado'
- *              (Como en Casa: cielo crema en medio, barril y uvas a la
- *              izquierda).
- *
- * Si ninguna vale, 'oscuro': velo negro y letra crema, que es lo que pide
- * una foto o una ilustracion oscura.
- *
- * Dos condiciones y no una. Solo con la media, la foto de la torre daba 0,64
- * y pasaba por clara: es cielo brillante CON una torre oscura recortada
- * dentro, asi que el texto caeria mitad sobre cielo y mitad sobre piedra.
- * Medido: La Basilica 0,87 y 0,15 de dispersion; el centro de Como en Casa
- * 0,90 y 0,003; la foto de la torre 0,64 y 0,25.
+ * Una sola zona: la franja central, que es por donde va el texto en las
+ * cuatro casas. Antes eran dos -izquierda y centro- y habia un tercer valor,
+ * 'claro-centrado', porque cada ilustracion dejaba el hueco en un sitio y el
+ * texto se movia a buscarlo. Con las cuatro cabeceras centradas ese caso
+ * desaparece: el texto ya no se mueve, asi que solo hay que saber si el
+ * centro es claro u oscuro.
  */
 async function estiloDelTexto(buffer) {
-  const zona = async (x0, x1, y0, y1) => {
-    const caja = {
-      left: Math.round(PORTADA.ancho * x0),
-      top: Math.round(PORTADA.alto * y0),
-      width: Math.round(PORTADA.ancho * (x1 - x0)),
-      height: Math.round(PORTADA.alto * (y1 - y0)),
-    };
-
-    // El recorte se materializa ANTES de pedir las estadisticas. stats() mira
-    // la imagen de ENTRADA e ignora el resize y el extract que lleve encima
-    // la tuberia: sin este toBuffer(), la medida sale de la imagen entera y
-    // da igual que caja se pida.
-    const trozo = await sharp(buffer).extract(caja).toBuffer();
-    const { channels } = await sharp(trozo).stats();
-    const [r, g, b] = channels;
-
-    // Luminancia percibida: el ojo no pesa igual los tres canales, y una
-    // media simple da "claro" a un azul saturado que en pantalla se ve oscuro.
-    const luz = (0.2126 * r.mean + 0.7152 * g.mean + 0.0722 * b.mean) / 255;
-    const dispersion = (0.2126 * r.stdev + 0.7152 * g.stdev + 0.0722 * b.stdev) / 255;
-
-    return luz > 0.72 && dispersion < 0.2;
+  // La franja donde cae el texto: el centro, en las cuatro casas. Antes se
+  // median dos zonas -la izquierda y la central- porque habia cabeceras
+  // alineadas a la izquierda; ahora estan todas centradas y solo cuenta esta.
+  const caja = {
+    left: Math.round(PORTADA.ancho * 0.2),
+    top: Math.round(PORTADA.alto * 0.22),
+    width: Math.round(PORTADA.ancho * 0.6),
+    height: Math.round(PORTADA.alto * 0.56),
   };
 
-  if (await zona(0.08, 0.38, 0.34, 0.78)) return 'claro';
-  if (await zona(0.35, 0.65, 0.15, 0.6)) return 'claro-centrado';
-  return 'oscuro';
+  // El recorte se materializa ANTES de pedir las estadisticas. stats() mira
+  // la imagen de ENTRADA e ignora el resize y el extract que lleve encima la
+  // tuberia: sin este toBuffer(), la medida sale de la imagen entera y da
+  // igual que caja se pida.
+  const trozo = await sharp(buffer).extract(caja).toBuffer();
+  const { channels } = await sharp(trozo).stats();
+  const [r, g, b] = channels;
+
+  // Luminancia percibida: el ojo no pesa igual los tres canales, y una media
+  // simple da "claro" a un azul saturado que en pantalla se ve oscuro.
+  const luz = (0.2126 * r.mean + 0.7152 * g.mean + 0.0722 * b.mean) / 255;
+
+  // Umbral en el medio de un hueco ancho: las cuatro portadas de ahora miden
+  // 0,24 y 0,30 las oscuras y 0,83 las dos claras. No hay caso dudoso, asi
+  // que no hace falta afinar mas.
+  //
+  // Se quito la condicion de dispersion que habia antes. Servia cuando el
+  // velo era una franja lateral y una zona moteada podia enganar; ahora el
+  // velo es un halo que domina el fondo, asi que lo unico que importa es de
+  // que color tiene que ser ese halo. Y ademas descartaba mal: La Basilica
+  // mide 0,202 de dispersion y se habria ido a "oscuro" siendo luminosa,
+  // dejando texto crema sobre cielo claro.
+  return luz > 0.55 ? 'claro' : 'oscuro';
 }
 
 /** Borra una portada sustituida. Igual que con los platos, fallar no es grave. */
