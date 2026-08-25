@@ -4,7 +4,7 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import IconoAlergeno from '../components/IconoAlergeno.jsx';
-import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
+import { Cargando, Error } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
 
@@ -101,7 +101,6 @@ export default function Carta() {
             · {local.datos.municipio}
           </p>
           <h1 style={{ marginBottom: '0.35rem' }}>Carta</h1>
-          <EstadoApertura abierto={local.datos.abierto_ahora} />
         </div>
       </section>
 

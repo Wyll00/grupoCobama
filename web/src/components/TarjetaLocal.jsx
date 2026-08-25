@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import BotonReservar from './BotonReservar.jsx';
-import { EstadoApertura } from './Estado.jsx';
 import { enlaceTelefono } from '../datos/grupo.js';
 
 export default function TarjetaLocal({ local }) {
@@ -27,8 +26,6 @@ export default function TarjetaLocal({ local }) {
           </h3>
           <span className="tarjeta__municipio">{local.municipio}</span>
         </div>
-
-        <EstadoApertura abierto={local.abierto_ahora} />
 
         <p className="apagado" style={{ marginTop: '0.75rem' }}>
           {local.reclamo}
