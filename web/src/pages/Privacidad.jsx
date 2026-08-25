@@ -13,7 +13,6 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
  */
 export default function Privacidad() {
   useMetadatos({
-    titulo: 'Politica de privacidad · Grupo Cobama',
     descripcion: 'Que datos tratamos, para que, cuanto tiempo y como ejercer tus derechos.',
   });
 

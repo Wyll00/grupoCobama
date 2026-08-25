@@ -12,7 +12,6 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
  */
 export default function AvisoLegal() {
   useMetadatos({
-    titulo: 'Aviso legal · Grupo Cobama',
     descripcion: 'Titular del sitio, condiciones de uso y responsabilidades.',
   });
 

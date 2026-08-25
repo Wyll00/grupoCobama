@@ -73,9 +73,6 @@ export default function Carta() {
   // entra por primera vez manda el del servidor; esto es para la navegacion
   // dentro de la propia web, donde el servidor ya no interviene.
   useMetadatos({
-    titulo: local.datos
-      ? `Carta de ${local.datos.nombre} · ${local.datos.municipio} · Grupo Cobama`
-      : undefined,
     descripcion: local.datos
       ? `Carta de ${local.datos.nombre}, en ${local.datos.municipio}. ${local.datos.reclamo ?? ''}`.trim()
       : undefined,

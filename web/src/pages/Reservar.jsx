@@ -56,7 +56,6 @@ export default function Reservar() {
   const [hecha, setHecha] = useState(null);
 
   useMetadatos({
-    titulo: 'Reservar mesa · Grupo Cobama',
     descripcion: 'Reserva mesa en cualquiera de los cuatro locales del Grupo Cobama.',
   });
 

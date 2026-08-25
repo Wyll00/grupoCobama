@@ -32,7 +32,6 @@ export default function Galeria() {
   const nombre = local.datos?.nombre ?? 'Grupo Cobama';
 
   useMetadatos({
-    titulo: slug ? `Fotos de ${nombre} · Grupo Cobama` : 'Galeria · Grupo Cobama',
     descripcion: slug
       ? `Fotos de ${nombre}: sus platos, el local y sus celebraciones.`
       : 'Fotos de los cuatro locales del Grupo Cobama: platos, salas y celebraciones.',

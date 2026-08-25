@@ -23,10 +23,10 @@ export default function Restaurante() {
   // la seccion no se pinta y la pagina sigue estando entera.
   const destacados = useApi((opts) => api.destacados(slug, opts), [slug]);
 
-  useMetadatos({
-    titulo: local ? `${local.nombre} · ${local.municipio} · Grupo Cobama` : undefined,
-    descripcion: local?.reclamo ?? undefined,
-  });
+  // Sin `titulo`: la pestana dice "Grupo Cobama" en toda la web, que es lo
+  // que pone el <title> del index.html. La descripcion si es de cada pagina,
+  // que es la que leen los buscadores.
+  useMetadatos({ descripcion: local?.reclamo ?? undefined });
 
   if (error) return <Error error={error} />;
   if (cargando) return <Cargando texto="Cargando el local..." />;
