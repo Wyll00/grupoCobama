@@ -73,14 +73,28 @@ export default function Plato({ plato }) {
         )}
       </div>
 
+      {/*
+        La media va a la IZQUIERDA del precio, no encima.
+
+        Encima competia con el importe por el mismo sitio y empujaba hacia
+        arriba la linea de "por persona · min. 2", que es la que no se puede
+        perder de vista. Al lado, las dos cifras se leen de un golpe -media y
+        entera- y debajo del importe queda libre el renglon de la condicion.
+
+        El importe y su condicion van juntos en su propia columna para que la
+        condicion cuelgue del numero grande y no de la media: es del precio de
+        la racion de lo que habla.
+      */}
       <div className="plato__precio">
         {plato.precio_media !== null && plato.precio_media !== undefined && (
           <span className="plato__media">
             media {formatoPrecio.format(plato.precio_media)}
           </span>
         )}
-        <span className="plato__importe">{formatoPrecio.format(plato.precio)}</span>
-        {condiciones(plato) && <span className="plato__unidad">{condiciones(plato)}</span>}
+        <span className="plato__cifras">
+          <span className="plato__importe">{formatoPrecio.format(plato.precio)}</span>
+          {condiciones(plato) && <span className="plato__unidad">{condiciones(plato)}</span>}
+        </span>
       </div>
     </li>
   );

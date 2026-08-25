@@ -1929,16 +1929,53 @@ button {
 
 .plato__precio {
   display: flex;
+  /*
+    En fila: la media a la izquierda y el importe a la derecha. `baseline` y
+    no `center` porque los dos son numeros de cuerpos distintos -0,72rem y
+    1,1rem-; centrados verticalmente parecen dos cosas sueltas, y sentados en
+    la misma linea se leen como lo que son, dos precios del mismo plato.
+  */
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  line-height: 1.25;
+}
+
+/* El importe con su condicion debajo. Van juntos para que "por persona ·
+   min. 2 personas" cuelgue del numero grande: es del precio de la racion de
+   lo que habla, no del de la media. */
+.plato__cifras {
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.1rem;
-  line-height: 1.25;
+}
+
+/*
+  En movil vuelve a apilarse.
+
+  En fila el bloque del precio pasa de 66 a 140 px -medido-, y esos 74 px
+  salen del nombre del plato: en una pantalla de 375 dos de los nueve platos
+  con media pasaban de dos lineas a tres. La carta se lee sobre todo desde el
+  movil y en la mesa, asi que el nombre del plato manda sobre la colocacion
+  de la segunda cifra.
+
+  Apilada la media sigue leyendose igual de bien; lo que se pierde es que las
+  dos cifras se lean de un golpe, que en una columna estrecha tampoco pasaba.
+*/
+@media (max-width: 560px) {
+  .plato__precio {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+  }
 }
 
 .plato__importe { font-weight: 700; }
 
-/* La media va ENCIMA y mas pequena: el precio grande tiene que seguir siendo
-   el de la racion, que es lo que pide casi todo el mundo. */
+/* Mas pequena y apagada: el precio grande tiene que seguir siendo el de la
+   racion, que es lo que pide casi todo el mundo. La palabra "media" delante
+   es lo que las distingue, asi que va siempre y no se abrevia. */
 .plato__media {
   font-size: 0.72rem;
   font-weight: 500;
