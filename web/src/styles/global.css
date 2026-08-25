@@ -2152,3 +2152,21 @@ button {
     );
   }
 }
+
+/*
+  Entradilla de seccion centrada: el titulo y la linea que lo acompana.
+
+  No vale solo con `text-align: center`. El parrafo lleva un ancho maximo para
+  que no se lea en lineas larguisimas, y una caja estrecha alineada a la
+  izquierda se queda a la izquierda por mucho que su texto vaya centrado
+  dentro. Hace falta el margen automatico para centrar la caja ademas del
+  texto.
+*/
+.seccion__intro {
+  text-align: center;
+}
+
+.seccion__intro > p {
+  max-width: 60ch;
+  margin-inline: auto;
+}

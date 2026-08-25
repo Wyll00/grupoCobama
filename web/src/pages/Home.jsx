@@ -114,10 +114,17 @@ export default function Home() {
 
       <section className="seccion">
         <div className="contenedor">
-          <h2>Nuestros locales</h2>
-          <p className="apagado" style={{ maxWidth: '60ch' }}>
-            Cada casa tiene su carta y su caracter. Elige la que te pille mas cerca.
-          </p>
+          {/* Centrado, igual que las cabeceras de las cuatro fichas. El ancho
+              maximo pasa del estilo en linea a la clase: centrar un parrafo
+              con `text-align` no lo mueve si su caja sigue pegada a la
+              izquierda, hace falta tambien el margen automatico, y las dos
+              cosas juntas se leen mejor en un sitio que repartidas. */}
+          <div className="seccion__intro">
+            <h2>Nuestros locales</h2>
+            <p className="apagado">
+              Cada casa tiene su carta y su caracter. Elige la que te pille mas cerca.
+            </p>
+          </div>
 
           {cargando ? (
             <Cargando texto="Cargando locales..." />
