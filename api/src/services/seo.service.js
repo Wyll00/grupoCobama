@@ -271,7 +271,27 @@ export function etiquetas(meta) {
   const d = escaparAtributo(meta.descripcion);
 
   const lineas = [
-    `<title>${t}</title>`,
+    /*
+      El <title> es SIEMPRE el nombre del grupo, y el descriptivo se queda
+      para compartir. Son dos trabajos distintos que antes salian del mismo
+      valor:
+
+        <title>     lo que se lee en la pestana. Ahi el nombre del grupo y ya,
+                    que es lo que se pidio: "Carta de La Basilica · Candelaria
+                    · Grupo Cobama" deja la marca al final, que es justo lo
+                    que se corta con varias pestanas abiertas.
+
+        og:title    lo que sale al pegar el enlace en WhatsApp o Instagram.
+                    Ahi el descriptivo SI hace falta: un enlace que solo dice
+                    "Grupo Cobama" no cuenta a donde lleva.
+
+      Sin esta separacion el cambio de la pestana no llegaba a produccion. En
+      desarrollo la web se sirve desde Vite y no pasa por aqui, asi que la
+      pestana salia bien; en produccion la sirve este prerenderizado y volvia
+      el titulo largo, ademas para siempre, porque las paginas ya no
+      sobrescriben el titulo desde el navegador.
+    */
+    `<title>${escaparAtributo(NOMBRE_GRUPO)}</title>`,
     `<meta name="description" content="${d}" />`,
 
     // Open Graph: lo que leen WhatsApp, Instagram, Facebook y LinkedIn.
