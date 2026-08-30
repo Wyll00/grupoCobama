@@ -1896,56 +1896,8 @@ button {
   scroll-snap-align: start;
 }
 
-.carrusel__foto {
-  display: block;
-  position: relative;
-  width: clamp(15rem, 30vw, 22rem);
-  padding: 0;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  overflow: hidden;
-  background: var(--superficie);
-  cursor: zoom-in;
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-
-.carrusel__foto:hover { border-color: var(--ocre); transform: translateY(-2px); }
-.carrusel__foto:focus-visible { outline: 2px solid var(--ocre); outline-offset: 2px; }
-
-.carrusel__foto img {
-  display: block;
-  width: 100%;
-  /* Aqui SI se recorta a una altura fija, al reves que en la galeria: en una
-     fila horizontal, fotos de altos distintos hacen que la tira baile. */
-  height: clamp(11rem, 22vw, 15rem);
-  object-fit: cover;
-}
-
-.carrusel__pie {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2rem 0.85rem 0.7rem;
-  background: linear-gradient(0deg, rgba(31, 26, 23, 0.9) 0%, rgba(31, 26, 23, 0) 100%);
-  color: #f5efe6;
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.carrusel__local {
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ocre-claro);
-}
-
 @media (max-width: 600px) {
   .carrusel__mandos { display: none; }
-  .carrusel__foto { width: 76vw; }
 }
 
 /* ------------------------------- precio con media, unidad y numero --- */
@@ -2680,17 +2632,22 @@ button {
   tono subido de luz que ya usan el boton de galeria y los titulos del pie.
 */
 .proxima {
-  grid-column: 1 / -1;
+  /*
+    En fila y no en columna: ahora tiene 1080 px de ancho en vez de 429, y
+    tres lineas apiladas en una caja tan ancha dejan dos huecos enormes a los
+    lados. En fila, el aviso, el nombre y la coletilla se leen de un tiron.
+  */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.3rem 0.9rem;
 
-  margin: 0.35rem 0 0;
-  padding: 0.7rem 1rem;
+  margin: 1.6rem 0 0;
+  padding: 1rem 1.25rem;
 
   border: 1px dashed rgba(224, 169, 79, 0.55);
-  border-radius: var(--radio-s);
+  border-radius: var(--radio);
   background: rgba(224, 169, 79, 0.08);
   text-align: center;
 }
@@ -2708,13 +2665,30 @@ button {
 
 .proxima__nombre {
   font-family: var(--fuente-titulo);
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--crema);
   line-height: 1.2;
 }
 
 .proxima__nota {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #b9afa4;
+}
+
+/*
+  En movil vuelve a apilarse. Ahi el hero no da 1080 px sino unos 340, y las
+  tres piezas en fila se parten donde les toca: el nombre acaba solo en su
+  renglon y la coletilla cortada en dos. Apiladas cada una tiene su linea.
+*/
+@media (max-width: 620px) {
+  .proxima {
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .proxima__nombre {
+    font-size: 1.25rem;
+  }
 }

@@ -1,13 +1,9 @@
-import { lazy, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 import TarjetaLocal from '../components/TarjetaLocal.jsx';
-import Carrusel from '../components/Carrusel.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
-
-const Visor = lazy(() => import('../components/Visor.jsx'));
 
 /**
  * Reloj para el reclamo de cocina ininterrumpida.
@@ -42,11 +38,6 @@ function RelojAbierto() {
 
 export default function Home() {
   const { datos: locales, cargando, error } = useApi((opts) => api.restaurantes(opts), []);
-  const galeria = useApi((opts) => api.galeria(null, null, opts), []);
-  const [abierta, setAbierta] = useState(null);
-
-  const fotos = galeria.datos?.fotos ?? [];
-
   if (error) return <Error error={error} />;
 
   return (
@@ -79,87 +70,34 @@ export default function Home() {
               Galeria
             </Link>
 
-            {/*
-              La casa que viene.
-
-              Debajo de los botones y SIN ser un boton: no lleva a ningun sitio
-              todavia porque no hay nada que enseniar. Con forma de boton la
-              gente lo pulsa, no pasa nada, y se queda pensando que la web esta
-              rota.
-
-              Dice el nombre y ya. Ni donde ni cuando: en cuanto se ponga una
-              fecha, esa fecha se convierte en una promesa que alguien tiene
-              que cumplir, y las aperturas se mueven.
-            */}
-            <p className="proxima">
-              <span className="proxima__aviso">Próximamente</span>
-              <span className="proxima__nombre">El Baifo</span>
-              <span className="proxima__nota">la quinta casa del grupo</span>
-            </p>
           </div>
         </div>
+
+        {/*
+          La casa que viene.
+
+          Debajo de la fila entera y del ancho del hero, no metido en la
+          columna de botones: ahi media 429 px de los 1080 del hero y se leia
+          como una nota al pie de los botones. Asi arranca donde arranca el
+          titular y acaba donde acaban los botones.
+
+          NO es un boton: esquinas de panel y no de pastilla -en esta web las
+          de pastilla son siempre algo que se pulsa- y borde discontinuo. No
+          lleva a ningun sitio todavia porque no hay nada que enseniar, y un
+          cartel con forma de boton se acaba pulsando.
+
+          Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una
+          fecha, esa fecha es una promesa que alguien tiene que cumplir, y las
+          aperturas se mueven.
+        */}
+        <div className="contenedor">
+          <p className="proxima">
+            <span className="proxima__aviso">Próximamente</span>
+            <span className="proxima__nombre">El Baifo</span>
+            <span className="proxima__nota">la quinta casa del grupo</span>
+          </p>
+        </div>
       </section>
-
-      {fotos.length > 0 && (
-        <section className="seccion seccion--fotos">
-          <div className="contenedor">
-            <Carrusel
-              total={fotos.length}
-              queSon="fotos"
-              cabecera={
-                <>
-                  <div>
-                    <h2>Asi se ve por dentro</h2>
-                    <p className="apagado" style={{ maxWidth: '52ch' }}>
-                      Los platos, las salas y lo que se cuece en las cuatro casas.
-                    </p>
-                  </div>
-                  <Link className="boton boton--secundario" to="/galeria">
-                    Ver toda la galeria
-                  </Link>
-                </>
-              }
-            >
-              {fotos.map((foto, i) => (
-                <li key={foto.id}>
-                  <button
-                    type="button"
-                    className="carrusel__foto"
-                    onClick={() => setAbierta(i)}
-                    aria-label={`Ampliar: ${foto.alt ?? foto.titulo ?? 'foto'}`}
-                  >
-                    <img
-                      src={foto.imagen_thumb}
-                      alt={foto.alt ?? ''}
-                      width={foto.ancho}
-                      height={foto.alto}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span className="carrusel__pie">
-                      {foto.titulo && <strong>{foto.titulo}</strong>}
-                      {foto.restaurante_nombre && (
-                        <span className="carrusel__local">{foto.restaurante_nombre}</span>
-                      )}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </Carrusel>
-          </div>
-        </section>
-      )}
-
-      {abierta !== null && (
-        <Suspense fallback={null}>
-          <Visor
-            fotos={fotos}
-            indice={abierta}
-            onCerrar={() => setAbierta(null)}
-            onCambiar={setAbierta}
-          />
-        </Suspense>
-      )}
 
       <section className="seccion">
         <div className="contenedor">
