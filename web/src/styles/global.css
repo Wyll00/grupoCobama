@@ -2632,22 +2632,19 @@ button {
   tono subido de luz que ya usan el boton de galeria y los titulos del pie.
 */
 .proxima {
-  /*
-    En fila y no en columna: ahora tiene 1080 px de ancho en vez de 429, y
-    tres lineas apiladas en una caja tan ancha dejan dos huecos enormes a los
-    lados. En fila, el aviso, el nombre y la coletilla se leen de un tiron.
-  */
+  /* Ocupa las dos columnas de la rejilla de botones: el mismo ancho que
+     "Galeria", que es el que tiene justo encima. */
+  grid-column: 1 / -1;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.3rem 0.9rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
 
-  margin: 1.6rem 0 0;
-  padding: 1rem 1.25rem;
+  margin: 0.35rem 0 0;
+  padding: 0.85rem 1rem;
 
   border: 1px dashed rgba(224, 169, 79, 0.55);
-  border-radius: var(--radio);
+  border-radius: var(--radio-s);
   background: rgba(224, 169, 79, 0.08);
   text-align: center;
 }
@@ -2656,7 +2653,7 @@ button {
    dibuja con la misma linea firme que lo que ya se puede usar. */
 
 .proxima__aviso {
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -2665,30 +2662,14 @@ button {
 
 .proxima__nombre {
   font-family: var(--fuente-titulo);
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: 700;
   color: var(--crema);
   line-height: 1.2;
 }
 
 .proxima__nota {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #b9afa4;
 }
 
-/*
-  En movil vuelve a apilarse. Ahi el hero no da 1080 px sino unos 340, y las
-  tres piezas en fila se parten donde les toca: el nombre acaba solo en su
-  renglon y la coletilla cortada en dos. Apiladas cada una tiene su linea.
-*/
-@media (max-width: 620px) {
-  .proxima {
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.85rem 1rem;
-  }
-
-  .proxima__nombre {
-    font-size: 1.25rem;
-  }
-}

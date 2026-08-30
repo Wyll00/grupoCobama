@@ -70,33 +70,28 @@ export default function Home() {
               Galeria
             </Link>
 
+            {/*
+              La casa que viene, debajo de galeria y del ancho de los botones.
+
+              NO es un boton: esquinas de panel y no de pastilla -en esta web
+              las de pastilla son siempre algo que se pulsa- y borde
+              discontinuo. No lleva a ningun sitio todavia porque no hay nada
+              que enseniar, y un cartel con forma de boton se acaba pulsando:
+              la gente pulsa, no pasa nada, y se queda pensando que la web
+              esta rota.
+
+              Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una
+              fecha, esa fecha es una promesa que alguien tiene que cumplir, y
+              las aperturas se mueven.
+            */}
+            <p className="proxima">
+              <span className="proxima__aviso">Próximamente</span>
+              <span className="proxima__nombre">El Baifo</span>
+              <span className="proxima__nota">la quinta casa del grupo</span>
+            </p>
           </div>
         </div>
 
-        {/*
-          La casa que viene.
-
-          Debajo de la fila entera y del ancho del hero, no metido en la
-          columna de botones: ahi media 429 px de los 1080 del hero y se leia
-          como una nota al pie de los botones. Asi arranca donde arranca el
-          titular y acaba donde acaban los botones.
-
-          NO es un boton: esquinas de panel y no de pastilla -en esta web las
-          de pastilla son siempre algo que se pulsa- y borde discontinuo. No
-          lleva a ningun sitio todavia porque no hay nada que enseniar, y un
-          cartel con forma de boton se acaba pulsando.
-
-          Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una
-          fecha, esa fecha es una promesa que alguien tiene que cumplir, y las
-          aperturas se mueven.
-        */}
-        <div className="contenedor">
-          <p className="proxima">
-            <span className="proxima__aviso">Próximamente</span>
-            <span className="proxima__nombre">El Baifo</span>
-            <span className="proxima__nota">la quinta casa del grupo</span>
-          </p>
-        </div>
       </section>
 
       <section className="seccion">
