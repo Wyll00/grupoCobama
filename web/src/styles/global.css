@@ -2336,25 +2336,39 @@ button {
   La cabecera pasa a ser mas alta que ancha y el texto la ocupa entera, asi
   que un circulo en el medio deja el municipio arriba y los botones abajo sin
   velo, justo sobre la ilustracion sin atenuar. Hace falta velo parejo de
-  arriba abajo, un poco mas flojo en el centro para que la ilustracion no
-  desaparezca del todo.
+  arriba abajo, un poco mas flojo en el centro.
+
+  LOS NUMEROS SALEN DE MEDIR, no de tantear. Estaban en 0,88-0,90 y eso es
+  casi crema solida: en el movil no se distinguia que detras hubiera una
+  ilustracion. Pero ademas sobraba muchisimo velo, porque el contraste que
+  daban era de 9,4 a 10,9 cuando el minimo exigible es 4,5.
+
+  Bajados a estos, midiendo el PEOR pixel de toda la franja de texto -no solo
+  la del titulo, que es donde mas velo hay-:
+
+    claras   La Basilica y Como en Casa   5,96   la ilustracion se ve 2,5 veces mas
+    oscuras  La Casa del Mago y El Descarado 5,69  se ve 1,9 veces mas
+
+  No se baja mas porque el limite lo pone Como en Casa: a 0,64/0,48/0,62 cae
+  a 4,48 y se queda por debajo del minimo. Ahi el velo no es cosmetico, es lo
+  unico que separa el texto del cielo de su ilustracion.
 */
 @media (max-width: 700px) {
   .ficha__cabecera--con-foto::before {
     background: linear-gradient(
       180deg,
-      rgba(31, 26, 23, 0.88) 0%,
-      rgba(31, 26, 23, 0.8) 55%,
-      rgba(31, 26, 23, 0.88) 100%
+      rgba(31, 26, 23, 0.78) 0%,
+      rgba(31, 26, 23, 0.64) 60%,
+      rgba(31, 26, 23, 0.76) 100%
     );
   }
 
   .ficha__cabecera--clara::before {
     background: linear-gradient(
       180deg,
-      rgba(247, 243, 234, 0.9) 0%,
-      rgba(247, 243, 234, 0.82) 60%,
-      rgba(247, 243, 234, 0.88) 100%
+      rgba(247, 243, 234, 0.72) 0%,
+      rgba(247, 243, 234, 0.58) 60%,
+      rgba(247, 243, 234, 0.7) 100%
     );
   }
 }
