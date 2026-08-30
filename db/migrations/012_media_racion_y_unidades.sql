@@ -39,5 +39,20 @@ ALTER TABLE carta_items
 
 -- Las salsas son seccion propia en la carta de papel. Estaban cayendo en
 -- "Carnes" por no tener sitio, y ahi no las busca nadie.
-INSERT INTO categorias (slug, nombre, nombre_en, orden)
-VALUES ('salsas', 'Salsas', 'Sauces', 45);
+--
+-- El id va explicito y alto A PROPOSITO. Las semillas reservan ids escritos a
+-- mano: del 1 al 7 en 001_base y del 10 al 13 en 004_bebidas. Si esta fila lo
+-- deja al autoincremento, en una base recien creada se lleva el id 1, y el
+-- INSERT de categorias de 001_base choca con el duplicado.
+--
+-- Y MySQL aborta la sentencia ENTERA, no solo la fila que choca: se pierden
+-- las siete categorias de golpe, con ellas los platos que las referencian y
+-- con los platos sus alergenos. Medido en una instalacion limpia: 53 platos
+-- en vez de 100, y 29 relaciones de alergenos en vez de 89. La carta sale a
+-- medias y los alergenos incompletos, que ademas son obligatorios por ley.
+--
+-- No se nota en bases anteriores a esta migracion, porque alli el
+-- autoincremento ya iba por encima del 7. Solo rompe las instalaciones
+-- desde cero, que son las de cualquiera que clone el repositorio.
+INSERT INTO categorias (id, slug, nombre, nombre_en, orden)
+VALUES (50, 'salsas', 'Salsas', 'Sauces', 45);
