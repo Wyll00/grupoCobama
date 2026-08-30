@@ -34,9 +34,7 @@ Hay algunos alias admitidos por comodidad (`pescados`, `granos_de_sesamo`,
 `dioxido_azufre_sulfitos`, `frutos_de_cascara`, `leche`). Si el nombre no
 cuadra con ninguno, el script lo dice en vez de generar un fichero suelto.
 
-## Que falta
+## Estado
 
-Del envio del 13-08-2026 llegaron 12 de los 14: **faltan `gluten` y
-`mostaza`**. Mientras no esten, esos dos salen en la carta como etiqueta de
-texto, que es el comportamiento correcto: nunca se oculta un alergeno por no
-tener dibujo.
+Los 14 estan. Los 12 primeros llegaron el 13-08-2026 y los dos que faltaban
+-`gluten` y `mostaza`- el 30-08-2026.
