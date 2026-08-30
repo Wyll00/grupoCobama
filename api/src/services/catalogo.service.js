@@ -70,7 +70,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
             p.id            AS plato_id,
             p.nombre, p.nombre_en, p.descripcion, p.descripcion_en, p.imagen,
             p.ancho_cm, p.modelo_glb,
-            p.es_vegetariano, p.es_vegano,
+            p.es_vegetariano, p.es_vegano, p.es_canario,
             c.id            AS categoria_id,
             c.slug          AS categoria_slug,
             c.nombre        AS categoria_nombre,
@@ -128,6 +128,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       agotado: Boolean(item.agotado),
       es_vegetariano: Boolean(item.es_vegetariano),
       es_vegano: Boolean(item.es_vegano),
+      es_canario: Boolean(item.es_canario),
       alergenos: alergenosPorPlato.get(item.plato_id) ?? [],
     });
   }

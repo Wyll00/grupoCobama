@@ -34,6 +34,43 @@ function condiciones(plato) {
   return partes.join(' · ');
 }
 
+/**
+ * Bandera de Canarias, para los platos de la tierra.
+ *
+ * Tres franjas verticales: blanco, azul y amarillo. Dibujada y no de emoji
+ * por lo mismo que las de idioma: Windows no pinta los emoji de bandera, y
+ * ademas Canarias no tiene emoji propio -el que existe es el de las islas
+ * Canarias como subdivision y casi ningun sistema lo dibuja-.
+ *
+ * El blanco lleva borde. Sobre el crema de la carta, una franja blanca sin
+ * contorno desaparece y la bandera se lee como dos colores, no como tres.
+ */
+function BanderaCanarias() {
+  return (
+    <svg
+      className="etiqueta__bandera"
+      viewBox="0 0 30 20"
+      width="21"
+      height="14"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect width="10" height="20" fill="#ffffff" />
+      <rect x="10" width="10" height="20" fill="#0072c6" />
+      <rect x="20" width="10" height="20" fill="#ffd500" />
+      <rect
+        x="0.5"
+        y="0.5"
+        width="29"
+        height="19"
+        fill="none"
+        stroke="rgba(31, 26, 23, 0.35)"
+        strokeWidth="1"
+      />
+    </svg>
+  );
+}
+
 export default function Plato({ plato }) {
   return (
     <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
@@ -54,6 +91,16 @@ export default function Plato({ plato }) {
           ) : plato.es_vegetariano ? (
             <span className="etiqueta etiqueta--veg">Vegetariano</span>
           ) : null}
+
+          {/* Producto canario. La bandera sola, como los alergenos: el nombre
+              va en el title y en el texto para lectores de pantalla, que tres
+              franjas de color no se leen en voz alta. */}
+          {plato.es_canario && (
+            <span className="etiqueta etiqueta--canario" title="Producto canario">
+              <BanderaCanarias />
+              <span className="solo-lectores">Producto canario</span>
+            </span>
+          )}
 
           {/*
             Los alergenos, junto al nombre y no debajo de la descripcion.

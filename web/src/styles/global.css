@@ -2628,3 +2628,24 @@ button {
     padding: 0.35rem 0.4rem;
   }
 }
+
+/*
+  Producto canario: la bandera sola, en la linea del nombre del plato.
+
+  Hereda la pastilla de .etiqueta pero sin su relleno de texto, igual que se
+  hizo con los alergenos que van solo con dibujo. Asi las tres cosas que
+  pueden acompanar a un nombre -la etiqueta de texto, el alergeno y esta- se
+  leen como la misma familia y no como tres inventos distintos.
+*/
+.etiqueta--canario {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+}
+
+.etiqueta__bandera {
+  display: block;
+  border-radius: 1px;
+}
