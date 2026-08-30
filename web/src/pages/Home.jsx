@@ -78,6 +78,24 @@ export default function Home() {
             <Link className="boton hero__galeria" to="/galeria">
               Galeria
             </Link>
+
+            {/*
+              La casa que viene.
+
+              Debajo de los botones y SIN ser un boton: no lleva a ningun sitio
+              todavia porque no hay nada que enseniar. Con forma de boton la
+              gente lo pulsa, no pasa nada, y se queda pensando que la web esta
+              rota.
+
+              Dice el nombre y ya. Ni donde ni cuando: en cuanto se ponga una
+              fecha, esa fecha se convierte en una promesa que alguien tiene
+              que cumplir, y las aperturas se mueven.
+            */}
+            <p className="proxima">
+              <span className="proxima__aviso">Próximamente</span>
+              <span className="proxima__nombre">El Baifo</span>
+              <span className="proxima__nota">la quinta casa del grupo</span>
+            </p>
           </div>
         </div>
       </section>
