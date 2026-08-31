@@ -307,11 +307,24 @@ export default function Reservar() {
                 </div>
               )}
 
+              {/*
+                `autocomplete` en los tres campos personales. La mayoria de las
+                reservas se hacen desde el movil, muchas veces con prisa, y sin
+                esto el telefono no ofrece rellenar el nombre, el numero ni el
+                correo: hay que teclearlos. Cada campo que se teclea a mano es
+                una oportunidad de abandonar el formulario a medias.
+
+                Los nombres son los del estandar y no cualquier palabra: el
+                navegador solo reconoce esos. "telefono" en vez de "tel" no
+                hace nada y no avisa.
+              */}
               <div className="reserva__fila">
                 <label className="reserva__campo">
                   <span>Nombre de la reserva</span>
                   <input
                     className="buscador"
+                    name="nombre"
+                    autoComplete="name"
                     value={form.nombre}
                     onChange={cambiar('nombre')}
                     placeholder="A nombre de..."
@@ -324,6 +337,8 @@ export default function Reservar() {
                   <input
                     className="buscador"
                     type="tel"
+                    name="telefono"
+                    autoComplete="tel"
                     value={form.telefono}
                     onChange={cambiar('telefono')}
                     placeholder="Para avisarte"
@@ -339,6 +354,8 @@ export default function Reservar() {
                 <input
                   className="buscador"
                   type="email"
+                  name="email"
+                  autoComplete="email"
                   value={form.email}
                   onChange={cambiar('email')}
                   placeholder="Para mandarte la confirmacion"

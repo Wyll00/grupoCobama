@@ -2723,3 +2723,48 @@ button {
   color: #b9afa4;
 }
 
+
+/* ------------------------------------- blancos tactiles en el movil ---- */
+
+/*
+  Cuatro elementos se quedaban por debajo de lo que un dedo acierta con
+  comodidad. Medidos a 375 px:
+
+    enlaces de navegacion   39 px de alto
+    el platito del tema     38 x 38
+    pestanas de la carta    37 px de alto
+    casilla de la politica  17 x 17 la casilla; su etiqueta 309 x 23
+
+  Ninguno esta "roto": se pulsan. Pero fallar el toque en una carta que se lee
+  en la mesa, o en la casilla que hay que marcar para poder reservar, es de
+  las cosas que hacen abandonar. El minimo razonable son 44.
+
+  Solo en movil: en escritorio se apunta con el raton y unos botones de 44 px
+  de alto en la barra de navegacion la engordarian sin motivo.
+
+  Se sube el ALTO MINIMO, no el relleno: con relleno cambiarian tambien de
+  ancho y la fila de pestanas de la carta dejaria de caber de un vistazo.
+*/
+@media (max-width: 700px) {
+  .nav a,
+  .pestana {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .platito {
+    width: 44px;
+    height: 44px;
+  }
+
+  /*
+    La casilla no se agranda -un cuadro de 44 px al lado de una linea de texto
+    queda enorme-: lo que se agranda es la etiqueta, que es lo que de verdad
+    se pulsa. Comprobado que pulsar el texto marca la casilla.
+  */
+  .consentimiento__casilla {
+    min-height: 44px;
+    padding-block: 0.35rem;
+  }
+}
