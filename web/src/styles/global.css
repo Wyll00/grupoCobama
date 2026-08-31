@@ -133,6 +133,30 @@ h1 { font-size: clamp(1.9rem, 5vw, 3rem); }
 h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); }
 h3 { font-size: 1.15rem; }
 
+/*
+  Anillo de foco de la casa, para todo lo que no traiga el suyo.
+
+  Habia seis reglas sueltas -la navegacion, la tarjeta de local, el platito,
+  la foto de galeria, el boton de galeria del hero y las flechas del
+  carrusel- y el resto se quedaba con el anillo que pinte cada navegador. Eso
+  no es que no se vea: es que se ve DISTINTO en cada sitio de la misma web, y
+  en los bloques oscuros -el hero, el pie, la cabecera de la ficha- el gris de
+  serie se pierde contra el carbon.
+
+  Va con un solo :focus-visible, que es la especificidad mas baja posible:
+  cualquiera de las seis reglas de antes le gana y sigue mandando la suya. En
+  particular la de la tarjeta, que a proposito NO pinta anillo en el enlace
+  porque lo pinta la tarjeta entera alrededor.
+
+  Y :focus-visible, no :focus: con :focus el anillo sale tambien al pulsar con
+  el raton, que es justo lo que hace que la gente lo quite del todo.
+*/
+:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 p { margin: 0 0 1em; }
 
 a { color: inherit; }
@@ -676,7 +700,7 @@ button {
   flex: 1;
 }
 
-.bloque-dato h3 {
+.bloque-dato h2 {
   font-family: var(--fuente-texto);
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -1287,6 +1311,10 @@ button {
 /*
   Los titulos de columna del pie, resaltados.
 
+  Van en h2 y no en h4 aunque se pinten pequenos: el tamano lo decide el CSS,
+  pero el NIVEL es la estructura del documento, y saltar de un h1 a un h4 deja
+  agujeros en el indice por el que navega un lector de pantalla.
+
   En ocre y con una regla corta debajo. La regla no es un adorno inventado:
   es lo mismo que hacen los titulos de categoria de la carta, que tambien
   abren un bloque de cosas. Corta y no de ancho completo porque aqui son tres
@@ -1296,7 +1324,7 @@ button {
   corto de contraste, y el claro es el mismo tono subido de luz que ya se usa
   para eso mismo en modo oscuro.
 */
-.pie h4 {
+.pie h2 {
   color: var(--ocre-claro);
   font-family: var(--fuente-texto);
   font-size: 0.78rem;

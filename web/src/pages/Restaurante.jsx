@@ -119,7 +119,7 @@ export default function Restaurante() {
       <section className="seccion">
         <div className="contenedor datos">
           <div className="bloque-dato">
-            <h3>Donde estamos</h3>
+            <h2>Donde estamos</h2>
 
             {/* Misma tarjeta que el horario, para que las dos columnas pesen
                 igual. El parking se marca como dato util, no como frase: en
@@ -165,7 +165,7 @@ export default function Restaurante() {
           </div>
 
           <div className="bloque-dato">
-            <h3>Horario</h3>
+            <h2>Horario</h2>
 
             {/*
               El dia de hoy va marcado: quien mira un horario casi siempre

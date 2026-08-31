@@ -43,7 +43,7 @@ export default function Layout() {
         <div className="contenedor">
           <div className="pie__rejilla">
             <div>
-              <h4>Nuestros locales</h4>
+              <h2>Nuestros locales</h2>
               <ul className="pie__lista">
                 {(locales ?? []).map((local) => (
                   <li key={local.slug}>
@@ -56,7 +56,7 @@ export default function Layout() {
             </div>
 
             <div>
-              <h4>Reservas</h4>
+              <h2>Reservas</h2>
               <ul className="pie__lista">
                 <li>
                   <a href={enlaceWhatsApp('Hola, me gustaria hacer una reserva.')}>
@@ -70,7 +70,7 @@ export default function Layout() {
             </div>
 
             <div>
-              <h4>Fotos</h4>
+              <h2>Fotos</h2>
               <ul className="pie__lista">
                 <li>
                   <Link to="/galeria">Galeria del grupo</Link>
@@ -84,7 +84,7 @@ export default function Layout() {
             </div>
 
             <div>
-              <h4>Siguenos</h4>
+              <h2>Siguenos</h2>
               <ul className="pie__lista">
                 <li>
                   <a href={GRUPO.instagram} target="_blank" rel="noreferrer">
