@@ -654,6 +654,28 @@ button {
   .datos { grid-template-columns: repeat(2, 1fr); }
 }
 
+/*
+  Los dos paneles de la ficha -donde estamos y horario- tienen que acabar a la
+  misma altura.
+
+  La rejilla ya estiraba las dos COLUMNAS por igual, pero el panel de dentro
+  se quedaba con su alto natural: el de horario medía 141 px contra 164 el de
+  la direccion, y el hueco de 23 px se veia como si a la derecha faltara algo.
+
+  Columna flexible y el panel creciendo dentro: asi el que sea mas bajo se
+  estira hasta el de al lado, y el dia que uno crezca -un local con dos turnos,
+  una direccion mas larga- siguen cuadrando sin tocar nada.
+*/
+.bloque-dato {
+  display: flex;
+  flex-direction: column;
+}
+
+.bloque-dato > .sitio,
+.bloque-dato > .horario {
+  flex: 1;
+}
+
 .bloque-dato h3 {
   font-family: var(--fuente-texto);
   font-size: 0.78rem;
