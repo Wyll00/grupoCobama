@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 /**
  * Interruptor de modo oscuro con forma de plato.
@@ -21,6 +22,7 @@ function temaActual() {
 
 export default function Platito() {
   const [tema, setTema] = useState(temaActual);
+  const boton = useRef(null);
 
   // Si el usuario no ha elegido nunca, la web sigue al sistema: cambiar el
   // movil a modo noche tiene que cambiar la carta sin tocar nada. En cuanto
@@ -46,15 +48,61 @@ export default function Platito() {
     // ademas lo coherente.
     const actual = document.documentElement.dataset.tema === 'oscuro' ? 'oscuro' : 'claro';
     const nuevo = actual === 'oscuro' ? 'claro' : 'oscuro';
-    document.documentElement.dataset.tema = nuevo;
-    try {
-      localStorage.setItem(CLAVE, nuevo);
-    } catch {
-      // Navegacion privada con el almacenamiento capado: el cambio funciona
-      // igual, solo que no se recuerda al recargar. No es motivo para que
-      // reviente el boton.
+
+    const aplicar = () => {
+      document.documentElement.dataset.tema = nuevo;
+      try {
+        localStorage.setItem(CLAVE, nuevo);
+      } catch {
+        // Navegacion privada con el almacenamiento capado: el cambio funciona
+        // igual, solo que no se recuerda al recargar. No es motivo para que
+        // reviente el boton.
+      }
+      // flushSync obliga a React a repintar el plato DENTRO de la transicion.
+      // Sin esto cambiaria de fase despues del barrido, y se nota.
+      flushSync(() => setTema(nuevo));
+    };
+
+    const pocaAnimacion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!document.startViewTransition || pocaAnimacion) {
+      aplicar();
+      return;
     }
-    setTema(nuevo);
+
+    // El circulo nace en el centro del boton y crece hasta tapar la esquina mas
+    // lejana. Por eso el radio se calcula a la esquina opuesta y no es un numero
+    // fijo: en un movil apaisado uno fijo se quedaria corto y se veria el corte.
+    const caja = boton.current?.getBoundingClientRect();
+    const x = caja ? caja.left + caja.width / 2 : window.innerWidth / 2;
+    const y = caja ? caja.top + caja.height / 2 : 0;
+    const radio = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+
+    const transicion = document.startViewTransition(aplicar);
+    transicion.ready
+      .then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${radio}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 480,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            // Se anima la capa NUEVA: el tema entrante se descubre por encima
+            // del saliente, que es lo que da la sensacion de barrido.
+            pseudoElement: '::view-transition-new(root)',
+          },
+        );
+      })
+      .catch(() => {
+        // Si el navegador aborta la transicion (otra pulsacion encima) el tema
+        // ya se aplico igualmente. No hay nada que rescatar.
+      });
   };
 
   const esOscuro = tema === 'oscuro';

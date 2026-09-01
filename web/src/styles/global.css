@@ -97,6 +97,39 @@
   color-scheme: dark;
 }
 
+/* ---------------------------------------------------------------------------
+   Transicion del modo oscuro
+
+   El navegador, por su cuenta, hace un fundido cruzado entre la pantalla de
+   antes y la de despues. Aqui estorba: encima del fundido dibujamos un circulo
+   que crece desde el boton, y las dos cosas a la vez se ven sucias, con medio
+   tono gris en el borde. Le quitamos su animacion y dejamos solo la nuestra,
+   que va en Platito.jsx.
+
+   El orden importa: la capa nueva encima, porque es a la que le recortamos el
+   circulo. Al reves se descubriria el tema viejo sobre el nuevo.
+--------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) { z-index: 0; }
+::view-transition-new(root) { z-index: 1; }
+
+/* Quien pide menos animaciones no ve el barrido: el cambio entra de golpe.
+   Esto duplica la comprobacion que ya hace el JS, a proposito, por si algun
+   dia alguien llama a startViewTransition desde otro sitio. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+
 *,
 *::before,
 *::after {
