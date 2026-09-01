@@ -12,7 +12,7 @@ export async function listarCategorias() {
 
 export async function listarAlergenos() {
   const [filas] = await pool.execute(
-    'SELECT id, slug, nombre, nombre_en, icono FROM alergenos ORDER BY id'
+    'SELECT id, slug, nombre, nombre_en, nombre_de, icono FROM alergenos ORDER BY id'
   );
   return filas;
 }
@@ -68,13 +68,15 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
             ci.destacado,
             (ci.agotado_hasta IS NOT NULL AND ci.agotado_hasta > NOW()) AS agotado,
             p.id            AS plato_id,
-            p.nombre, p.nombre_en, p.descripcion, p.descripcion_en, p.imagen,
+            p.nombre, p.nombre_en, p.nombre_de,
+            p.descripcion, p.descripcion_en, p.descripcion_de, p.imagen,
             p.ancho_cm, p.modelo_glb,
             p.es_vegetariano, p.es_vegano, p.es_canario,
             c.id            AS categoria_id,
             c.slug          AS categoria_slug,
             c.nombre        AS categoria_nombre,
-            c.nombre_en     AS categoria_nombre_en
+            c.nombre_en     AS categoria_nombre_en,
+            c.nombre_de     AS categoria_nombre_de
        FROM carta_items ci
        JOIN platos p     ON p.id = ci.plato_id
        JOIN categorias c ON c.id = p.categoria_id
@@ -96,6 +98,7 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
         slug: item.categoria_slug,
         nombre: item.categoria_nombre,
         nombre_en: item.categoria_nombre_en,
+        nombre_de: item.categoria_nombre_de,
         platos: [],
       };
       indice.set(item.categoria_id, categoria);
@@ -107,8 +110,10 @@ export async function obtenerCarta(restauranteId, filtros = {}) {
       id: item.plato_id,
       nombre: item.nombre,
       nombre_en: item.nombre_en,
+      nombre_de: item.nombre_de,
       descripcion: item.descripcion,
       descripcion_en: item.descripcion_en,
+      descripcion_de: item.descripcion_de,
       imagen: item.imagen,
       ancho_cm: item.ancho_cm === null ? null : Number(item.ancho_cm),
       // La carta solo necesita saber SI se puede ver en la mesa; el modelo lo
@@ -143,7 +148,7 @@ async function cargarAlergenos(platoIds) {
   const huecos = platoIds.map(() => '?').join(', ');
   const [filas] = await pool.execute(
     `SELECT pa.plato_id, pa.trazas,
-            a.id, a.slug, a.nombre, a.nombre_en, a.icono
+            a.id, a.slug, a.nombre, a.nombre_en, a.nombre_de, a.icono
        FROM plato_alergenos pa
        JOIN alergenos a ON a.id = pa.alergeno_id
       WHERE pa.plato_id IN (${huecos})
@@ -158,6 +163,7 @@ async function cargarAlergenos(platoIds) {
       slug: f.slug,
       nombre: f.nombre,
       nombre_en: f.nombre_en,
+      nombre_de: f.nombre_de,
       icono: f.icono,
       trazas: Boolean(f.trazas),
     });
@@ -179,9 +185,11 @@ export async function destacadosDeLocal(slug, limite = 12) {
   const [filas] = await pool.execute(
     `SELECT ci.id AS carta_item_id, ci.precio, ci.precio_media, ci.unidad,
             ci.minimo_personas, ci.numero_carta, ci.agotado_hasta,
-            p.id, p.nombre, p.nombre_en, p.descripcion, p.descripcion_en,
+            p.id, p.nombre, p.nombre_en, p.nombre_de,
+            p.descripcion, p.descripcion_en, p.descripcion_de,
             p.imagen, p.imagen_thumb, p.es_vegano, p.es_vegetariano,
-            c.slug AS categoria_slug, c.nombre AS categoria_nombre
+            c.slug AS categoria_slug, c.nombre AS categoria_nombre,
+            c.nombre_en AS categoria_nombre_en, c.nombre_de AS categoria_nombre_de
        FROM carta_items ci
        JOIN platos p ON p.id = ci.plato_id
        JOIN categorias c ON c.id = p.categoria_id
@@ -200,8 +208,10 @@ export async function destacadosDeLocal(slug, limite = 12) {
     id: f.id,
     nombre: f.nombre,
     nombre_en: f.nombre_en,
+    nombre_de: f.nombre_de,
     descripcion: f.descripcion,
     descripcion_en: f.descripcion_en,
+    descripcion_de: f.descripcion_de,
     imagen: f.imagen,
     imagen_thumb: f.imagen_thumb,
     precio: Number(f.precio),
@@ -216,5 +226,7 @@ export async function destacadosDeLocal(slug, limite = 12) {
     es_vegetariano: Boolean(f.es_vegetariano),
     categoria_slug: f.categoria_slug,
     categoria_nombre: f.categoria_nombre,
+    categoria_nombre_en: f.categoria_nombre_en,
+    categoria_nombre_de: f.categoria_nombre_de,
   })).filter((p) => !p.agotado);
 }

@@ -2600,15 +2600,26 @@ button {
 }
 
 /*
-  Mientras no traduzcan: apagados y con el cursor de "aqui no".
+  El que esta puesto.
 
-  Se quedan a la vista y no escondidos para poder cuadrar el hueco ahora, sin
-  recolocar nada el dia que se enciendan. 0,45 de opacidad es bastante para
-  que se lea que hay algo y poco para que nadie lo intente pulsar.
+  Se marca con el borde y el fondo, no solo con el color de la letra: sobre la
+  cabecera oscura, tres banderas de colores ya compiten bastante entre ellas
+  como para distinguirlas ademas por un matiz del texto.
 */
-.idioma:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.idioma--activo {
+  border-color: var(--ocre-claro);
+  background: rgba(224, 169, 79, 0.22);
+  color: #fff;
+}
+
+/* Los otros dos, un poco apagados: asi el puesto se ve de un vistazo sin
+   tener que comparar. */
+.idioma:not(.idioma--activo) {
+  opacity: 0.72;
+}
+
+.idioma:not(.idioma--activo):hover {
+  opacity: 1;
 }
 
 .idioma__bandera {

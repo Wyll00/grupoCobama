@@ -5,6 +5,8 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import IconoAlergeno from '../components/IconoAlergeno.jsx';
 import Idiomas from '../components/Idiomas.jsx';
+import { useIdioma } from '../hooks/useIdioma.js';
+import { texto, ui } from '../datos/idioma.js';
 import { Cargando, Error } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
@@ -15,6 +17,7 @@ export default function Carta() {
   // llega con el filtro puesto.
   const [params, setParams] = useSearchParams();
 
+  const [idioma] = useIdioma();
   const categoria = params.get('categoria') ?? '';
   const busqueda = params.get('q') ?? '';
   const vegetariano = params.get('vegetariano') === '1';
@@ -124,7 +127,7 @@ export default function Carta() {
                 className={`pestana ${categoria === c.slug ? 'pestana--activa' : ''}`}
                 onClick={() => actualizar('categoria', categoria === c.slug ? null : c.slug)}
               >
-                {c.nombre}
+                {texto(c, 'nombre', idioma)}
               </button>
             ))}
           </div>
@@ -178,7 +181,7 @@ export default function Carta() {
                     aria-pressed={sinAlergenos.includes(a.slug)}
                   >
                     <IconoAlergeno alergeno={a} tamano={18} />
-                    <span>{a.nombre}</span>
+                    <span>{texto(a, 'nombre', idioma)}</span>
                   </button>
                 ))}
               </div>
@@ -219,7 +222,7 @@ export default function Carta() {
             visibles.map((c) => (
               <div key={c.id} className="categoria">
                 <h2 id={c.slug} data-cuenta={`${c.platos.length} platos`}>
-                  {c.nombre}
+                  {texto(c, 'nombre', idioma)}
                 </h2>
 
                 {/* Cabezal de las dos columnas de precio. Solo si en esta
@@ -228,8 +231,8 @@ export default function Carta() {
                     buscar algo que no esta. */}
                 {c.platos.some((p) => p.precio_media !== null && p.precio_media !== undefined) && (
                   <div className="carta__columnas" aria-hidden="true">
-                    <span className="carta__columna">Media racion</span>
-                    <span className="carta__columna">Racion</span>
+                    <span className="carta__columna">{ui('precio.media', idioma)}</span>
+                    <span className="carta__columna">{ui('precio.racion', idioma)}</span>
                   </div>
                 )}
 
@@ -257,7 +260,7 @@ export default function Carta() {
           {(alergenos.datos ?? []).length > 0 && (
             <section className="leyenda" aria-labelledby="leyenda-alergenos">
               <h2 id="leyenda-alergenos" className="leyenda__titulo">
-                Que significa cada icono
+                {ui('leyenda.titulo', idioma)}
               </h2>
 
               <ul className="leyenda__lista">
@@ -266,7 +269,7 @@ export default function Carta() {
                   .map((a) => (
                     <li key={a.id} className="leyenda__item">
                       <IconoAlergeno alergeno={a} tamano={30} />
-                      <span>{a.nombre}</span>
+                      <span>{texto(a, 'nombre', idioma)}</span>
                     </li>
                   ))}
               </ul>
@@ -289,20 +292,19 @@ export default function Carta() {
                   {(() => {
                     const frase = alergenos.datos
                       .filter((a) => !a.icono)
-                      .map((a) => a.nombre.toLowerCase())
+                      .map((a) => texto(a, 'nombre', idioma).toLowerCase())
                       .join(' y ');
                     return frase.charAt(0).toUpperCase() + frase.slice(1);
                   })()}{' '}
-                  salen escritos en la carta, todavia no tienen dibujo.
+                  {ui('leyenda.sinDibujo', idioma)}
                 </p>
               )}
             </section>
           )}
 
           <div className="aviso" style={{ marginTop: '2rem' }}>
-            <strong>Alergias e intolerancias.</strong> La informacion de alergenos es
-            orientativa y la cocina es compartida, por lo que no se puede descartar la
-            contaminacion cruzada. Consulta siempre con el personal de sala.
+            <strong>{ui('aviso.alergenos.titulo', idioma)}</strong>{' '}
+            {ui('aviso.alergenos.texto', idioma)}
           </div>
         </div>
       </section>

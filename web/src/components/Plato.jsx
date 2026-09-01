@@ -1,4 +1,6 @@
 import IconoAlergeno from './IconoAlergeno.jsx';
+import { useIdioma } from '../hooks/useIdioma.js';
+import { texto, ui } from '../datos/idioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -13,10 +15,10 @@ const formatoPrecio = new Intl.NumberFormat('es-ES', {
  * quien lo lee entiende que ese es el plato y le llega una cuenta al doble.
  * Igual con los arroces, que van por persona y con un minimo de dos.
  */
-const UNIDAD = {
-  kg: 'el kilo',
-  ud: 'la unidad',
-  persona: 'por persona',
+const CLAVE_UNIDAD = {
+  kg: 'unidad.kg',
+  ud: 'unidad.ud',
+  persona: 'unidad.persona',
 };
 
 /**
@@ -27,10 +29,13 @@ const UNIDAD = {
  * solo, y en la mesa le dicen que no: eso no es informacion incompleta, es
  * informacion que induce a error.
  */
-function condiciones(plato) {
+function condiciones(plato, idioma) {
   const partes = [];
-  if (UNIDAD[plato.unidad]) partes.push(UNIDAD[plato.unidad]);
-  if (plato.minimo_personas) partes.push(`min. ${plato.minimo_personas} personas`);
+  const clave = CLAVE_UNIDAD[plato.unidad];
+  if (clave) partes.push(ui(clave, idioma));
+  if (plato.minimo_personas) {
+    partes.push(ui('unidad.minimo', idioma, { n: plato.minimo_personas }));
+  }
   return partes.join(' · ');
 }
 
@@ -72,6 +77,13 @@ function BanderaCanarias() {
 }
 
 export default function Plato({ plato }) {
+  const [idioma] = useIdioma();
+  // Campo a campo y no plato a plato: de 70 platos traducidos solo 30 tienen
+  // descripcion, asi que uno a medias sale con el nombre traducido y la
+  // descripcion en castellano en vez de con un hueco en blanco.
+  const nombre = texto(plato, 'nombre', idioma);
+  const descripcion = texto(plato, 'descripcion', idioma);
+
   return (
     <li className={`plato ${plato.agotado ? 'plato--agotado' : ''}`}>
       <div className="plato__info">
@@ -79,26 +91,26 @@ export default function Plato({ plato }) {
           {/* El numero del papel. En sala se pide "ponme el 35", asi que
               tenerlo en el movil evita tener que describir el plato entero. */}
           {plato.numero_carta && <span className="plato__numero">{plato.numero_carta}</span>}
-          <span>{plato.nombre}</span>
+          <span>{nombre}</span>
           {/* Se sigue enseñando en lugar de esconderlo: si desaparece, el
               cliente lo pide igual porque lo vio ayer. */}
-          {plato.agotado && <span className="etiqueta etiqueta--agotado">Hoy no queda</span>}
+          {plato.agotado && <span className="etiqueta etiqueta--agotado">{ui('etiqueta.agotado', idioma)}</span>}
           {plato.destacado && !plato.agotado && (
-            <span className="etiqueta etiqueta--destacado">De la casa</span>
+            <span className="etiqueta etiqueta--destacado">{ui('etiqueta.destacado', idioma)}</span>
           )}
           {plato.es_vegano ? (
-            <span className="etiqueta etiqueta--veg">Vegano</span>
+            <span className="etiqueta etiqueta--veg">{ui('etiqueta.vegano', idioma)}</span>
           ) : plato.es_vegetariano ? (
-            <span className="etiqueta etiqueta--veg">Vegetariano</span>
+            <span className="etiqueta etiqueta--veg">{ui('etiqueta.vegetariano', idioma)}</span>
           ) : null}
 
           {/* Producto canario. La bandera sola, como los alergenos: el nombre
               va en el title y en el texto para lectores de pantalla, que tres
               franjas de color no se leen en voz alta. */}
           {plato.es_canario && (
-            <span className="etiqueta etiqueta--canario" title="Producto canario">
+            <span className="etiqueta etiqueta--canario" title={ui('etiqueta.canario', idioma)}>
               <BanderaCanarias />
-              <span className="solo-lectores">Producto canario</span>
+              <span className="solo-lectores">{ui('etiqueta.canario', idioma)}</span>
             </span>
           )}
 
@@ -123,21 +135,22 @@ export default function Plato({ plato }) {
             <span
               className="alergenos"
               role="list"
-              aria-label={`Alergenos de ${plato.nombre}`}
+              aria-label={`Alergenos de ${nombre}`}
             >
               {plato.alergenos.map((a) => {
                 const soloDibujo = Boolean(a.icono) && !a.trazas;
+                const nombreAlergeno = texto(a, 'nombre', idioma);
                 return (
                   <span
                     key={a.id}
                     role="listitem"
                     className={`alergeno ${soloDibujo ? 'alergeno--dibujo' : ''}`}
                   >
-                    <IconoAlergeno alergeno={a} nombre={soloDibujo ? a.nombre : null} />
+                    <IconoAlergeno alergeno={a} nombre={soloDibujo ? nombreAlergeno : null} />
                     {!soloDibujo && (
                       <span>
-                        {a.nombre}
-                        {a.trazas && ' (trazas)'}
+                        {nombreAlergeno}
+                        {a.trazas && ` (${ui('alergeno.trazas', idioma)})`}
                       </span>
                     )}
                   </span>
@@ -147,7 +160,7 @@ export default function Plato({ plato }) {
           )}
         </div>
 
-        {plato.descripcion && <p className="plato__descripcion">{plato.descripcion}</p>}
+        {descripcion && <p className="plato__descripcion">{descripcion}</p>}
       </div>
 
       {/*
@@ -175,7 +188,9 @@ export default function Plato({ plato }) {
         )}
         <span className="plato__cifras">
           <span className="plato__importe">{formatoPrecio.format(plato.precio)}</span>
-          {condiciones(plato) && <span className="plato__unidad">{condiciones(plato)}</span>}
+          {condiciones(plato, idioma) && (
+            <span className="plato__unidad">{condiciones(plato, idioma)}</span>
+          )}
         </span>
       </div>
     </li>

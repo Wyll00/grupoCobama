@@ -1,27 +1,32 @@
+import { useIdioma } from '../hooks/useIdioma.js';
+
 /**
  * Selector de idioma de la carta.
  *
- * TODAVIA NO TRADUCE. Los botones estan puestos y colocados, pero
- * deshabilitados a proposito: en la base hay nombre en ingles para 67 de los
- * 171 platos y para ninguna descripcion, y en aleman no hay absolutamente
- * nada. Una bandera que se pulsa y deja la carta en castellano es peor que no
- * tenerla: el cliente cree que la web esta rota.
- *
- * Deshabilitados y no escondidos porque asi se ve donde van a ir y se puede
- * ajustar el hueco ahora, sin tener que recolocar nada el dia que se
- * enciendan. Para encenderlos: quitar `disabled`, quitar `title` y colgar el
- * onClick del idioma.
- *
  * Las banderas van DIBUJADAS y no como emoji. Windows no pinta los emoji de
- * bandera: 🇬🇧 sale como las letras "GB" y 🇩🇪 como "DE", asi que en la mitad
- * de los escritorios no se veria ninguna bandera. Dibujadas se ven igual en
- * todos lados y escalan sin ensuciarse.
+ * bandera: se ven como las letras "ES", "GB" y "DE", asi que en la mitad de
+ * los escritorios no habria ninguna bandera.
  *
- * Ojo el dia que se enciendan: una bandera es un pais, no un idioma. La del
- * Reino Unido para "ingles" deja fuera a media Europa que lo lee, y para el
- * aleman estan Austria y Suiza. Si un dia molesta, lo estandar es poner las
- * siglas EN / DE.
+ * Ojo, que es una decision con coste: una bandera es un pais, no un idioma. La
+ * del Reino Unido para "ingles" deja fuera a media Europa que lo lee, y para
+ * el aleman estan Austria y Suiza. Se eligio bandera a sabiendas; lo estandar
+ * son las siglas, y cambiarlo es quitar el <svg> y dejar el codigo.
+ *
+ * Que hay traducido de verdad, para no prometer de mas: de 166 platos hay 70
+ * con nombre en ingles y aleman, y 30 con descripcion. Lo que falte sale en
+ * castellano, campo a campo -ver `texto()` en datos/idioma.js-. Un plato a
+ * medias es mejor que un hueco en blanco, y muchisimo mejor en una carta con
+ * alergenos.
  */
+
+function BanderaEspana() {
+  return (
+    <svg viewBox="0 0 60 30" className="idioma__bandera" aria-hidden="true" focusable="false">
+      <rect width="60" height="30" fill="#aa151b" />
+      <rect y="7.5" width="60" height="15" fill="#f1bf00" />
+    </svg>
+  );
+}
 
 function BanderaReinoUnido() {
   return (
@@ -48,30 +53,36 @@ function BanderaAlemania() {
   );
 }
 
-const IDIOMAS = [
+const BANDERAS = [
+  { codigo: 'es', nombre: 'Espanol', Bandera: BanderaEspana },
   { codigo: 'en', nombre: 'English', Bandera: BanderaReinoUnido },
   { codigo: 'de', nombre: 'Deutsch', Bandera: BanderaAlemania },
 ];
 
 export default function Idiomas() {
+  const [idioma, cambiar] = useIdioma();
+
   return (
     <div className="idiomas" role="group" aria-label="Idioma de la carta">
-      {IDIOMAS.map(({ codigo, nombre, Bandera }) => (
-        <button
-          key={codigo}
-          type="button"
-          className="idioma"
-          lang={codigo}
-          disabled
-          // El motivo va en el title Y en el aria-label: un boton
-          // deshabilitado sin explicacion es una pared sin puerta.
-          title={`${nombre}: todavia no disponible`}
-          aria-label={`${nombre}: todavia no disponible`}
-        >
-          <Bandera />
-          <span className="idioma__codigo">{codigo.toUpperCase()}</span>
-        </button>
-      ))}
+      {BANDERAS.map(({ codigo, nombre, Bandera }) => {
+        const activo = idioma === codigo;
+        return (
+          <button
+            key={codigo}
+            type="button"
+            className={`idioma ${activo ? 'idioma--activo' : ''}`}
+            lang={codigo}
+            onClick={() => cambiar(codigo)}
+            // `aria-pressed` y no solo la clase: quien no ve la pantalla
+            // necesita saber cual esta puesto, y el color no se lo dice.
+            aria-pressed={activo}
+            title={nombre}
+          >
+            <Bandera />
+            <span className="idioma__codigo">{codigo.toUpperCase()}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

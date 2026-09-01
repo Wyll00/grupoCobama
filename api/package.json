@@ -18,6 +18,7 @@
     "db:adoptar": "node scripts/db.js adoptar",
     "portadas": "node scripts/subir-portadas.js",
     "canarios": "node scripts/marcar-canarios.js",
+    "idiomas": "node scripts/importar-idiomas-basilica.js",
     "alergenos": "node scripts/iconos-alergenos.js",
     "carta-basilica": "node scripts/cargar-alergenos-basilica.js",
     "purgar": "node scripts/purgar-reservas.js",
