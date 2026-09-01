@@ -27,6 +27,57 @@ services:
       retries: 10
       start_period: 30s
 
+  # ---------------------------------------------------------------------
+  # api
+  #
+  # Aqui dentro por una razon concreta: se caia sola varias veces al dia y
+  # habia que levantarla a mano. Con `restart: unless-stopped` vuelve ella,
+  # igual que la base.
+  #
+  # Se monta el codigo desde el host para poder tocarlo sin reconstruir la
+  # imagen, pero NUNCA node_modules: sharp lleva binarios compilados y los de
+  # Windows no arrancan en Alpine.
+  # ---------------------------------------------------------------------
+  api:
+    build: ./api
+    container_name: cobama-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # El fichero trae los secretos -JWT_SECRET y demas- y `environment` pisa
+    # lo que haga falta: en compose gana siempre environment sobre env_file.
+    env_file: ./api/.env
+    environment:
+      # Dentro de la red de compose la base no esta en 127.0.0.1 sino en el
+      # nombre del servicio.
+      DB_HOST: db
+      DB_PORT: 3306
+      PORT: 4100
+      NODE_ENV: development
+    ports:
+      - "${API_PORT:-4100}:4100"
+    volumes:
+      - ./api/src:/app/src
+      - ./api/scripts:/app/scripts
+      # Las imagenes subidas viven en el host: si se quedaran dentro, se
+      # perderian al reconstruir la imagen.
+      - ./api/uploads:/app/uploads
+      # El prerenderizado lee el index.html construido. La ruta es la que
+      # calcula prerender.js: tres niveles por encima de src/middleware, o
+      # sea la raiz del contenedor.
+      - ./web/dist:/web/dist:ro
+    # --watch para recargar al tocar el codigo. Si los avisos de cambio no
+    # cruzan el bind mount -en Windows es lo normal- no estorba: simplemente
+    # no recarga, y se reinicia a mano con `docker compose restart api`.
+    command: node --watch src/server.js
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4100/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   phpmyadmin:
     image: phpmyadmin:5
     container_name: cobama-phpmyadmin

@@ -27,20 +27,36 @@ Genera un secreto de JWT y ponlo en `api/.env` como `JWT_SECRET`:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Levanta la base de datos y carga esquema y datos:
+Levanta la base de datos y la API, y carga esquema y datos:
 
 ```bash
 docker compose up -d && npm install --prefix api && npm run db:setup --prefix api
 ```
 
-Luego, en dos terminales:
+Eso deja corriendo la base, phpMyAdmin y la API. Los tres con
+`restart: unless-stopped`, asi que vuelven solos si se caen y al reiniciar el
+ordenador.
 
-```bash
-npm run dev --prefix api
-```
+La web de desarrollo sí va a mano, en su terminal:
 
 ```bash
 npm install --prefix web && npm run dev --prefix web
+```
+
+**Al tocar codigo de la API hay que reiniciarla:**
+
+```bash
+docker compose restart api
+```
+
+Lleva `node --watch`, pero en Windows los avisos de cambio de fichero no
+cruzan el bind mount y no se entera. En Linux y Mac sí recarga sola.
+
+Si prefieres la API fuera de Docker mientras trabajas -para tener recarga
+automatica-, para el contenedor primero o chocaran por el puerto 4100:
+
+```bash
+docker compose stop api && npm run dev --prefix api
 ```
 
 | Servicio | URL |

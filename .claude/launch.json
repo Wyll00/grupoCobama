@@ -10,8 +10,7 @@
     },
     {
       "name": "api",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "api"],
+      "url": "http://localhost:4100",
       "port": 4100,
       "autoPort": false
     }
