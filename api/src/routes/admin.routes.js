@@ -38,6 +38,7 @@ import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
 import * as galeriaCtrl from '../controllers/admin.galeria.controller.js';
+import * as resumenCtrl from '../controllers/admin.resumen.controller.js';
 import {
   actualizarFotoSchema,
   reordenarGaleriaSchema,
@@ -61,6 +62,11 @@ adminRouter.use(autenticar);
 // poder LEERLO para anadir platos a su carta, pero no puede crear ni editar.
 // ---------------------------------------------------------------------------
 const soloAdmin = exigirRol('admin_grupo');
+
+// Lo que falta por rematar en la carta, para la portada del panel. Va sin
+// validacion de consulta porque no acepta parametros: el alcance sale del
+// token, no de la peticion.
+adminRouter.get('/resumen', asyncHandler(resumenCtrl.resumen));
 
 adminRouter.get('/platos', validarConsulta(listarPlatosSchema), asyncHandler(platosCtrl.getPlatos));
 adminRouter.get('/platos/:id', asyncHandler(platosCtrl.getPlato));

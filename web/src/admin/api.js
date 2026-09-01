@@ -102,6 +102,9 @@ export const adminApi = {
 
   // --- catalogo publico de apoyo -----------------------------------------
   restaurantes: () => get('/restaurantes'),
+  // Recuentos de lo que falta por rematar en la carta. El alcance (grupo o
+  // un solo local) lo decide el servidor a partir del token, no se le pasa.
+  resumen: () => get('/admin/resumen'),
   categorias: () => get('/categorias'),
   alergenos: () => get('/alergenos'),
 

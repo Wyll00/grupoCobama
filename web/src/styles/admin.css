@@ -535,6 +535,44 @@
 .panel-resumen h2 { margin: 0 0 0.4rem; font-size: 1.05rem; }
 .panel-resumen p { font-size: 0.9rem; max-width: 70ch; }
 
+
+/* --------------------------------------------------- lo que falta rematar */
+
+.pendientes-panel { margin-bottom: 1.5rem; }
+
+.pendientes-panel__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pendiente {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-s);
+  color: var(--texto);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.pendiente:hover,
+.pendiente:focus-visible { border-color: var(--ocre); background: var(--crema-hueso); }
+.pendiente strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+/* Los alergenos son obligatorios por ley: se marcan aparte para que no se lean
+   como una tarea mas de la lista. */
+.pendiente--grave { border-color: var(--mojo-rojo); }
+.pendiente--grave strong { color: var(--mojo-rojo); }
+
+.pendientes-panel__ok { font-size: 0.9rem; color: var(--mojo-verde); margin: 0; }
+
 /* ------------------------------------------------------------ modal */
 
 .modal__fondo {

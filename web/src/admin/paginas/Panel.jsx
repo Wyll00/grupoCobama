@@ -10,6 +10,7 @@ export default function Panel() {
   const { usuario, esAdmin, localFijo } = useAuth();
   const locales = useDatos(() => adminApi.restaurantes(), []);
   const catalogo = useDatos(() => adminApi.platos({ porPagina: 1 }), []);
+  const pendiente = useDatos(() => adminApi.resumen(), []);
 
   const visibles = (locales.datos ?? []).filter((l) => esAdmin || l.id === localFijo);
 
@@ -27,6 +28,44 @@ export default function Panel() {
       </header>
 
       <Aviso tipo="error">{locales.error?.message}</Aviso>
+
+      {/* Lo que falta por rematar.
+          Antes el panel solo abria puertas; ahora dice tambien por donde
+          empezar. Solo salen las lineas con algo pendiente: una lista de
+          tareas llena de ceros se deja de mirar a los dos dias. */}
+      {pendiente.datos && (
+        <section className="pendientes-panel">
+          {(() => {
+            const d = pendiente.datos;
+            const tareas = [
+              // Los alergenos van primero y en rojo: son obligatorios por ley,
+              // no una mejora estetica como la foto.
+              { n: d.sin_alergenos, grave: true, texto: 'sin alergenos', a: '/admin/platos?falta=alergenos' },
+              { n: d.reservas_pendientes, texto: 'reservas por confirmar', a: '/admin/reservas' },
+              { n: d.sin_traducir, texto: 'sin traducir', a: '/admin/platos?falta=idiomas' },
+              { n: d.sin_foto, texto: 'sin foto', a: '/admin/platos?falta=foto' },
+              { n: d.agotados, texto: 'agotados hoy', a: '/admin/carta' },
+              { n: d.fuera_de_carta, texto: 'fuera de toda carta', a: '/admin/platos?falta=carta' },
+            ].filter((t) => t.n > 0);
+
+            if (tareas.length === 0) {
+              return <p className="pendientes-panel__ok">La carta esta al dia. Nada pendiente.</p>;
+            }
+            return (
+              <ul className="pendientes-panel__lista">
+                {tareas.map((t) => (
+                  <li key={t.texto}>
+                    <Link to={t.a} className={t.grave ? 'pendiente pendiente--grave' : 'pendiente'}>
+                      <strong>{t.n}</strong>
+                      <span>{t.texto}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            );
+          })()}
+        </section>
+      )}
 
       <section className="tarjetas-panel">
         {visibles.map((local) => (
