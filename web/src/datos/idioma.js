@@ -151,3 +151,46 @@ export function ui(clave, idioma, valores) {
   if (valores) for (const [k, v] of Object.entries(valores)) s = s.replaceAll(`{${k}}`, v);
   return s;
 }
+
+/*
+  Las bebidas no cuentan para decidir si una carta esta traducida.
+
+  Sus nombres son casi todos marcas o palabras iguales en los tres idiomas
+  -Coca-Cola, Dorada, Rioja-, asi que no traducirlas no se nota. Contarlas si
+  hundiria a La Basilica al 54% teniendo la comida al 100%, y le quitaria el
+  ingles a la unica carta que lo tiene entero.
+*/
+const SIN_TRADUCIR_HACE_FALTA = new Set(['refrescos', 'cervezas', 'vinos', 'cafes-licores']);
+
+/*
+  Por debajo de esto, ofrecer el idioma hace mas dano que bien.
+
+  El 80% no es simetrico por casualidad: unos pocos platos en castellano dentro
+  de una carta en ingles se leen como "esto no esta traducido todavia", pero
+  unos pocos en ingles dentro de una carta en castellano se leen como que la
+  web esta rota. Y una carta que parece rota no se vuelve a abrir.
+*/
+const MINIMO = 0.8;
+
+/**
+ * Los idiomas que esta carta puede ofrecer de verdad.
+ *
+ * Se calcula de los platos que se van a ensenar, no de un ajuste que alguien
+ * tiene que acordarse de cambiar: el dia que se traduzca una carta, su bandera
+ * aparece sola, y si alguien anade treinta platos sin traducir, desaparece
+ * sola tambien.
+ */
+export function idiomasDisponibles(categorias) {
+  const platos = (categorias ?? [])
+    .filter((c) => !SIN_TRADUCIR_HACE_FALTA.has(c.slug))
+    .flatMap((c) => c.platos ?? []);
+
+  // Sin carta cargada todavia, solo el castellano: es preferible que la
+  // bandera aparezca un instante despues a que aparezca y se vaya.
+  if (platos.length === 0) return ['es'];
+
+  const sirve = (idioma) =>
+    platos.filter((p) => p[`nombre_${idioma}`]).length / platos.length >= MINIMO;
+
+  return ['es', ...['en', 'de'].filter(sirve)];
+}

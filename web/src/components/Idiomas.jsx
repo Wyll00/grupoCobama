@@ -59,9 +59,23 @@ const BANDERAS = [
   { codigo: 'de', nombre: 'Deutsch', Bandera: BanderaAlemania },
 ];
 
-export default function Idiomas() {
+export default function Idiomas({ disponibles }) {
   const [idioma, cambiar] = useIdioma();
-  const indice = Math.max(0, BANDERAS.findIndex((b) => b.codigo === idioma));
+
+  /*
+    Solo se ensenan los idiomas en los que ESTA carta esta traducida.
+
+    Sin esto, en Como en Casa -5 platos traducidos de 32- se pulsaba "EN" y
+    salia un plato en ingles rodeado de castellano. Eso no se lee como una
+    traduccion a medias, se lee como una web rota.
+
+    Con una sola bandera no se ensena nada: un mando de una posicion no es un
+    mando, es un adorno que ocupa sitio en la cabecera.
+  */
+  const lista = BANDERAS.filter((b) => (disponibles ?? ['es']).includes(b.codigo));
+  if (lista.length < 2) return null;
+
+  const indice = Math.max(0, lista.findIndex((b) => b.codigo === idioma));
 
   /*
     Flechas para moverse, como en cualquier grupo de opciones.
@@ -77,12 +91,12 @@ export default function Idiomas() {
   const teclas = (e) => {
     const salto = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
     let destino = null;
-    if (salto) destino = (indice + salto + BANDERAS.length) % BANDERAS.length;
+    if (salto) destino = (indice + salto + lista.length) % lista.length;
     else if (e.key === 'Home') destino = 0;
-    else if (e.key === 'End') destino = BANDERAS.length - 1;
+    else if (e.key === 'End') destino = lista.length - 1;
     if (destino === null) return;
     e.preventDefault();
-    cambiar(BANDERAS[destino].codigo);
+    cambiar(lista[destino].codigo);
     // El foco sigue a la eleccion: si se quedara donde estaba, la siguiente
     // flecha saldria del sitio equivocado.
     e.currentTarget.querySelectorAll('.idioma')[destino]?.focus();
@@ -96,6 +110,10 @@ export default function Idiomas() {
       role="radiogroup"
       aria-label="Idioma de la carta"
       onKeyDown={teclas}
+      // Cuantas posiciones tiene el mando: lo necesita el CSS para repartir el
+      // ancho de la corredera. Va como variable y no en la hoja porque depende
+      // de cuantos idiomas tenga traducidos esta carta concreta.
+      style={{ '--posiciones': lista.length }}
     >
       {/*
         La pastilla que se desliza. Va detras y no dentro de cada boton para
@@ -109,7 +127,7 @@ export default function Idiomas() {
         aria-hidden="true"
       />
 
-      {BANDERAS.map(({ codigo, nombre, Bandera }, i) => {
+      {lista.map(({ codigo, nombre, Bandera }, i) => {
         const activo = i === indice;
         return (
           <button

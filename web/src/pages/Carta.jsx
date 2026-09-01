@@ -6,7 +6,7 @@ import { api } from '../api/client.js';
 import IconoAlergeno from '../components/IconoAlergeno.jsx';
 import Idiomas from '../components/Idiomas.jsx';
 import { useIdioma } from '../hooks/useIdioma.js';
-import { texto, ui } from '../datos/idioma.js';
+import { texto, ui, idiomasDisponibles } from '../datos/idioma.js';
 import { Cargando, Error } from '../components/Estado.jsx';
 import Plato from '../components/Plato.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
@@ -83,6 +83,27 @@ export default function Carta() {
   });
 
   const todasLasCategorias = carta.datos?.categorias ?? [];
+
+  /*
+    Los idiomas que ESTA carta puede ofrecer, calculados de sus propios platos.
+    Ver `idiomasDisponibles` en datos/idioma.js: hoy solo La Basilica tiene la
+    comida traducida entera, y las otras tres no ensenan banderas.
+  */
+  const disponibles = idiomasDisponibles(todasLasCategorias);
+
+  /*
+    El idioma que se usa DE VERDAD en esta carta.
+
+    Si alguien dejo puesto el ingles en La Basilica y entra en Como en Casa,
+    que no lo tiene, hay que enseniarle el castellano: si no, veria los cinco
+    platos traducidos en ingles y los otros veintisiete en castellano, que es
+    exactamente el problema que se esta arreglando.
+
+    Y no se cambia el idioma guardado, solo el que se pinta aqui: al volver a
+    una carta que si lo tenga, sigue en ingles. Cambiarlo de verdad seria
+    quitarle al usuario una eleccion que hizo el, sin decirselo.
+  */
+  const idiomaEfectivo = disponibles.includes(idioma) ? idioma : 'es';
   const visibles = categoria
     ? todasLasCategorias.filter((c) => c.slug === categoria)
     : todasLasCategorias;
@@ -102,11 +123,11 @@ export default function Carta() {
               </Link>{' '}
               · {local.datos.municipio}
             </p>
-            <h1 style={{ marginBottom: '0.35rem' }}>{ui('carta.titulo', idioma)}</h1>
+            <h1 style={{ marginBottom: '0.35rem' }}>{ui('carta.titulo', idiomaEfectivo)}</h1>
           </div>
 
           {/* Las banderas todavia NO traducen: ver el comentario de Idiomas.jsx. */}
-          <Idiomas />
+          <Idiomas disponibles={disponibles} />
         </div>
       </section>
 
@@ -118,7 +139,7 @@ export default function Carta() {
               className={`pestana ${!categoria ? 'pestana--activa' : ''}`}
               onClick={() => actualizar('categoria', null)}
             >
-              {ui('carta.todo', idioma)}
+              {ui('carta.todo', idiomaEfectivo)}
             </button>
             {todasLasCategorias.map((c) => (
               <button
@@ -127,14 +148,14 @@ export default function Carta() {
                 className={`pestana ${categoria === c.slug ? 'pestana--activa' : ''}`}
                 onClick={() => actualizar('categoria', categoria === c.slug ? null : c.slug)}
               >
-                {texto(c, 'nombre', idioma)}
+                {texto(c, 'nombre', idiomaEfectivo)}
               </button>
             ))}
           </div>
 
           <details className="detalle-filtros" open={hayFiltros}>
             <summary>
-              {ui('filtros.abrir', idioma)}
+              {ui('filtros.abrir', idiomaEfectivo)}
               {sinAlergenos.length > 0 &&
                 ` · sin ${sinAlergenos.length} alergeno${sinAlergenos.length > 1 ? 's' : ''}`}
             </summary>
@@ -143,10 +164,10 @@ export default function Carta() {
               <input
                 type="search"
                 className="buscador"
-                placeholder={ui('filtros.buscar', idioma)}
+                placeholder={ui('filtros.buscar', idiomaEfectivo)}
                 value={textoBusqueda}
                 onChange={(e) => setTextoBusqueda(e.target.value)}
-                aria-label={ui('filtros.buscar', idioma)}
+                aria-label={ui('filtros.buscar', idiomaEfectivo)}
               />
 
               <div className="filtros" style={{ marginTop: '0.75rem' }}>
@@ -156,7 +177,7 @@ export default function Carta() {
                   onClick={() => actualizar('vegetariano', vegetariano ? null : '1')}
                   aria-pressed={vegetariano}
                 >
-                  {ui('etiqueta.vegetariano', idioma)}
+                  {ui('etiqueta.vegetariano', idiomaEfectivo)}
                 </button>
                 <button
                   type="button"
@@ -164,12 +185,12 @@ export default function Carta() {
                   onClick={() => actualizar('vegano', vegano ? null : '1')}
                   aria-pressed={vegano}
                 >
-                  {ui('etiqueta.vegano', idioma)}
+                  {ui('etiqueta.vegano', idiomaEfectivo)}
                 </button>
               </div>
 
               <p className="apagado" style={{ fontSize: '0.8rem', margin: '0.9rem 0 0.4rem' }}>
-                {ui('filtros.ocultar', idioma)}
+                {ui('filtros.ocultar', idiomaEfectivo)}
               </p>
               <div className="filtros">
                 {(alergenos.datos ?? []).map((a) => (
@@ -181,7 +202,7 @@ export default function Carta() {
                     aria-pressed={sinAlergenos.includes(a.slug)}
                   >
                     <IconoAlergeno alergeno={a} tamano={18} />
-                    <span>{texto(a, 'nombre', idioma)}</span>
+                    <span>{texto(a, 'nombre', idiomaEfectivo)}</span>
                   </button>
                 ))}
               </div>
@@ -214,15 +235,15 @@ export default function Carta() {
             <Cargando />
           ) : platosVisibles === 0 ? (
             <p className="vacio">
-              {ui('filtros.vacio', idioma)}
+              {ui('filtros.vacio', idiomaEfectivo)}
               <br />
-              {ui('filtros.vaciar', idioma)}
+              {ui('filtros.vaciar', idiomaEfectivo)}
             </p>
           ) : (
             visibles.map((c) => (
               <div key={c.id} className="categoria">
-                <h2 id={c.slug} data-cuenta={ui('carta.cuenta', idioma, { n: c.platos.length })}>
-                  {texto(c, 'nombre', idioma)}
+                <h2 id={c.slug} data-cuenta={ui('carta.cuenta', idiomaEfectivo, { n: c.platos.length })}>
+                  {texto(c, 'nombre', idiomaEfectivo)}
                 </h2>
 
                 {/* Cabezal de las dos columnas de precio. Solo si en esta
@@ -231,14 +252,14 @@ export default function Carta() {
                     buscar algo que no esta. */}
                 {c.platos.some((p) => p.precio_media !== null && p.precio_media !== undefined) && (
                   <div className="carta__columnas" aria-hidden="true">
-                    <span className="carta__columna">{ui('precio.media', idioma)}</span>
-                    <span className="carta__columna">{ui('precio.racion', idioma)}</span>
+                    <span className="carta__columna">{ui('precio.media', idiomaEfectivo)}</span>
+                    <span className="carta__columna">{ui('precio.racion', idiomaEfectivo)}</span>
                   </div>
                 )}
 
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {c.platos.map((plato) => (
-                    <Plato key={plato.carta_item_id} plato={plato} />
+                    <Plato key={plato.carta_item_id} plato={plato} idioma={idiomaEfectivo} />
                   ))}
                 </ul>
               </div>
@@ -260,7 +281,7 @@ export default function Carta() {
           {(alergenos.datos ?? []).length > 0 && (
             <section className="leyenda" aria-labelledby="leyenda-alergenos">
               <h2 id="leyenda-alergenos" className="leyenda__titulo">
-                {ui('leyenda.titulo', idioma)}
+                {ui('leyenda.titulo', idiomaEfectivo)}
               </h2>
 
               <ul className="leyenda__lista">
@@ -269,7 +290,7 @@ export default function Carta() {
                   .map((a) => (
                     <li key={a.id} className="leyenda__item">
                       <IconoAlergeno alergeno={a} tamano={30} />
-                      <span>{texto(a, 'nombre', idioma)}</span>
+                      <span>{texto(a, 'nombre', idiomaEfectivo)}</span>
                     </li>
                   ))}
               </ul>
@@ -292,19 +313,19 @@ export default function Carta() {
                   {(() => {
                     const frase = alergenos.datos
                       .filter((a) => !a.icono)
-                      .map((a) => texto(a, 'nombre', idioma).toLowerCase())
+                      .map((a) => texto(a, 'nombre', idiomaEfectivo).toLowerCase())
                       .join(' y ');
                     return frase.charAt(0).toUpperCase() + frase.slice(1);
                   })()}{' '}
-                  {ui('leyenda.sinDibujo', idioma)}
+                  {ui('leyenda.sinDibujo', idiomaEfectivo)}
                 </p>
               )}
             </section>
           )}
 
           <div className="aviso" style={{ marginTop: '2rem' }}>
-            <strong>{ui('aviso.alergenos.titulo', idioma)}</strong>{' '}
-            {ui('aviso.alergenos.texto', idioma)}
+            <strong>{ui('aviso.alergenos.titulo', idiomaEfectivo)}</strong>{' '}
+            {ui('aviso.alergenos.texto', idiomaEfectivo)}
           </div>
         </div>
       </section>

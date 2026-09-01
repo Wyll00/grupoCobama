@@ -1,5 +1,4 @@
 import IconoAlergeno from './IconoAlergeno.jsx';
-import { useIdioma } from '../hooks/useIdioma.js';
 import { texto, ui } from '../datos/idioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
@@ -76,8 +75,10 @@ function BanderaCanarias() {
   );
 }
 
-export default function Plato({ plato }) {
-  const [idioma] = useIdioma();
+export default function Plato({ plato, idioma = 'es' }) {
+  // El idioma lo decide la carta y baja por props: ella es la que sabe si esta
+  // traducida entera o hay que caer al castellano. Si cada plato lo leyera por
+  // su cuenta, en una carta a medias unos saldrian traducidos y otros no.
   // Campo a campo y no plato a plato: de 70 platos traducidos solo 30 tienen
   // descripcion, asi que uno a medias sale con el nombre traducido y la
   // descripcion en castellano en vez de con un hueco en blanco.

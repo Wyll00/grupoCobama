@@ -2587,7 +2587,11 @@ button {
 .idiomas {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* auto-fit y no un 3 fijo: una carta puede ofrecer dos idiomas en vez de
+     tres, y con las columnas escritas a mano quedaria un hueco vacio con la
+     corredera moviendose por sitios donde no hay nada. */
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   flex-shrink: 0;
   padding: 3px;
   border: 1px solid rgba(250, 246, 240, 0.28);
@@ -2601,7 +2605,9 @@ button {
   top: 3px;
   left: 3px;
   bottom: 3px;
-  width: calc((100% - 6px) / 3);
+  /* El ancho lo pone el numero de posiciones que haya, no un 3 fijo: se
+     calcula en el componente con --posiciones. */
+  width: calc((100% - 6px) / var(--posiciones, 3));
   border-radius: 999px;
   background: var(--ocre-claro);
   /*
