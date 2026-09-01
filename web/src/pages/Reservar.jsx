@@ -82,6 +82,27 @@ export default function Reservar() {
 
   const horasDisponibles = useMemo(() => tramos.datos?.tramos ?? [], [tramos.datos]);
 
+  /*
+    Las horas que rodean el hueco, sacadas de las que de verdad se ofrecen y no
+    de restarle un cuarto de hora a la franja.
+
+    La franja empieza a las 13:15 porque las 13:00 si se reservan, pero decirle
+    a un cliente "de 13:15 a 17:00" suena a hora inventada. Lo que quiere saber
+    es hasta cuando puede pedir mesa: "la ultima a las 13:00". Y si se saca de
+    la lista real, no puede contradecirla nunca.
+
+    `ultima` puede no existir: un sabado por la tarde ya han pasado todas las
+    de la manana y la lista empieza directamente a las 17:00. Por eso el aviso
+    tiene dos redacciones.
+  */
+  const [ultimaAntesDelHueco, primeraDespuesDelHueco] = useMemo(() => {
+    const franja = tramos.datos?.sinReservas;
+    if (!franja) return [null, null];
+    const antes = horasDisponibles.filter((h) => h < franja.desde);
+    const despues = horasDisponibles.filter((h) => h >= franja.hasta);
+    return [antes.at(-1) ?? null, despues[0] ?? franja.hasta];
+  }, [horasDisponibles, tramos.datos]);
+
   // Si la hora elegida deja de existir al cambiar de dia o de local, se limpia.
   useEffect(() => {
     if (form.hora && horasDisponibles.length > 0 && !horasDisponibles.includes(form.hora)) {
@@ -322,8 +343,9 @@ export default function Reservar() {
               {tramos.datos?.sinReservas && (
                 <div className="aviso">
                   <strong>
-                    De {tramos.datos.sinReservas.desde} a {tramos.datos.sinReservas.hasta} no
-                    cogemos reservas ese dia.
+                    {ultimaAntesDelHueco
+                      ? `Ese dia la ultima mesa a mediodia es a las ${ultimaAntesDelHueco}, y volvemos a reservar a partir de las ${primeraDespuesDelHueco}.`
+                      : `Ese dia no cogemos reservas hasta las ${primeraDespuesDelHueco}.`}
                   </strong>{' '}
                   La cocina esta abierta: esas mesas las guardamos para quien llega sin
                   reservar. Puedes venirte igual, o reservar antes o despues.
