@@ -57,6 +57,20 @@ const SELECT_RESERVA = `
  * la manana un lunes y en sala se encuentran con un cliente en la puerta
  * cuando todavia no han abierto.
  */
+/**
+ * Si una hora cae dentro de la franja que el local no reserva.
+ *
+ * El limite de arriba es EXCLUSIVO: con la franja de 13:00 a 17:00, las 17:00
+ * si se pueden reservar. Es a lo que suena "y a partir de las cinco otra vez".
+ */
+function enFranjaSinReservas(horario, minutos) {
+  if (!horario.sin_reservas_desde || !horario.sin_reservas_hasta) return false;
+  return (
+    minutos >= horaAMinutos(horario.sin_reservas_desde) &&
+    minutos < horaAMinutos(horario.sin_reservas_hasta)
+  );
+}
+
 export async function comprobarHorario(restauranteId, fecha, hora, { esManual = false } = {}) {
   const hoy = hoyEnCanarias();
 
@@ -74,7 +88,7 @@ export async function comprobarHorario(restauranteId, fecha, hora, { esManual = 
 
   const dia = diaSemanaDeFecha(fecha);
   const [filas] = await pool.execute(
-    `SELECT hora_apertura, hora_cierre, cerrado
+    `SELECT hora_apertura, hora_cierre, cerrado, sin_reservas_desde, sin_reservas_hasta
        FROM horarios WHERE restaurante_id = ? AND dia_semana = ? LIMIT 1`,
     [restauranteId, dia]
   );
@@ -95,6 +109,24 @@ export async function comprobarHorario(restauranteId, fecha, hora, { esManual = 
     );
   }
 
+  /*
+    La franja sin reservas. Se comprueba AQUI ademas de no ofrecerla en el
+    desplegable: el desplegable es una comodidad, y esto es la regla. Quien
+    llame a la API directamente -o tenga la pagina abierta de ayer, con las
+    horas de antes cargadas- se la salta si solo se filtra al pintar.
+
+    El encargado si puede: `esManual` es una reserva que entra por telefono y
+    la apunta alguien de la casa, que ya sabe si le queda sitio. La regla es
+    para el formulario publico.
+  */
+  if (!esManual && enFranjaSinReservas(horario, minutos)) {
+    throw ApiError.peticionInvalida(
+      `Ese dia no reservamos de ${formatearHora(horario.sin_reservas_desde)} a ` +
+        `${formatearHora(horario.sin_reservas_hasta)}: esas mesas se guardan para quien ` +
+        'llega sin reserva. Puedes venirte igual, o reservar antes o despues.'
+    );
+  }
+
   if (!esManual && fecha === hoy) {
     const ahora = ahoraEnCanarias();
     if (minutos < ahora.minutos + ANTELACION_MINIMA_MINUTOS) {
@@ -111,7 +143,7 @@ export async function comprobarHorario(restauranteId, fecha, hora, { esManual = 
 export async function tramosDisponibles(restauranteId, fecha) {
   const dia = diaSemanaDeFecha(fecha);
   const [filas] = await pool.execute(
-    `SELECT hora_apertura, hora_cierre, cerrado
+    `SELECT hora_apertura, hora_cierre, cerrado, sin_reservas_desde, sin_reservas_hasta
        FROM horarios WHERE restaurante_id = ? AND dia_semana = ? LIMIT 1`,
     [restauranteId, dia]
   );
@@ -131,10 +163,26 @@ export async function tramosDisponibles(restauranteId, fecha) {
   const tramos = [];
   // Se redondea al cuarto de hora siguiente para no ofrecer las 13:07.
   for (let m = Math.ceil(desde / 15) * 15; m <= ultima; m += 15) {
+    if (enFranjaSinReservas(horario, m)) continue;
     tramos.push(minutosAHora(m));
   }
 
-  return { cerrado: false, tramos };
+  /*
+    Se devuelve tambien la franja, no solo el hueco.
+
+    Sin esto, quien mire el desplegable un sabado ve que salta de 12:45 a
+    17:00 y no sabe si es que esta lleno, si la web falla o si el local cierra.
+    Un hueco sin explicacion se lee como un error. Con la franja, el formulario
+    puede decir por que.
+  */
+  const sinReservas = horario.sin_reservas_desde
+    ? {
+        desde: formatearHora(horario.sin_reservas_desde),
+        hasta: formatearHora(horario.sin_reservas_hasta),
+      }
+    : null;
+
+  return { cerrado: false, tramos, sinReservas };
 }
 
 async function conCodigoUnico(insertar) {

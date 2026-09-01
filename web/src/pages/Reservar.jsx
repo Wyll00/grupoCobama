@@ -308,6 +308,29 @@ export default function Reservar() {
               )}
 
               {/*
+                Por que faltan horas.
+
+                Sin esto, quien abra el desplegable un sabado ve que salta de
+                las 12:45 a las 17:00 y no sabe si esta lleno, si la web falla
+                o si el local cierra a mediodia. Un hueco sin explicacion se
+                lee como un error, y quien cree que la web esta rota no lo
+                intenta otra vez: se va.
+
+                Y dice que puede venirse igual, que es el motivo de que la
+                franja exista: esas mesas se guardan justo para eso.
+              */}
+              {tramos.datos?.sinReservas && (
+                <div className="aviso">
+                  <strong>
+                    De {tramos.datos.sinReservas.desde} a {tramos.datos.sinReservas.hasta} no
+                    cogemos reservas ese dia.
+                  </strong>{' '}
+                  La cocina esta abierta: esas mesas las guardamos para quien llega sin
+                  reservar. Puedes venirte igual, o reservar antes o despues.
+                </div>
+              )}
+
+              {/*
                 `autocomplete` en los tres campos personales. La mayoria de las
                 reservas se hacen desde el movil, muchas veces con prisa, y sin
                 esto el telefono no ofrece rellenar el nombre, el numero ni el
