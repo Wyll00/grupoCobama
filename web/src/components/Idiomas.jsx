@@ -61,21 +61,68 @@ const BANDERAS = [
 
 export default function Idiomas() {
   const [idioma, cambiar] = useIdioma();
+  const indice = Math.max(0, BANDERAS.findIndex((b) => b.codigo === idioma));
+
+  /*
+    Flechas para moverse, como en cualquier grupo de opciones.
+
+    Es lo que espera quien navega con teclado: en un radiogroup el tabulador
+    entra y sale del grupo entero y las flechas eligen dentro. Sin esto habria
+    que tabular tres veces para pasar tres banderas, y ademas cada parada
+    seria un sitio del que salir.
+
+    Inicio y Fin tambien, que en un grupo de tres es un detalle pero cuesta
+    dos lineas.
+  */
+  const teclas = (e) => {
+    const salto = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+    let destino = null;
+    if (salto) destino = (indice + salto + BANDERAS.length) % BANDERAS.length;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = BANDERAS.length - 1;
+    if (destino === null) return;
+    e.preventDefault();
+    cambiar(BANDERAS[destino].codigo);
+    // El foco sigue a la eleccion: si se quedara donde estaba, la siguiente
+    // flecha saldria del sitio equivocado.
+    e.currentTarget.querySelectorAll('.idioma')[destino]?.focus();
+  };
 
   return (
-    <div className="idiomas" role="group" aria-label="Idioma de la carta">
-      {BANDERAS.map(({ codigo, nombre, Bandera }) => {
-        const activo = idioma === codigo;
+    <div
+      className="idiomas"
+      // radiogroup y no un grupo de botones: es elegir UNO de tres, no pulsar
+      // tres cosas. Un lector de pantalla dice "1 de 3" y cual esta puesto.
+      role="radiogroup"
+      aria-label="Idioma de la carta"
+      onKeyDown={teclas}
+    >
+      {/*
+        La pastilla que se desliza. Va detras y no dentro de cada boton para
+        que pueda moverse de una posicion a otra: es UNA sola, y eso es lo que
+        hace que se lea como un interruptor y no como tres botones que se
+        encienden.
+      */}
+      <span
+        className="idiomas__corredera"
+        style={{ transform: `translateX(${indice * 100}%)` }}
+        aria-hidden="true"
+      />
+
+      {BANDERAS.map(({ codigo, nombre, Bandera }, i) => {
+        const activo = i === indice;
         return (
           <button
             key={codigo}
             type="button"
             className={`idioma ${activo ? 'idioma--activo' : ''}`}
             lang={codigo}
+            role="radio"
+            aria-checked={activo}
+            // Solo el elegido entra en el recorrido del tabulador; a los otros
+            // se llega con las flechas. Es como funciona un grupo de opciones.
+            tabIndex={activo ? 0 : -1}
             onClick={() => cambiar(codigo)}
-            // `aria-pressed` y no solo la clase: quien no ve la pantalla
-            // necesita saber cual esta puesto, y el color no se lo dice.
-            aria-pressed={activo}
             title={nombre}
           >
             <Bandera />

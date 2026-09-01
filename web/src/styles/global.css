@@ -2571,55 +2571,97 @@ button {
   gap: 1rem;
 }
 
+/*
+  Interruptor de tres posiciones: espanol, ingles, aleman.
+
+  Una sola pastilla que se desliza, no tres botones que se encienden. Es la
+  diferencia entre "hay tres cosas y una esta marcada" y "esto es un mando con
+  tres posiciones": lo segundo se entiende sin leer nada, que es de lo que se
+  trata cuando quien lo mira no habla el idioma en el que esta escrito.
+
+  Las tres columnas son iguales -1fr cada una- porque la corredera se mueve un
+  100% de su propio ancho por posicion. Con columnas de anchos distintos
+  habria que calcular el desplazamiento en pixeles y volveria a descuadrarse
+  cada vez que cambie una etiqueta.
+*/
 .idiomas {
-  display: flex;
-  gap: 0.4rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   flex-shrink: 0;
+  padding: 3px;
+  border: 1px solid rgba(250, 246, 240, 0.28);
+  border-radius: 999px;
+  background: rgba(250, 246, 240, 0.08);
+}
+
+.idiomas__corredera {
+  position: absolute;
+  /* Los 3px del padding, para que la pastilla quede dentro del carril. */
+  top: 3px;
+  left: 3px;
+  bottom: 3px;
+  width: calc((100% - 6px) / 3);
+  border-radius: 999px;
+  background: var(--ocre-claro);
+  /*
+    Mas larga y con una curva que frena al final en vez de cortarse en seco.
+    Los 0,28 de antes se leian como un salto; a 0,45 se sigue con la vista, que
+    es de lo que se trata: el movimiento explica que las tres posiciones son
+    del mismo mando.
+
+    El ultimo tramo de la curva pasa de 1 -sobrepasa un poco y vuelve-. Es lo
+    que hace que parezca que la pastilla tiene peso en vez de teletransportarse.
+  */
+  transition: transform 0.45s cubic-bezier(0.34, 1.35, 0.4, 1);
+  pointer-events: none;
+}
+
+/* Con el sistema puesto en "menos animaciones" salta en vez de deslizarse: ahi
+   el usuario ya ha dicho que no quiere movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  .idiomas__corredera {
+    transition: none;
+  }
 }
 
 .idioma {
+  /* Por encima de la corredera, que va en el mismo sitio. */
+  position: relative;
+  z-index: 1;
+
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.55rem;
-  border: 1px solid rgba(250, 246, 240, 0.28);
-  border-radius: var(--radio-s);
-  background: rgba(250, 246, 240, 0.08);
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.6rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
   color: var(--crema);
   font-family: var(--fuente-texto);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.idioma:hover:not(:disabled) {
-  background: rgba(250, 246, 240, 0.16);
-  border-color: rgba(250, 246, 240, 0.5);
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 /*
-  El que esta puesto.
-
-  Se marca con el borde y el fondo, no solo con el color de la letra: sobre la
-  cabecera oscura, tres banderas de colores ya compiten bastante entre ellas
-  como para distinguirlas ademas por un matiz del texto.
+  El elegido va en tinta oscura porque debajo tiene la pastilla ocre clara. El
+  crema de los otros dos sobre ocre daria 1,9 de contraste: ilegible justo en
+  el unico que hay que poder leer.
 */
 .idioma--activo {
-  border-color: var(--ocre-claro);
-  background: rgba(224, 169, 79, 0.22);
-  color: #fff;
+  color: var(--carbon);
 }
 
-/* Los otros dos, un poco apagados: asi el puesto se ve de un vistazo sin
-   tener que comparar. */
 .idioma:not(.idioma--activo) {
-  opacity: 0.72;
+  opacity: 0.6;
 }
 
 .idioma:not(.idioma--activo):hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 
 .idioma__bandera {

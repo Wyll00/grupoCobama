@@ -101,6 +101,26 @@ const UI = {
   'etiqueta.vegetariano': { es: 'Vegetariano', en: 'Vegetarian', de: 'Vegetarisch' },
   'etiqueta.canario': { es: 'Producto canario', en: 'Canarian produce', de: 'Kanarisches Produkt' },
   'alergeno.trazas': { es: 'trazas', en: 'traces', de: 'Spuren' },
+  'carta.titulo': { es: 'Carta', en: 'Menu', de: 'Speisekarte' },
+  'carta.todo': { es: 'Todo', en: 'All', de: 'Alle' },
+  'carta.cuenta': { es: '{n} platos', en: '{n} dishes', de: '{n} Gerichte' },
+  'filtros.abrir': { es: 'Buscar y filtrar', en: 'Search and filter', de: 'Suchen und filtern' },
+  'filtros.buscar': { es: 'Buscar un plato...', en: 'Search for a dish...', de: 'Gericht suchen...' },
+  'filtros.ocultar': {
+    es: 'Ocultar platos que contengan:',
+    en: 'Hide dishes containing:',
+    de: 'Gerichte ausblenden mit:',
+  },
+  'filtros.vacio': {
+    es: 'Ningun plato encaja con estos filtros.',
+    en: 'No dish matches these filters.',
+    de: 'Kein Gericht passt zu diesen Filtern.',
+  },
+  'filtros.vaciar': {
+    es: 'Prueba a quitar alguno.',
+    en: 'Try removing one.',
+    de: 'Entfernen Sie einen davon.',
+  },
   'aviso.alergenos.titulo': {
     es: 'Alergias e intolerancias.',
     en: 'Allergies and intolerances.',

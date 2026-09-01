@@ -102,7 +102,7 @@ export default function Carta() {
               </Link>{' '}
               · {local.datos.municipio}
             </p>
-            <h1 style={{ marginBottom: '0.35rem' }}>Carta</h1>
+            <h1 style={{ marginBottom: '0.35rem' }}>{ui('carta.titulo', idioma)}</h1>
           </div>
 
           {/* Las banderas todavia NO traducen: ver el comentario de Idiomas.jsx. */}
@@ -118,7 +118,7 @@ export default function Carta() {
               className={`pestana ${!categoria ? 'pestana--activa' : ''}`}
               onClick={() => actualizar('categoria', null)}
             >
-              Todo
+              {ui('carta.todo', idioma)}
             </button>
             {todasLasCategorias.map((c) => (
               <button
@@ -134,7 +134,7 @@ export default function Carta() {
 
           <details className="detalle-filtros" open={hayFiltros}>
             <summary>
-              Buscar y filtrar
+              {ui('filtros.abrir', idioma)}
               {sinAlergenos.length > 0 &&
                 ` · sin ${sinAlergenos.length} alergeno${sinAlergenos.length > 1 ? 's' : ''}`}
             </summary>
@@ -143,10 +143,10 @@ export default function Carta() {
               <input
                 type="search"
                 className="buscador"
-                placeholder="Buscar un plato..."
+                placeholder={ui('filtros.buscar', idioma)}
                 value={textoBusqueda}
                 onChange={(e) => setTextoBusqueda(e.target.value)}
-                aria-label="Buscar un plato"
+                aria-label={ui('filtros.buscar', idioma)}
               />
 
               <div className="filtros" style={{ marginTop: '0.75rem' }}>
@@ -156,7 +156,7 @@ export default function Carta() {
                   onClick={() => actualizar('vegetariano', vegetariano ? null : '1')}
                   aria-pressed={vegetariano}
                 >
-                  Vegetariano
+                  {ui('etiqueta.vegetariano', idioma)}
                 </button>
                 <button
                   type="button"
@@ -164,12 +164,12 @@ export default function Carta() {
                   onClick={() => actualizar('vegano', vegano ? null : '1')}
                   aria-pressed={vegano}
                 >
-                  Vegano
+                  {ui('etiqueta.vegano', idioma)}
                 </button>
               </div>
 
               <p className="apagado" style={{ fontSize: '0.8rem', margin: '0.9rem 0 0.4rem' }}>
-                Ocultar platos que contengan:
+                {ui('filtros.ocultar', idioma)}
               </p>
               <div className="filtros">
                 {(alergenos.datos ?? []).map((a) => (
@@ -214,14 +214,14 @@ export default function Carta() {
             <Cargando />
           ) : platosVisibles === 0 ? (
             <p className="vacio">
-              Ningun plato encaja con estos filtros.
+              {ui('filtros.vacio', idioma)}
               <br />
-              Prueba a quitar alguno.
+              {ui('filtros.vaciar', idioma)}
             </p>
           ) : (
             visibles.map((c) => (
               <div key={c.id} className="categoria">
-                <h2 id={c.slug} data-cuenta={`${c.platos.length} platos`}>
+                <h2 id={c.slug} data-cuenta={ui('carta.cuenta', idioma, { n: c.platos.length })}>
                   {texto(c, 'nombre', idioma)}
                 </h2>
 
