@@ -41,12 +41,11 @@ export default function Panel() {
               // Los alergenos van primero y en rojo: son obligatorios por ley,
               // no una mejora estetica como la foto.
               //
-              // Dice "sin confirmar" y no "sin revisar" porque los datos SI
-              // estan: ciento treinta y dos platos tienen sus alergenos
-              // puestos. Lo que falta es la firma, que es otra cosa y tiene su
-              // propio boton. "Sin revisar" hacia pensar que faltaban datos y
-              // mandaba a rellenar lo que ya estaba relleno.
-              { n: d.sin_revisar, grave: true, texto: 'sin confirmar por cocina', a: '/admin/platos?falta=revision' },
+              // Cuenta solo lo que de verdad esta sin hacer: ni alergenos
+              // puestos ni confirmacion de que no lleva. Un plato con sus
+              // alergenos asignados ya esta resuelto, y el agua mineral se
+              // quita de la lista pulsando confirmar una vez.
+              { n: d.alergenos_pendientes, grave: true, texto: 'sin alergenos ni confirmar', a: '/admin/platos?falta=alergenos' },
               { n: d.reservas_pendientes, texto: 'reservas por confirmar', a: '/admin/reservas' },
               { n: d.sin_traducir, texto: 'sin traducir', a: '/admin/platos?falta=idiomas' },
               { n: d.sin_foto, texto: 'sin foto', a: '/admin/platos?falta=foto' },

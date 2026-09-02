@@ -23,23 +23,26 @@ export async function resumen(req, res) {
   const filtroLocal = local ? 'AND c.restaurante_id = ?' : '';
   const arg = local ? [local] : [];
 
-  // Sin revisar, no "sin alergenos". No es lo mismo que un plato no lleve
-  // gluten a que nadie haya dicho todavia si lo lleva, y delante de un cliente
-  // celiaco esa diferencia es justo la que importa.
+  // Pendiente = ni tiene alergenos asignados NI nadie ha confirmado que no
+  // lleva ninguno. Las dos formas de estar resuelto valen:
   //
-  // Contar los que no tienen filas en plato_alergenos era ademas un contador
-  // que nunca podia llegar a cero: el agua mineral y el cafe solo no llevan
-  // ninguno de los catorce declarables y ahi seguirian para siempre. Un aviso
-  // que no se puede apagar se acaba ignorando, y con el se ignora el de al lado.
+  //   Ponerle los alergenos. Es como se trabaja aqui: asignarlos ES la
+  //   revision, y ciento veintisiete platos ya estan asi. Marcarlos como
+  //   pendientes era dar por no hecho un trabajo que si estaba hecho.
   //
-  // Esto en cambio baja segun se confirma cada plato, incluidos los que se
-  // confirman con cero alergenos, que es exactamente el trabajo que hay que
-  // hacer y el que deja constancia de que se hizo.
-  const [[{ sin_revisar }]] = await pool.execute(
-    `SELECT COUNT(DISTINCT p.id) AS sin_revisar
+  //   Confirmar que no lleva ninguno. Para el agua mineral y los veinticinco
+  //   refrescos y cafes que de verdad no llevan nada de los catorce
+  //   declarables. Sin esta segunda via el contador no podia llegar a cero
+  //   nunca, y un aviso que no se puede apagar se acaba ignorando.
+  //
+  // Asi el numero baja haciendo cualquiera de las dos cosas, que es lo que se
+  // espera de una lista de tareas.
+  const [[{ alergenos_pendientes }]] = await pool.execute(
+    `SELECT COUNT(DISTINCT p.id) AS alergenos_pendientes
        FROM platos p
        JOIN carta_items c ON c.plato_id = p.id AND c.activo = 1
-      WHERE p.alergenos_revisados_en IS NULL
+      WHERE NOT EXISTS (SELECT 1 FROM plato_alergenos a WHERE a.plato_id = p.id)
+        AND p.alergenos_revisados_en IS NULL
         ${filtroLocal}`,
     arg
   );
@@ -93,7 +96,7 @@ export async function resumen(req, res) {
 
   res.json({
     datos: {
-      sin_revisar,
+      alergenos_pendientes,
       sin_foto,
       sin_traducir,
       agotados,
