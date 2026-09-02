@@ -39,8 +39,11 @@ export default function Panel() {
             const d = pendiente.datos;
             const tareas = [
               // Los alergenos van primero y en rojo: son obligatorios por ley,
-              // no una mejora estetica como la foto.
-              { n: d.sin_alergenos, grave: true, texto: 'sin alergenos', a: '/admin/platos?falta=alergenos' },
+              // no una mejora estetica como la foto. Y se cuentan los SIN
+              // REVISAR, no los que no tienen ninguno: el agua mineral no lleva
+              // alergenos y no hay nada que arreglar en ella, pero que nadie
+              // haya confirmado la ensalada si es un pendiente de verdad.
+              { n: d.sin_revisar, grave: true, texto: 'sin revisar alergenos', a: '/admin/platos?falta=revision' },
               { n: d.reservas_pendientes, texto: 'reservas por confirmar', a: '/admin/reservas' },
               { n: d.sin_traducir, texto: 'sin traducir', a: '/admin/platos?falta=idiomas' },
               { n: d.sin_foto, texto: 'sin foto', a: '/admin/platos?falta=foto' },
