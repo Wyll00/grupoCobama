@@ -2862,14 +2862,14 @@ button {
 }
 
 /* ======================================================================
-   Menus de celebracion (portada, entre los locales y el pie)
+   Menus de celebracion (ficha del local, tras los recomendados)
 
    La tarjeta es oscura en los DOS temas, como el hero, la cabecera de la
    ficha y el pie: son los bloques de marca de esta web. Por eso lleva
    --carbon-suave y --crema y no --superficie y --texto, que si cambian de
-   noche. Sobre el crema de la portada, tres bloques oscuros seguidos son
-   ademas lo que separa "los menus" de "los locales" sin una linea de por
-   medio.
+   noche. Ademas separa los menus cerrados de los platos sueltos que quedan
+   justo encima, en los recomendados: no se piden igual, y viniendo los dos
+   con nombre y precio conviene que no se lean como la misma lista.
 
    Del rojo mojo sale el acento, pero aclarado: el #a63a2b de la paleta sobre
    carbon se queda en 2,4 de contraste y hay texto encima. Va como variable

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 import TarjetaLocal from '../components/TarjetaLocal.jsx';
-import MenusCelebracion from '../components/MenusCelebracion.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 
@@ -145,11 +144,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      {/* Los menus cerrados para grupos, entre los locales y el pie: quien
-          organiza una comida de veinte ya ha visto las cuatro casas y es
-          justo aqui donde se pregunta cuanto le va a costar. */}
-      <MenusCelebracion />
     </>
   );
 }

@@ -36,17 +36,17 @@ function minimoComun(menus) {
   return minimos.size === 1 ? [...minimos][0] : null;
 }
 
-export default function MenusCelebracion() {
-  const { datos: menus, cargando, error } = useApi((opts) => api.menusCelebracion(opts), []);
+export default function MenusCelebracion({ slug }) {
+  const { datos: menus, cargando, error } = useApi((opts) => api.menusCelebracion(slug, opts), [slug]);
 
   /*
     Sin menus no hay seccion, y no hay hueco donde estuvo.
 
-    Ni mientras carga, ni si la peticion falla, ni si la casa los quita de la
-    web. Es un anadido de la portada, no su contenido: un titulo "Menus de
-    celebracion" sobre un vacio, o un cartel de error donde deberia haber
-    comida, hacen mas dano que no ensenar nada. Los cuatro locales, que son lo
-    que la gente viene a buscar, ya estan arriba.
+    Ni mientras carga, ni si la peticion falla, ni si la casa no tiene. Es un
+    anadido de la ficha, no su contenido: un titulo "Menus de celebracion"
+    sobre un vacio, o un cartel de error donde deberia haber comida, hacen mas
+    dano que no ensenar nada. Y hoy solo los tiene La Basilica: las otras tres
+    casas no ensenan la seccion en vez de ensenarla vacia.
   */
   if (cargando || error || !menus?.length) return null;
 

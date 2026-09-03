@@ -4,6 +4,7 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import BotonReservar from '../components/BotonReservar.jsx';
 import Recomendados from '../components/Recomendados.jsx';
+import MenusCelebracion from '../components/MenusCelebracion.jsx';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
@@ -194,6 +195,12 @@ export default function Restaurante() {
       </section>
 
       <Recomendados local={local} platos={destacados.datos ?? []} />
+
+      {/* Detras de los recomendados y delante de la barra de reserva: lo
+          que se pide para veinte personas se mira despues de haber visto
+          la casa, y justo antes de dar al boton. Se pinta solo si este
+          local tiene menus. */}
+      <MenusCelebracion slug={slug} />
 
       <BarraReserva local={local} />
     </>
