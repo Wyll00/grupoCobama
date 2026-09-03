@@ -32,6 +32,7 @@ export const api = {
   destacados: (slug, opts) => get(`/restaurantes/${slug}/destacados`, {}, opts),
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
+  menusCelebracion: (opts) => get('/menus-celebracion', {}, opts),
   ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
   galeria: (slug, categoria, opts) =>
     get(slug ? `/restaurantes/${slug}/galeria` : '/galeria', { categoria }, opts),

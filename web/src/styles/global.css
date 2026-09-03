@@ -2860,3 +2860,223 @@ button {
     padding-block: 0.35rem;
   }
 }
+
+/* ======================================================================
+   Menus de celebracion (portada, entre los locales y el pie)
+
+   La tarjeta es oscura en los DOS temas, como el hero, la cabecera de la
+   ficha y el pie: son los bloques de marca de esta web. Por eso lleva
+   --carbon-suave y --crema y no --superficie y --texto, que si cambian de
+   noche. Sobre el crema de la portada, tres bloques oscuros seguidos son
+   ademas lo que separa "los menus" de "los locales" sin una linea de por
+   medio.
+
+   Del rojo mojo sale el acento, pero aclarado: el #a63a2b de la paleta sobre
+   carbon se queda en 2,4 de contraste y hay texto encima. Va como variable
+   de la tarjeta para no repetir el tono en las cinco reglas que lo usan.
+   ====================================================================== */
+
+.rejilla-menus {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  margin-top: 1.75rem;
+}
+
+@media (min-width: 760px) {
+  .rejilla-menus { grid-template-columns: repeat(2, 1fr); }
+
+  /* El que se queda solo en la ultima fila ocupa el ancho entero en vez de
+     dejar medio hueco vacio al lado. Hoy es el infantil, que ademas es el
+     mas corto y agradece el ancho; el dia que se anada un cuarto menu, la
+     rejilla vuelve sola a dos columnas iguales. */
+  .rejilla-menus > .menu:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+.menu {
+  --acento: #dd8f7f;
+  /* El mismo gris calido que ya usa el cartel de "proximamente" sobre el
+     carbon del hero. Las notas y --texto-suave no valen aqui: en modo claro
+     ese gris es casi negro y sobre la tarjeta oscura no se leeria. */
+  --tenue: #b9afa4;
+
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: var(--radio);
+  background: var(--carbon-suave);
+  color: var(--crema);
+}
+
+/* --- cabecera: nombre a la izquierda, precio en el circulo --- */
+
+.menu__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(250, 246, 240, 0.14);
+  margin-bottom: 1.25rem;
+}
+
+.menu__identidad { min-width: 0; }
+
+.menu__tipo {
+  margin: 0 0 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+/* Los titulares de la web van en --tinta, que en modo claro es casi negro:
+   sobre esta tarjeta hay que devolverlos al crema. */
+.menu h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--crema);
+}
+
+.menu__descripcion {
+  margin: 0.4rem 0 0;
+  font-size: 0.92rem;
+  color: var(--tenue);
+}
+
+/*
+  El precio, en su circulo.
+
+  Va con `min-width`/`min-height` y radio de pastilla en vez de un ancho fijo
+  con `border-radius: 50%`: con dos cifras es un circulo exacto, y si algun
+  dia hay un menu de 120 EUR se estira a pastilla en lugar de desbordarse.
+*/
+.menu__precio {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+
+  min-width: 92px;
+  min-height: 92px;
+  margin: 0;
+  padding: 0.5rem 0.8rem;
+
+  border-radius: 999px;
+  background: var(--acento);
+  color: var(--carbon);
+  text-align: center;
+}
+
+.menu__euros {
+  font-weight: 700;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+.menu__unidad {
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+/* Solo aparece cuando los menus no comparten minimo; si lo comparten, lo
+   dice la entradilla de la seccion. Ver MenusCelebracion.jsx. */
+.menu__minimo {
+  margin: -0.5rem 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--tenue);
+}
+
+/* --- cada bloque: entrantes, principal, postre, bebidas --- */
+
+.menu__seccion + .menu__seccion { margin-top: 1.25rem; }
+
+/*
+  El titulo del bloque, en pastilla.
+
+  Es un h4, asi que hereda la serif de los titulares: aqui se le quita a
+  proposito. Son cuatro etiquetas cortas que se leen de un vistazo -no se
+  leen, se localizan-, y en versalitas apretadas la serif se ensucia.
+*/
+.menu__seccion h4 {
+  display: inline-block;
+  margin: 0 0 0.45rem;
+  padding: 0.28rem 0.7rem;
+
+  border-radius: var(--radio-s);
+  background: var(--acento);
+  color: var(--carbon);
+
+  font-family: var(--fuente-texto);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/*
+  Como se sirve el bloque: "a compartir cada 4 personas", "a elegir uno por
+  persona".
+
+  No es un adorno del titulo. Es lo que decide si una mesa de veinte entiende
+  cuanta comida le llega por 25 EUR, y sin ello el precio no se puede juzgar.
+  Va en cursiva y en gris para que no compita con los platos, pero se lee.
+*/
+.menu__nota {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--tenue);
+}
+
+.menu__lineas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.menu__lineas li {
+  display: flex;
+  gap: 0.55rem;
+  font-size: 0.97rem;
+  line-height: 1.45;
+}
+
+/* La raya en el color de acento y fuera del texto: marca donde empieza cada
+   linea sin que la segunda linea de un plato largo se meta debajo de ella. */
+.menu__lineas li::before {
+  content: '–';
+  flex-shrink: 0;
+  color: var(--acento);
+}
+
+/* --- lo que entra en el precio sin pedirlo --- */
+
+.menu__incluye {
+  margin: 1.35rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(250, 246, 240, 0.14);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--crema);
+}
+
+/* En movil solo se encoge el circulo. El nombre y el precio siguen uno al
+   lado del otro, que a este ancho caben: medido a 375 px, la cabecera son
+   303 px, el circulo del precio mas caro ocupa 84 y el nombre 140, en una
+   sola linea. */
+@media (max-width: 480px) {
+  .menu { padding: 1.25rem; }
+
+  .menu__precio {
+    min-width: 76px;
+    min-height: 76px;
+  }
+
+  .menu h3 { font-size: 1.4rem; }
+}

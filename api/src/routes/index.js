@@ -11,6 +11,7 @@ import {
   getDestacados,
 } from '../controllers/restaurantes.controller.js';
 import { getCategorias, getAlergenos } from '../controllers/catalogo.controller.js';
+import { getMenusCelebracion } from '../controllers/menus.controller.js';
 import { getAr } from '../controllers/ar.controller.js';
 
 export const router = Router();
@@ -31,6 +32,10 @@ router.get('/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGal
 
 router.get('/categorias', asyncHandler(getCategorias));
 router.get('/alergenos', asyncHandler(getAlergenos));
+
+// Menus cerrados para grupos y celebraciones. Publico: se ensenan en la
+// portada, antes de que nadie llame a preguntar cuanto cuesta.
+router.get('/menus-celebracion', asyncHandler(getMenusCelebracion));
 
 // Ver el plato en la mesa. Publico: lo pide el cliente desde su movil.
 router.get('/platos/:id/ar', asyncHandler(getAr));
