@@ -1,6 +1,7 @@
 import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import { Aviso } from '../componentes/Campos.jsx';
+import IconoAlergeno from '../../components/IconoAlergeno.jsx';
 
 /**
  * Estadisticas de la carta.
@@ -55,7 +56,11 @@ export default function Estadisticas() {
               {d.alergenos.map((a) => (
                 <li key={a.id} className="alergeno-fila">
                   <div className="alergeno-fila__nombre">
-                    {a.icono && <img src={a.icono} alt="" width="22" height="22" />}
+                    {/* El componente compartido: sabe que los dibujos viven en
+                        /alergenos/, y sin nombre los marca como decorativos
+                        porque el texto va justo al lado. Mi <img> a pelo ponia
+                        el src sin la carpeta y salia roto en /admin. */}
+                    <IconoAlergeno alergeno={a} />
                     <span>{a.nombre}</span>
                   </div>
 
