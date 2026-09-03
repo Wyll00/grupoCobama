@@ -30,9 +30,9 @@ export const api = {
   restaurante: (slug, opts) => get(`/restaurantes/${slug}`, {}, opts),
   carta: (slug, filtros, opts) => get(`/restaurantes/${slug}/carta`, filtros, opts),
   destacados: (slug, opts) => get(`/restaurantes/${slug}/destacados`, {}, opts),
+  menusCelebracion: (slug, opts) => get(`/restaurantes/${slug}/menus-celebracion`, {}, opts),
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
-  menusCelebracion: (opts) => get('/menus-celebracion', {}, opts),
   ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
   galeria: (slug, categoria, opts) =>
     get(slug ? `/restaurantes/${slug}/galeria` : '/galeria', { categoria }, opts),

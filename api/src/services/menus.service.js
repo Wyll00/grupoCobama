@@ -1,23 +1,31 @@
 import { pool } from '../config/db.js';
 
 /**
- * Los menus de celebracion del grupo, con sus secciones y sus lineas.
+ * Los menus de celebracion que se sirven en un local, con secciones y lineas.
  *
- * Tres consultas y el armado en JavaScript, igual que la carta: una sola
- * consulta con dos JOIN devolveria el menu repetido tantas veces como lineas
- * tiene y habria que deshacerlo despues de todos modos.
+ * Devuelve los suyos MAS los que tengan restaurante_id NULL, que significa
+ * "del grupo, iguales en las cuatro casas". Hoy no hay ninguno asi -los tres
+ * que existen son de La Basilica-, pero es lo que quiere decir esa columna, y
+ * filtrarlos fuera los esconderia el dia que los haya.
  *
- * De momento solo los del grupo -restaurante_id NULL-. La columna admite el
- * id de una casa para cuando alguna tenga menus propios; ese dia esto recibe
- * un parametro y no hay que cambiar nada mas.
+ * Tres consultas y el armado en JavaScript, igual que la carta: una sola con
+ * dos JOIN devolveria el menu repetido tantas veces como lineas tiene y
+ * habria que deshacerlo despues de todos modos.
+ *
+ * Un slug que no existe devuelve lista vacia y no un error: esto es un
+ * anadido de la ficha, y el 404 del local lo da la consulta principal.
  */
-export async function menusDeCelebracion() {
+export async function menusDeCelebracion(slug) {
   const [menus] = await pool.execute(
     `SELECT id, slug, nombre, descripcion, precio_por_persona, unidad_precio,
             minimo_comensales, incluye
        FROM menus_grupo
-      WHERE activo = 1 AND restaurante_id IS NULL
-      ORDER BY orden, id`
+      WHERE activo = 1
+        AND (restaurante_id IS NULL
+             OR restaurante_id = (SELECT id FROM restaurantes
+                                   WHERE slug = ? AND activo = 1))
+      ORDER BY orden, id`,
+    [slug]
   );
 
   if (menus.length === 0) return [];

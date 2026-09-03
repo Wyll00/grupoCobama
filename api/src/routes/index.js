@@ -25,6 +25,8 @@ router.get('/restaurantes', asyncHandler(getRestaurantes));
 router.get('/restaurantes/:slug', asyncHandler(getRestaurante));
 router.get('/restaurantes/:slug/carta', asyncHandler(getCarta));
 router.get('/restaurantes/:slug/destacados', asyncHandler(getDestacados));
+// Menus cerrados para grupos, los de ese local mas los del grupo entero.
+router.get('/restaurantes/:slug/menus-celebracion', asyncHandler(getMenusCelebracion));
 router.get('/restaurantes/:slug/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGaleria));
 
 // Galeria del grupo: todas las fotos, de las cuatro casas y las sueltas.
@@ -32,10 +34,6 @@ router.get('/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGal
 
 router.get('/categorias', asyncHandler(getCategorias));
 router.get('/alergenos', asyncHandler(getAlergenos));
-
-// Menus cerrados para grupos y celebraciones. Publico: se ensenan en la
-// portada, antes de que nadie llame a preguntar cuanto cuesta.
-router.get('/menus-celebracion', asyncHandler(getMenusCelebracion));
 
 // Ver el plato en la mesa. Publico: lo pide el cliente desde su movil.
 router.get('/platos/:id/ar', asyncHandler(getAr));
