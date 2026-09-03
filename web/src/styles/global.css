@@ -2893,6 +2893,25 @@ button {
   .rejilla-menus > .menu:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 
+/*
+  Una casa con un solo menu no lo estira de lado a lado.
+
+  Las otras tres casas tienen un menu cada una, y con la regla de arriba
+  -unico, luego ultimo e impar- se llevaba las dos columnas enteras: mil
+  pixeles de ancho para lineas de cuatro palabras. El ojo tiene que cruzar
+  la tarjeta entera para volver al siguiente plato.
+
+  Se queda con el ancho de una columna larga y centrado. Va fuera de la
+  media query a proposito: en movil no cambia nada -ahi solo hay una
+  columna y el max-width no llega a apretar-, y asi la regla no depende de
+  que alguien recuerde tocar tambien la version ancha.
+*/
+.rejilla-menus > .menu:only-child {
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
+}
+
 .menu {
   --acento: #dd8f7f;
   /* El mismo gris calido que ya usa el cartel de "proximamente" sobre el
