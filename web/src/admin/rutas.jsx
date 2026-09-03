@@ -9,6 +9,7 @@ const Login = lazy(() => import('./paginas/Login.jsx'));
 const Panel = lazy(() => import('./paginas/Panel.jsx'));
 const CartaLocal = lazy(() => import('./paginas/CartaLocal.jsx'));
 const Platos = lazy(() => import('./paginas/Platos.jsx'));
+const Estadisticas = lazy(() => import('./paginas/Estadisticas.jsx'));
 const Reservas = lazy(() => import('./paginas/Reservas.jsx'));
 const Ocupacion = lazy(() => import('./paginas/Ocupacion.jsx'));
 const GaleriaAdmin = lazy(() => import('./paginas/Galeria.jsx'));
