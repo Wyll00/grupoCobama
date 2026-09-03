@@ -39,6 +39,7 @@ import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
 import * as galeriaCtrl from '../controllers/admin.galeria.controller.js';
 import * as resumenCtrl from '../controllers/admin.resumen.controller.js';
+import * as alergenosCtrl from '../controllers/admin.alergenos.controller.js';
 import {
   actualizarFotoSchema,
   reordenarGaleriaSchema,
@@ -67,6 +68,9 @@ const soloAdmin = exigirRol('admin_grupo');
 // validacion de consulta porque no acepta parametros: el alcance sale del
 // token, no de la peticion.
 adminRouter.get('/resumen', asyncHandler(resumenCtrl.resumen));
+
+// Mapa de alergenos de la carta, para la pagina de estadisticas.
+adminRouter.get('/alergenos/mapa', asyncHandler(alergenosCtrl.mapaAlergenos));
 
 adminRouter.get('/platos', validarConsulta(listarPlatosSchema), asyncHandler(platosCtrl.getPlatos));
 adminRouter.get('/platos/:id', asyncHandler(platosCtrl.getPlato));

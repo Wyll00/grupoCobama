@@ -33,6 +33,7 @@ export default function AdminLayout() {
             <NavLink to="/admin/platos">Catalogo</NavLink>
             <NavLink to="/admin/galeria">Galeria</NavLink>
             <NavLink to="/admin/ocupacion">Ocupacion</NavLink>
+            <NavLink to="/admin/estadisticas">Estadisticas</NavLink>
             {esAdmin && <NavLink to="/admin/usuarios">Usuarios</NavLink>}
           </nav>
 

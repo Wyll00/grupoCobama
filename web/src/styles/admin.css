@@ -573,6 +573,63 @@
 
 .pendientes-panel__ok { font-size: 0.9rem; color: var(--mojo-verde); margin: 0; }
 
+
+/* ------------------------------------------------- mapa de alergenos */
+
+.mapa-alergenos { margin-top: 1.5rem; }
+.mapa-alergenos h2 { margin: 0 0 0.3rem; font-size: 1.05rem; }
+.mapa-alergenos > p { margin-bottom: 1rem; font-size: 0.9rem; }
+
+.mapa-alergenos__lista { margin: 0; padding: 0; list-style: none; }
+
+.alergeno-fila {
+  display: grid;
+  grid-template-columns: 13rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+
+.alergeno-fila__nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
+.alergeno-fila__nombre img { flex: none; }
+
+/* La barra mide los platos que LO LLEVAN: cuanto mas larga, mas restrictivo es
+   ese alergeno en esta carta. Se lee de un vistazo cual es el que mas cierra
+   el menu, que aqui son los sulfitos por los vinos. */
+.alergeno-fila__barra {
+  height: 8px;
+  background: var(--crema-hueso);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.alergeno-fila__barra div {
+  height: 100%;
+  background: var(--ocre);
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+.alergeno-fila__cifras {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.alergeno-fila__cifras strong { font-variant-numeric: tabular-nums; }
+.alergeno-fila__cifras .verde { color: var(--mojo-verde); }
+
+@media (max-width: 46rem) {
+  .alergeno-fila { grid-template-columns: 1fr; gap: 0.35rem; }
+  .alergeno-fila__barra { order: 3; }
+}
+
 /* ------------------------------------------------------------ modal */
 
 .modal__fondo {

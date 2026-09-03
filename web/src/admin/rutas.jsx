@@ -31,6 +31,7 @@ export function rutasAdmin() {
         <Route index element={<Panel />} />
         <Route path="carta" element={<CartaLocal />} />
         <Route path="platos" element={<Platos />} />
+        <Route path="estadisticas" element={<Estadisticas />} />
         <Route path="reservas" element={<Reservas />} />
         <Route path="ocupacion" element={<Ocupacion />} />
         <Route path="galeria" element={<GaleriaAdmin />} />
