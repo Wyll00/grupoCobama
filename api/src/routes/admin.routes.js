@@ -44,7 +44,7 @@ import {
   actualizarFotoSchema,
   reordenarGaleriaSchema,
 } from '../esquemas/galeria.js';
-import { actualizarLocalSchema } from '../esquemas/locales.js';
+import { actualizarLocalSchema, horariosSchema } from '../esquemas/locales.js';
 import {
   crearReservaManualSchema,
   actualizarReservaSchema,
@@ -143,11 +143,25 @@ adminRouter.post(
 );
 
 // Ajustes del local. Mismo ambito que la portada: un encargado toca el suyo.
+adminRouter.get(
+  '/restaurantes/:restauranteId',
+  ambitoLocal(),
+  asyncHandler(localesCtrl.getLocal)
+);
 adminRouter.patch(
   '/restaurantes/:restauranteId',
   ambitoLocal(),
   validarCuerpo(actualizarLocalSchema),
   asyncHandler(localesCtrl.patchLocal)
+);
+
+// La semana entera de golpe. Ver putHorarios: media semana guardada seria
+// peor que ninguna.
+adminRouter.put(
+  '/restaurantes/:restauranteId/horarios',
+  ambitoLocal(),
+  validarCuerpo(horariosSchema),
+  asyncHandler(localesCtrl.putHorarios)
 );
 
 // Foto de portada del local, la que va de fondo en la cabecera de su ficha.

@@ -9,6 +9,7 @@ const Login = lazy(() => import('./paginas/Login.jsx'));
 const Panel = lazy(() => import('./paginas/Panel.jsx'));
 const CartaLocal = lazy(() => import('./paginas/CartaLocal.jsx'));
 const Platos = lazy(() => import('./paginas/Platos.jsx'));
+const Locales = lazy(() => import('./paginas/Locales.jsx'));
 const Estadisticas = lazy(() => import('./paginas/Estadisticas.jsx'));
 const Reservas = lazy(() => import('./paginas/Reservas.jsx'));
 const Ocupacion = lazy(() => import('./paginas/Ocupacion.jsx'));
@@ -32,6 +33,7 @@ export function rutasAdmin() {
         <Route index element={<Panel />} />
         <Route path="carta" element={<CartaLocal />} />
         <Route path="platos" element={<Platos />} />
+        <Route path="locales" element={<Locales />} />
         <Route path="estadisticas" element={<Estadisticas />} />
         <Route path="reservas" element={<Reservas />} />
         <Route path="ocupacion" element={<Ocupacion />} />
