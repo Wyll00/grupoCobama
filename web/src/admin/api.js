@@ -146,6 +146,14 @@ export const adminApi = {
     enviar('POST', `/admin/restaurantes/${restauranteId}/carta/nuevo-plato`, { cuerpo: datos }),
   qr: (restauranteId) => get(`/admin/restaurantes/${restauranteId}/qr`),
 
+  // --- datos del local ----------------------------------------------------
+  local: (restauranteId) => get(`/admin/restaurantes/${restauranteId}`),
+  guardarLocal: (restauranteId, datos) =>
+    enviar('PATCH', `/admin/restaurantes/${restauranteId}`, { cuerpo: datos }),
+  // La semana entera: el servidor la guarda de una pieza o no la guarda.
+  guardarHorarios: (restauranteId, horarios) =>
+    enviar('PUT', `/admin/restaurantes/${restauranteId}/horarios`, { cuerpo: { horarios } }),
+
   // --- portada del local --------------------------------------------------
   subirPortada: (restauranteId, formData) =>
     enviar('POST', `/admin/restaurantes/${restauranteId}/portada`, { formData }),

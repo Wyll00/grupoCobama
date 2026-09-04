@@ -1400,3 +1400,76 @@
   border-radius: var(--radio-s, 8px);
   background: rgba(192, 125, 42, 0.1);
 }
+
+/* ---------------------------------------------- datos del local ------ */
+
+/*
+  Los ajustes van en bloques con titulo en vez de un formulario seguido.
+  Son cuatro cosas distintas -como se presenta, donde esta, cuando abre y
+  como se le llama- y de corrido no se distingue donde acaba una y empieza
+  otra, que es cuando alguien cambia el telefono creyendo cambiar el de
+  WhatsApp.
+*/
+.bloque-ajustes {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio, 12px);
+  background: var(--superficie);
+}
+
+.bloque-ajustes > h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.bloque-ajustes__sub {
+  margin: 1.5rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.rejilla-campos {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .rejilla-campos { grid-template-columns: 1fr 1fr; }
+}
+
+/* El campo de pegar y su boton, en la misma linea mientras quepan. */
+.pegar-mapa {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pegar-mapa .entrada {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+
+/* Las horas no necesitan el ancho de un campo de texto, y a ancho completo
+   la tabla de siete dias se lee como un formulario largo en vez de como una
+   semana. */
+.tabla--horarios .entrada {
+  width: auto;
+  min-width: 7.5rem;
+}
+
+.acciones-guardar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: sticky;
+  bottom: 0;
+  padding: 0.85rem 0;
+  background: var(--fondo);
+}
+
+.acciones-guardar__hecho {
+  color: var(--mojo-verde);
+  font-weight: 600;
+}
