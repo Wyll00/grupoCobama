@@ -90,13 +90,16 @@ export default function Restaurante() {
             >
               Ver la carta
             </Link>
-            <Link
-              className="boton boton--secundario"
-              style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
-              to={`/${local.slug}/galeria`}
-            >
-              Ver fotos
-            </Link>
+            {/* Solo si esta casa tiene fotos que ensenar. Ver Home.jsx. */}
+            {local.fotos > 0 && (
+              <Link
+                className="boton boton--secundario"
+                style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
+                to={`/${local.slug}/galeria`}
+              >
+                Ver fotos
+              </Link>
+            )}
             <a
               className="boton boton--secundario"
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}

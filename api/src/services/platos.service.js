@@ -22,9 +22,52 @@ const normalizar = (p) => ({
   ancho_cm: p.ancho_cm === null ? null : Number(p.ancho_cm),
 });
 
-export async function listar({ categoria, q, activo, pagina, porPagina }) {
+/**
+ * El catalogo, filtrado.
+ *
+ * `falta` responde a los avisos de la portada del panel y tiene que contar
+ * EXACTAMENTE lo mismo que admin.resumen.controller.js: si el aviso dice 36 y
+ * la lista ensena 41, el que la abre deja de fiarse de los dos numeros. Por eso
+ * cada caso de aqui abajo repite la condicion de alli, incluido el detalle de
+ * que solo cuenta lo que un cliente puede ver -carta_items activos-.
+ *
+ * `alcance` trae el local del encargado, que es el mismo recorte que aplica el
+ * resumen: cuenta lo suyo, luego lista lo suyo. Va aparte de los filtros de la
+ * peticion a proposito, porque no lo elige quien pregunta. El resto del
+ * catalogo sigue viendose sin filtro: un encargado necesita el maestro entero
+ * para anadir platos a su carta.
+ */
+export async function listar({ categoria, q, activo, pagina, porPagina, falta }, alcance = {}) {
   const where = [];
   const params = [];
+
+  // "Lo sirve alguien hoy", acotado al local del encargado si lo hay.
+  const enCarta = alcance.restauranteId
+    ? 'EXISTS (SELECT 1 FROM carta_items ci WHERE ci.plato_id = p.id AND ci.activo = 1 AND ci.restaurante_id = ?)'
+    : 'EXISTS (SELECT 1 FROM carta_items ci WHERE ci.plato_id = p.id AND ci.activo = 1)';
+  const argCarta = alcance.restauranteId ? [alcance.restauranteId] : [];
+
+  if (falta === 'alergenos') {
+    // Pendiente = ni tiene alergenos NI nadie ha confirmado que no lleva.
+    where.push(`${enCarta}
+      AND NOT EXISTS (SELECT 1 FROM plato_alergenos a WHERE a.plato_id = p.id)
+      AND p.alergenos_revisados_en IS NULL`);
+    params.push(...argCarta);
+  }
+  if (falta === 'foto') {
+    where.push(`${enCarta} AND (p.imagen IS NULL OR p.imagen = '')`);
+    params.push(...argCarta);
+  }
+  if (falta === 'idiomas') {
+    where.push(`${enCarta} AND (p.nombre_en IS NULL OR p.nombre_en = ''
+                              OR p.nombre_de IS NULL OR p.nombre_de = '')`);
+    params.push(...argCarta);
+  }
+  if (falta === 'carta') {
+    // Del catalogo maestro y sin filtrar por local: un plato que no sirve
+    // nadie no es de nadie. El resumen solo se lo ensena al administrador.
+    where.push('NOT EXISTS (SELECT 1 FROM carta_items ci WHERE ci.plato_id = p.id)');
+  }
 
   if (categoria) {
     where.push('c.slug = ?');

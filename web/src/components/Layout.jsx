@@ -69,19 +69,31 @@ export default function Layout() {
               </ul>
             </div>
 
-            <div>
-              <h2>Fotos</h2>
-              <ul className="pie__lista">
-                <li>
-                  <Link to="/galeria">Galeria del grupo</Link>
-                </li>
-                {(locales ?? []).map((local) => (
-                  <li key={local.slug}>
-                    <Link to={`/${local.slug}/galeria`}>Fotos de {local.nombre}</Link>
+            {/*
+              La columna de fotos entera desaparece si no hay ninguna.
+
+              Eran seis enlaces -la del grupo y una por casa- y los seis caian
+              en "todavia no hay fotos publicadas aqui". Un pie lleno de
+              callejones sin salida hace parecer rota una web que funciona.
+              Cada casa se ensena solo si la suya tiene algo.
+            */}
+            {(locales ?? []).some((l) => l.fotos > 0) && (
+              <div>
+                <h2>Fotos</h2>
+                <ul className="pie__lista">
+                  <li>
+                    <Link to="/galeria">Galeria del grupo</Link>
                   </li>
-                ))}
-              </ul>
-            </div>
+                  {(locales ?? [])
+                    .filter((local) => local.fotos > 0)
+                    .map((local) => (
+                      <li key={local.slug}>
+                        <Link to={`/${local.slug}/galeria`}>Fotos de {local.nombre}</Link>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
 
             <div>
               <h2>Siguenos</h2>

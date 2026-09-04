@@ -1378,3 +1378,25 @@
 }
 
 .enlace--peligro { color: #b3261e; }
+
+/*
+  Aviso de lista recortada, en el catalogo de platos.
+
+  Sale cuando se llega desde uno de los pendientes de la portada -"36 sin
+  alergenos"-. Lleva el ocre del resto de avisos del panel, no el rojo: no
+  es un error, es un filtro puesto a proposito.
+*/
+.filtro-pendiente {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+
+  border: 1px solid rgba(192, 125, 42, 0.42);
+  border-radius: var(--radio-s, 8px);
+  background: rgba(192, 125, 42, 0.1);
+}

@@ -66,9 +66,20 @@ export default function Home() {
             >
               WhatsApp {GRUPO.whatsapp}
             </a>
-            <Link className="boton hero__galeria" to="/galeria">
-              Galeria
-            </Link>
+            {/*
+              El boton de la galeria solo si hay alguna foto publicada.
+
+              Un boton grande en la portada que lleva a "todavia no hay fotos"
+              es peor que no tenerlo: quien lo pulsa se lleva la impresion de
+              que la web esta a medias, y esa impresion no la arregla luego el
+              resto de la pagina. El dia que se suba la primera foto vuelve
+              solo, sin tocar nada.
+            */}
+            {(locales ?? []).some((l) => l.fotos > 0) && (
+              <Link className="boton hero__galeria" to="/galeria">
+                Galeria
+              </Link>
+            )}
 
             {/*
               La casa que viene, debajo de galeria y del ancho de los botones.
