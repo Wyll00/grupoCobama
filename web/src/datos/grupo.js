@@ -19,7 +19,20 @@ export const enlaceWhatsApp = (mensaje) =>
 
 export const enlaceTelefono = (telefono) => `tel:${telefono.replace(/\s/g, '')}`;
 
+/**
+ * A donde lleva el boton "Como llegar".
+ *
+ * `dir` y no `search`: con search se abre la ficha del sitio con un pin y hay
+ * que pulsar otra vez para que te lleve. Con dir, Maps abre la ruta desde
+ * donde estas, que es lo que promete el boton; en el movil, la app en modo
+ * navegacion. Quien solo queria ver donde cae lo tiene igual de facil, porque
+ * la ruta ensena el destino en el mapa.
+ *
+ * Con coordenadas cuando las hay, que son exactas y no dependen de que Google
+ * entienda el nombre. El nombre y la direccion quedan de respaldo: buscar
+ * "Como en Casa Guamasa" acierta casi siempre. Casi.
+ */
 export const enlaceMapa = ({ nombre, direccion, lat, lng }) =>
   lat && lng
-    ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nombre} ${direccion}`)}`;
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${nombre} ${direccion}`)}`;
