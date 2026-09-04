@@ -4,7 +4,13 @@ import { recorteSchema } from '../esquemas/catalogo.js';
 import { ApiError } from '../utils/ApiError.js';
 
 export async function getPlatos(req, res) {
-  res.json(await platos.listar(req.consulta));
+  // El local sale de la sesion y nunca de la peticion, igual que en el
+  // resumen: si viniera en la consulta, un encargado podria pedir el catalogo
+  // pendiente de otra casa cambiando un numero en la barra de direcciones.
+  const alcance =
+    req.usuario.rol === 'admin_grupo' ? {} : { restauranteId: req.usuario.restaurante_id };
+
+  res.json(await platos.listar(req.consulta, alcance));
 }
 
 export async function getPlato(req, res) {

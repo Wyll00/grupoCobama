@@ -4,7 +4,20 @@ import { estaAbiertoAhora, resumirHorarios } from '../utils/horarios.js';
 const CAMPOS_LISTADO = `
   r.id, r.slug, r.nombre, r.municipio, r.direccion, r.telefono, r.email,
   r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.imagen_portada, r.imagen_portada_movil, r.portada_estilo,
-  r.tiene_parking, r.orden, r.url_reservas
+  r.tiene_parking, r.orden, r.url_reservas,
+
+  -- Cuantas fotos ensenaria SU galeria. Incluye las del grupo -las que no
+  -- son de ningun local- porque la galeria de cada casa tambien las saca:
+  -- misma condicion que galeria.service.js, para que el enlace no prometa
+  -- una pagina vacia ni esconda una que tiene fotos.
+  --
+  -- Es para saber si el enlace se ensena, no para pintar un contador. Sale
+  -- aqui y no en una peticion aparte porque la portada, el pie y la ficha ya
+  -- piden estos datos: asi esconder los enlaces no cuesta ni una peticion
+  -- mas. Cuando se suban fotos, los enlaces vuelven solos.
+  (SELECT COUNT(*) FROM galeria g
+    WHERE g.activo = 1
+      AND (g.restaurante_id = r.id OR g.restaurante_id IS NULL)) AS fotos
 `;
 
 export async function listarRestaurantes() {
@@ -79,6 +92,7 @@ export async function obtenerIdPorSlug(slug) {
 function normalizar(r) {
   return {
     ...r,
+    fotos: Number(r.fotos ?? 0),
     tiene_parking: Boolean(r.tiene_parking),
     lat: r.lat === null ? null : Number(r.lat),
     lng: r.lng === null ? null : Number(r.lng),

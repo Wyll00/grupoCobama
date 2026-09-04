@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
@@ -7,8 +8,30 @@ import { puedeEditarPlato } from '../permisos.js';
 import Categorias from '../componentes/Categorias.jsx';
 import { Aviso, Boton, Entrada, Seleccion } from '../componentes/Campos.jsx';
 
+/**
+ * Los cuatro avisos de la portada del panel enlazan aqui con ?falta=...
+ * Esto es lo que ese enlace quiere decir una vez abierta la lista.
+ *
+ * Los textos son los mismos que los del aviso, palabra por palabra. Si alli
+ * pone "sin alergenos ni confirmar" y aqui pusiera "sin revisar", habria que
+ * pararse a pensar si son la misma lista.
+ */
+const QUE_FALTA = {
+  alergenos: 'sin alergenos ni confirmar',
+  foto: 'sin foto',
+  idiomas: 'sin traducir',
+  carta: 'fuera de toda carta',
+};
+
 export default function Platos() {
   const { esAdmin, localFijo } = useAuth();
+
+  // Vive en la direccion y no en el estado: asi el enlace del panel abre la
+  // lista ya filtrada, y la direccion se puede guardar o pasarsela a alguien.
+  // Un valor que no sea de los cuatro se ignora en vez de filtrar por nada.
+  const [parametros, setParametros] = useSearchParams();
+  const pedido = parametros.get('falta');
+  const falta = QUE_FALTA[pedido] ? pedido : '';
 
   const [filtros, setFiltros] = useState({ q: '', categoria: '', activo: 'todos', pagina: 1 });
   const [busqueda, setBusqueda] = useState('');
@@ -24,10 +47,24 @@ export default function Platos() {
     return () => clearTimeout(id);
   }, [busqueda]);
 
+  // Volver a la primera pagina al cambiar de aviso. Sin esto se puede acabar
+  // en la pagina 3 de una lista de doce platos, que sale vacia.
+  useEffect(() => {
+    setFiltros((f) => ({ ...f, pagina: 1 }));
+  }, [falta]);
+
+  const consulta = { ...filtros, falta };
+
   const categorias = useDatos(() => adminApi.categorias(), []);
-  const platos = useDatos(() => adminApi.platos(filtros), [JSON.stringify(filtros)]);
+  const platos = useDatos(() => adminApi.platos(consulta), [JSON.stringify(consulta)]);
 
   const resultado = platos.datos;
+
+  const quitarFiltroPendiente = () => {
+    const sinFalta = new URLSearchParams(parametros);
+    sinFalta.delete('falta');
+    setParametros(sinFalta, { replace: true });
+  };
 
   return (
     <>
@@ -60,6 +97,24 @@ export default function Platos() {
       )}
 
       <Aviso tipo="error">{platos.error?.message}</Aviso>
+
+      {/*
+        Que se vea que la lista esta recortada.
+
+        Una lista filtrada sin nada que lo diga se lee como un catalogo que ha
+        perdido platos. Y el numero va al lado del texto porque es el que traia
+        el aviso de la portada: si alli ponia 36 y aqui pone 36, el enlace
+        cumplio; si no coinciden, se ve al momento.
+      */}
+      {falta && (
+        <p className="filtro-pendiente">
+          <span>
+            Solo los platos <strong>{QUE_FALTA[falta]}</strong>
+            {resultado ? ` · ${resultado.paginacion.total}` : ''}
+          </span>
+          <Boton onClick={quitarFiltroPendiente}>Ver todo el catalogo</Boton>
+        </p>
+      )}
 
       <div className="filtros-admin">
         <Entrada
@@ -199,3 +254,4 @@ export default function Platos() {
     </>
   );
 }
+

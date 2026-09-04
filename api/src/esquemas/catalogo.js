@@ -45,6 +45,15 @@ export const listarPlatosSchema = z.object({
   activo: z.enum(['1', '0', 'todos']).optional().default('todos'),
   pagina: z.coerce.number().int().min(1).optional().default(1),
   porPagina: z.coerce.number().int().min(1).max(200).optional().default(50),
+
+  // Lo que le falta al plato. Son los cuatro avisos de la portada del panel,
+  // que enlazan aqui con ?falta=...
+  //
+  // Sin esto el filtro no llegaba: z.object() descarta las claves que no
+  // declara, asi que el enlace "36 sin alergenos" abria el catalogo entero,
+  // 171 platos, y habia que buscarlos a ojo. El aviso contaba bien y no
+  // llevaba a ningun sitio.
+  falta: z.enum(['alergenos', 'foto', 'idiomas', 'carta']).optional(),
 });
 
 // ------------------------------------------------------------- carta_items
