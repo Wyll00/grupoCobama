@@ -120,7 +120,7 @@ export default function Galeria() {
             <p className="apagado" style={{ marginTop: '2rem', fontSize: '0.9rem' }}>
               Cada casa tiene la suya:{' '}
               <Link to="/como-en-casa/galeria">Como en Casa</Link>,{' '}
-              <Link to="/la-basilica/galeria">La Basilica</Link>,{' '}
+              <Link to="/la-basilica/galeria">La Basílica</Link>,{' '}
               <Link to="/la-casa-del-mago/galeria">La Casa del Mago</Link> y{' '}
               <Link to="/el-descarado/galeria">El Descarado</Link>.
             </p>

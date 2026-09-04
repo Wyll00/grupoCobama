@@ -14,7 +14,7 @@ let plantilla = null;
 const GENERICO = {
   titulo: 'Grupo Cobama · Cocina canaria en Tenerife',
   descripcion:
-    'Cuatro guachinches de cocina canaria en Tenerife: Como en Casa, La Basilica, La Casa del Mago y El Descarado.',
+    'Cuatro guachinches de cocina canaria en Tenerife: Como en Casa, La Basílica, La Casa del Mago y El Descarado.',
   canonica: null,
   tipo: 'website',
   jsonLd: null,
