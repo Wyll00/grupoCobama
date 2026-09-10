@@ -1,3 +1,4 @@
+import { useEffect, useId, useRef, useState } from 'react';
 import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
@@ -13,20 +14,20 @@ import { useIdioma } from '../hooks/useIdioma.js';
  * ocurre: la carta avisa cuando la suya no esta en el idioma elegido y la
  * sirve en castellano, en vez de mezclar los dos sin decir nada.
  *
+ * ES UN DESPLEGABLE, no tres banderas en fila. En fila ocupaba el ancho de
+ * tres botones en una cabecera que ya lleva cinco enlaces y el interruptor de
+ * tema; en el movil eso empujaba la navegacion a una segunda linea. Asi ocupa
+ * uno y ademas se lee mejor: se ve en que idioma estas, que es lo que se mira
+ * primero, y las otras dos opciones aparecen solo cuando se van a usar.
+ *
  * Las banderas van DIBUJADAS y no como emoji. Windows no pinta los emoji de
  * bandera: se ven como las letras "ES", "GB" y "DE", asi que en la mitad de
  * los escritorios no habria ninguna bandera.
  *
  * Ojo, que es una decision con coste: una bandera es un pais, no un idioma. La
  * del Reino Unido para "ingles" deja fuera a media Europa que lo lee, y para
- * el aleman estan Austria y Suiza. Se eligio bandera a sabiendas; lo estandar
- * son las siglas, y cambiarlo es quitar el <svg> y dejar el codigo.
- *
- * Que hay traducido de verdad, para no prometer de mas: de 166 platos hay 70
- * con nombre en ingles y aleman, y 30 con descripcion. Lo que falte sale en
- * castellano, campo a campo -ver `texto()` en datos/idioma.js-. Un plato a
- * medias es mejor que un hueco en blanco, y muchisimo mejor en una carta con
- * alergenos.
+ * el aleman estan Austria y Suiza. Se eligio bandera a sabiendas; por eso al
+ * lado va siempre el codigo escrito, que es lo que de verdad lo identifica.
  */
 
 function BanderaEspana() {
@@ -63,6 +64,28 @@ function BanderaAlemania() {
   );
 }
 
+function Flecha() {
+  return (
+    <svg
+      className="idiomas__flecha"
+      viewBox="0 0 12 8"
+      width="10"
+      height="7"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M1 1.5 L6 6.5 L11 1.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const BANDERAS = [
   { codigo: 'es', nombre: 'Español', Bandera: BanderaEspana },
   { codigo: 'en', nombre: 'English', Bandera: BanderaReinoUnido },
@@ -71,91 +94,140 @@ const BANDERAS = [
 
 export default function Idiomas({ disponibles }) {
   const [idioma, cambiar] = useIdioma();
+  const [abierto, setAbierto] = useState(false);
+  const caja = useRef(null);
+  const boton = useRef(null);
+  const lista = useRef(null);
+  const idLista = useId();
 
   /*
     Sin `disponibles` salen los tres, que es el caso de la cabecera: la
     interfaz esta traducida entera y no hay nada que esconder.
 
     El filtro se queda por si algun dia hace falta recortar la lista en una
-    pantalla concreta. Con una sola bandera no se ensena nada: un mando de una
-    posicion no es un mando, es un adorno que ocupa sitio.
+    pantalla concreta. Con una sola opcion no se ensena nada: un desplegable
+    de un elemento no es un desplegable, es un adorno que ocupa sitio.
   */
-  const lista = disponibles ? BANDERAS.filter((b) => disponibles.includes(b.codigo)) : BANDERAS;
-  if (lista.length < 2) return null;
+  const opciones = disponibles
+    ? BANDERAS.filter((b) => disponibles.includes(b.codigo))
+    : BANDERAS;
 
-  const indice = Math.max(0, lista.findIndex((b) => b.codigo === idioma));
+  const indice = Math.max(0, opciones.findIndex((b) => b.codigo === idioma));
+  const actual = opciones[indice];
 
   /*
-    Flechas para moverse, como en cualquier grupo de opciones.
+    Cerrar al pulsar fuera y al perder el foco.
 
-    Es lo que espera quien navega con teclado: en un radiogroup el tabulador
-    entra y sale del grupo entero y las flechas eligen dentro. Sin esto habria
-    que tabular tres veces para pasar tres banderas, y ademas cada parada
-    seria un sitio del que salir.
-
-    Inicio y Fin tambien, que en un grupo de tres es un detalle pero cuesta
-    dos lineas.
+    Va en `pointerdown` y no en `click`: si se escucha el click, pulsar un
+    enlace de la navegacion con el menu abierto dispara antes la navegacion
+    que el cierre, y el menu se queda pintado encima de la pagina nueva.
   */
-  const teclas = (e) => {
-    const salto = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
-    let destino = null;
-    if (salto) destino = (indice + salto + lista.length) % lista.length;
-    else if (e.key === 'Home') destino = 0;
-    else if (e.key === 'End') destino = lista.length - 1;
-    if (destino === null) return;
-    e.preventDefault();
-    cambiar(lista[destino].codigo);
-    // El foco sigue a la eleccion: si se quedara donde estaba, la siguiente
-    // flecha saldria del sitio equivocado.
-    e.currentTarget.querySelectorAll('.idioma')[destino]?.focus();
+  useEffect(() => {
+    if (!abierto) return undefined;
+
+    const fuera = (e) => {
+      if (!caja.current?.contains(e.target)) setAbierto(false);
+    };
+    document.addEventListener('pointerdown', fuera);
+    return () => document.removeEventListener('pointerdown', fuera);
+  }, [abierto]);
+
+  // Al abrir, el foco va a la opcion puesta: quien navega con teclado empieza
+  // donde esta, no en la primera de la lista.
+  useEffect(() => {
+    if (!abierto) return;
+    lista.current?.querySelectorAll('[role="option"]')[indice]?.focus();
+  }, [abierto, indice]);
+
+  const cerrarYVolver = () => {
+    setAbierto(false);
+    boton.current?.focus();
   };
 
-  return (
-    <div
-      className="idiomas"
-      // radiogroup y no un grupo de botones: es elegir UNO de tres, no pulsar
-      // tres cosas. Un lector de pantalla dice "1 de 3" y cual esta puesto.
-      role="radiogroup"
-      aria-label="Idioma de la web"
-      onKeyDown={teclas}
-      // Cuantas posiciones tiene el mando: lo necesita el CSS para repartir el
-      // ancho de la corredera. Va como variable y no en la hoja porque depende
-      // de cuantos idiomas tenga traducidos esta carta concreta.
-      style={{ '--posiciones': lista.length }}
-    >
-      {/*
-        La pastilla que se desliza. Va detras y no dentro de cada boton para
-        que pueda moverse de una posicion a otra: es UNA sola, y eso es lo que
-        hace que se lea como un interruptor y no como tres botones que se
-        encienden.
-      */}
-      <span
-        className="idiomas__corredera"
-        style={{ transform: `translateX(${indice * 100}%)` }}
-        aria-hidden="true"
-      />
+  const elegir = (codigo) => {
+    cambiar(codigo);
+    cerrarYVolver();
+  };
 
-      {lista.map(({ codigo, nombre, Bandera }, i) => {
-        const activo = i === indice;
-        return (
-          <button
-            key={codigo}
-            type="button"
-            className={`idioma ${activo ? 'idioma--activo' : ''}`}
-            lang={codigo}
-            role="radio"
-            aria-checked={activo}
-            // Solo el elegido entra en el recorrido del tabulador; a los otros
-            // se llega con las flechas. Es como funciona un grupo de opciones.
-            tabIndex={activo ? 0 : -1}
-            onClick={() => cambiar(codigo)}
-            title={nombre}
-          >
-            <Bandera />
-            <span className="idioma__codigo">{codigo.toUpperCase()}</span>
-          </button>
-        );
-      })}
+  /* Las teclas de un desplegable de toda la vida: abajo abre, escape cierra. */
+  const teclasBoton = (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setAbierto(true);
+    }
+  };
+
+  const teclasLista = (e) => {
+    const salto = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+    let destino = null;
+
+    if (salto) destino = (indice + salto + opciones.length) % opciones.length;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = opciones.length - 1;
+    else if (e.key === 'Escape' || e.key === 'Tab') {
+      cerrarYVolver();
+      return;
+    } else return;
+
+    e.preventDefault();
+    // Moverse por la lista CAMBIA el idioma, como en un <select> nativo: se
+    // ve el efecto de cada paso en vez de tener que confirmar a ciegas.
+    cambiar(opciones[destino].codigo);
+  };
+
+  if (opciones.length < 2) return null;
+
+  return (
+    <div className="idiomas" ref={caja}>
+      <button
+        type="button"
+        ref={boton}
+        className="idiomas__actual"
+        // haspopup + expanded + controls: es lo que hace que un lector de
+        // pantalla lo anuncie como un desplegable y diga si esta abierto.
+        aria-haspopup="listbox"
+        aria-expanded={abierto}
+        aria-controls={idLista}
+        aria-label={`Idioma: ${actual.nombre}`}
+        onClick={() => setAbierto((v) => !v)}
+        onKeyDown={teclasBoton}
+      >
+        <actual.Bandera />
+        <span className="idioma__codigo">{actual.codigo.toUpperCase()}</span>
+        <Flecha />
+      </button>
+
+      {abierto && (
+        <ul
+          className="idiomas__menu"
+          id={idLista}
+          ref={lista}
+          role="listbox"
+          aria-label="Idioma de la web"
+          onKeyDown={teclasLista}
+        >
+          {opciones.map(({ codigo, nombre, Bandera }, i) => {
+            const puesto = i === indice;
+            return (
+              <li key={codigo}>
+                <button
+                  type="button"
+                  className={`idiomas__opcion ${puesto ? 'idiomas__opcion--puesta' : ''}`}
+                  lang={codigo}
+                  role="option"
+                  aria-selected={puesto}
+                  tabIndex={puesto ? 0 : -1}
+                  onClick={() => elegir(codigo)}
+                >
+                  <Bandera />
+                  <span className="idiomas__nombre">{nombre}</span>
+                  <span className="idioma__codigo">{codigo.toUpperCase()}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

@@ -37,6 +37,7 @@ import * as categoriasCtrl from '../controllers/admin.categorias.controller.js';
 import * as ocupacionCtrl from '../controllers/admin.ocupacion.controller.js';
 import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
+import * as estadoCtrl from '../controllers/admin.estado.controller.js';
 import * as galeriaCtrl from '../controllers/admin.galeria.controller.js';
 import * as resumenCtrl from '../controllers/admin.resumen.controller.js';
 import * as alergenosCtrl from '../controllers/admin.alergenos.controller.js';
@@ -68,6 +69,14 @@ const soloAdmin = exigirRol('admin_grupo');
 // validacion de consulta porque no acepta parametros: el alcance sale del
 // token, no de la peticion.
 adminRouter.get('/resumen', asyncHandler(resumenCtrl.resumen));
+
+// Que esta conectado de verdad: CoverManager, correo, reservas sin atender.
+//
+// Nace de una revision externa que no pudo comprobar si las reservas llegan a
+// CoverManager, y se quedo con la duda de cuanto trabajo manual habia detras.
+// Esa duda no se contesta leyendo el codigo: hay que verlo en el sistema que
+// esta corriendo. Solo admin_grupo.
+adminRouter.get('/estado', soloAdmin, asyncHandler(estadoCtrl.getEstado));
 
 // Mapa de alergenos de la carta, para la pagina de estadisticas.
 adminRouter.get('/alergenos/mapa', asyncHandler(alergenosCtrl.mapaAlergenos));

@@ -166,6 +166,25 @@ const UI = {
     de: 'Lokale werden geladen...',
   },
 
+  // ---- fotos de la portada ----
+  // Copiados de los mismos platos en la carta: dos nombres distintos para el
+  // mismo plato en la misma web es peor que no traducirlo.
+  'portada.papas': {
+    es: 'Papas arrugadas con mojos',
+    en: 'Canarian wrinkled potatoes with mojo sauces',
+    de: 'Kanarische Runzelkartoffeln mit Mojo-Saucen',
+  },
+  'portada.queso': {
+    es: 'Queso asado con mojo',
+    en: 'Grilled cheese with mojo sauce',
+    de: 'Gegrillter Käse mit Mojo-Sauce',
+  },
+  'portada.cabra': {
+    es: 'Carne cabra',
+    en: 'Goat stew',
+    de: 'Ziegenragout',
+  },
+
   // ---- tarjeta de cada local ----
   'tarjeta.reservar': { es: 'Reservar', en: 'Book', de: 'Reservieren' },
   'tarjeta.llamar': { es: 'Llamar', en: 'Call', de: 'Anrufen' },

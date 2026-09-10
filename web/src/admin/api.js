@@ -105,6 +105,9 @@ export const adminApi = {
   // Recuentos de lo que falta por rematar en la carta. El alcance (grupo o
   // un solo local) lo decide el servidor a partir del token, no se le pasa.
   resumen: () => get('/admin/resumen'),
+  // Que esta conectado de verdad: CoverManager, correo, purga. Solo
+  // admin_grupo; el servidor lo rechaza para los demas.
+  estado: (opts) => get('/admin/estado', opts),
   // Mapa de alergenos de la carta, para la pagina de estadisticas.
   mapaAlergenos: () => get('/admin/alergenos/mapa'),
   categorias: () => get('/categorias'),
