@@ -27,7 +27,7 @@ export const LEGAL = {
   // --- Identificacion (LSSI art. 10) --------------------------------------
   razonSocial: 'PENDIENTE — razon social completa, p. ej. "Cobama Restauracion, S.L."',
   nif: 'PENDIENTE — CIF/NIF',
-  domicilio: 'PENDIENTE — domicilio social completo con codigo postal',
+  domicilio: 'PENDIENTE — domicilio social completo con código postal',
   registro: null, // p. ej. 'Registro Mercantil de Santa Cruz de Tenerife, tomo X, folio Y, hoja Z'
 
   // --- Contacto para ejercer derechos -------------------------------------
@@ -46,7 +46,7 @@ export const LEGAL = {
   conservacion: {
     reservaMeses: 12,
     reservaMotivo:
-      'para gestionar la reserva, poder atender una reclamacion posterior y llevar el control de asistencia',
+      'para gestionar la reserva, poder atender una reclamación posterior y llevar el control de asistencia',
     marketingMeses: null, // hasta que la persona se de de baja
   },
 
@@ -63,7 +63,7 @@ export const LEGAL = {
   encargados: [
     {
       nombre: 'CoverManager',
-      para: 'gestion de las reservas y del libro de mesas',
+      para: 'gestión de las reservas y del libro de mesas',
       pais: 'Espana (UE)',
       contrato: false,
     },
@@ -75,7 +75,7 @@ export const LEGAL = {
     },
     {
       nombre: 'PENDIENTE — proveedor de correo',
-      para: 'envio de los avisos de reserva',
+      para: 'envío de los avisos de reserva',
       pais: 'PENDIENTE',
       contrato: false,
     },

@@ -19,7 +19,7 @@ export default function Estadisticas() {
     <>
       <header className="pagina__cabecera">
         <div>
-          <h1>Estadisticas de la carta</h1>
+          <h1>Estadísticas de la carta</h1>
           <p className="apagado">
             Que puede comer alguien con una intolerancia, plato a plato.
           </p>
@@ -34,7 +34,7 @@ export default function Estadisticas() {
             <h2>Cobertura</h2>
             <p className="apagado">
               De <strong>{d.en_carta}</strong> platos servidos,{' '}
-              <strong>{d.con_datos}</strong> tienen informacion de alergenos.
+              <strong>{d.con_datos}</strong> tienen información de alérgenos.
               {d.sin_datos > 0 && (
                 <>
                   {' '}Los <strong>{d.sin_datos}</strong> restantes no cuentan como aptos
@@ -48,7 +48,7 @@ export default function Estadisticas() {
           <section className="mapa-alergenos">
             <h2>Los catorce declarables</h2>
             <p className="apagado">
-              Sobre los {d.con_datos} platos con informacion. Los que no la tienen
+              Sobre los {d.con_datos} platos con información. Los que no la tienen
               quedan fuera de la cuenta a proposito.
             </p>
 

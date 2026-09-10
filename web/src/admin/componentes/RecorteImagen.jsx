@@ -157,7 +157,7 @@ export default function RecorteImagen({
 
           <p className="recorte__nota">
             {nota ??
-              'Se guardara en 4:3, convertida a WebP, en dos tamanos: 1200x900 para la ficha y 400x300 para los listados.'}
+              'Se guardará en 4:3, convertida a WebP, en dos tamaños: 1200x900 para la ficha y 400x300 para los listados.'}
           </p>
         </>
       )}

@@ -38,9 +38,9 @@ export default function GaleriaAdmin() {
     <>
       <header className="pagina__cabecera">
         <div>
-          <h1>Galeria</h1>
+          <h1>Galería</h1>
           <p className="apagado">
-            Las fotos que se ven en la web. Las del grupo salen ademas en la galeria de
+            Las fotos que se ven en la web. Las del grupo salen además en la galería de
             los cuatro locales.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function GaleriaAdmin() {
       {fotos.cargando ? (
         <p className="apagado">Cargando fotos...</p>
       ) : (fotos.datos ?? []).length === 0 ? (
-        <p className="apagado">Todavia no hay fotos aqui. Sube la primera.</p>
+        <p className="apagado">Todavía no hay fotos aquí. Sube la primera.</p>
       ) : (
         <ul className="galeria-admin">
           {fotos.datos.map((foto) => (
@@ -117,7 +117,7 @@ function SubirFoto({ destino, onSubida }) {
 
   return (
     <div className="subir-fotos">
-      <Campo etiqueta="Que son estas fotos" ayuda="Se puede cambiar despues, foto a foto.">
+      <Campo etiqueta="Que son estas fotos" ayuda="Se puede cambiar después, foto a foto.">
         <Seleccion value={categoria} onChange={(e) => setCategoria(e.target.value)}>
           {CATEGORIAS.map((c) => (
             <option key={c.valor} value={c.valor}>
@@ -141,7 +141,7 @@ function SubirFoto({ destino, onSubida }) {
       </label>
 
       <p className="apagado subir-fotos__nota">
-        Se pueden elegir varias de golpe. No hace falta recortarlas: aqui las fotos
+        Se pueden elegir varias de golpe. No hace falta recortarlas: aquí las fotos
         conservan su encuadre.
       </p>
 
@@ -199,7 +199,7 @@ function FichaFoto({ foto, onCambio }) {
             ello, pero tiene que verse que falta. */}
         {!foto.alt && (
           <p className="galeria-admin__pendiente">
-            <strong>Sin describir.</strong> Quien no ve la foto no sabe que hay en ella,
+            <strong>Sin describir.</strong> Quien no ve la foto no sabe qué hay en ella,
             y los buscadores tampoco.
           </p>
         )}

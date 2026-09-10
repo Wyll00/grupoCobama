@@ -181,8 +181,8 @@ export default function Locales() {
         <div>
           <h1>Datos del local</h1>
           <p className="apagado">
-            Lo que sale en su ficha: donde esta, como se llega, a que hora abre y por
-            donde se le llama.
+            Lo que sale en su ficha: dónde está, cómo se llega, a qué hora abre y por
+            dónde se le llama.
           </p>
         </div>
 
@@ -207,14 +207,14 @@ export default function Locales() {
       <Aviso tipo="error">{guardado.error?.message}</Aviso>
 
       <section className="bloque-ajustes">
-        <h2>Como se presenta</h2>
+        <h2>Cómo se presenta</h2>
         <div className="rejilla-campos">
           <Campo etiqueta="Nombre">
             <Entrada {...campo('nombre')} maxLength={120} />
           </Campo>
           <Campo
             etiqueta="Frase corta"
-            ayuda="La linea que acompana al nombre en la portada y en la cabecera."
+            ayuda="La línea que acompaña al nombre en la portada y en la cabecera."
           >
             <Entrada {...campo('reclamo')} maxLength={180} />
           </Campo>
@@ -225,13 +225,13 @@ export default function Locales() {
           invita a preguntar como se activa.
         */}
         <p className="campo__ayuda">
-          La direccion de la ficha es <code>/{guardado.datos?.slug}</code> y no se cambia
-          desde aqui: es la que llevan impresa los codigos QR de las mesas.
+          La dirección de la ficha es <code>/{guardado.datos?.slug}</code> y no se cambia
+          desde aquí: es la que llevan impresa los códigos QR de las mesas.
         </p>
       </section>
 
       <section className="bloque-ajustes">
-        <h2>Donde esta</h2>
+        <h2>Dónde está</h2>
         <div className="rejilla-campos">
           <Campo etiqueta="Direccion">
             <Entrada {...campo('direccion')} maxLength={200} />
@@ -249,8 +249,8 @@ export default function Locales() {
 
         <h3 className="bloque-ajustes__sub">El punto del mapa</h3>
         <p className="campo__ayuda">
-          Es lo que usa el boton <strong>Como llegar</strong> de la ficha. Pega la
-          direccion de la ficha del local en Google Maps y se rellena sola.
+          Es lo que usa el botón <strong>Cómo llegar</strong> de la ficha. Pega la
+          dirección de la ficha del local en Google Maps y se rellena sola.
         </p>
 
         <div className="pegar-mapa">
@@ -258,7 +258,7 @@ export default function Locales() {
             value={pegado}
             onChange={(e) => setPegado(e.target.value)}
             placeholder="https://www.google.com/maps/place/..."
-            aria-label="Direccion de Google Maps"
+            aria-label="Dirección de Google Maps"
           />
           <Boton onClick={aplicarPegado} disabled={!leido}>
             Leer coordenadas
@@ -268,15 +268,15 @@ export default function Locales() {
         {pegado && !leido && (
           <p className="campo__error">
             {esEnlaceCorto(pegado)
-              ? 'Ese es un enlace corto y no lleva las coordenadas dentro. Abrelo en el navegador y copia de la barra la direccion larga.'
-              : 'No encuentro coordenadas ahi dentro.'}
+              ? 'Ese es un enlace corto y no lleva las coordenadas dentro. Ábrelo en el navegador y copia de la barra la dirección larga.'
+              : 'No encuentro coordenadas ahí dentro.'}
           </p>
         )}
 
         {leido?.fuente === 'vista' && (
           <p className="campo__error">
             Eso es el centro del mapa, no el sitio: puede quedarse a un par de cientos de
-            metros. Abre la ficha del local en Maps y copia esa direccion.
+            metros. Abre la ficha del local en Maps y copia esa dirección.
           </p>
         )}
 
@@ -315,13 +315,13 @@ export default function Locales() {
         <h2>Horarios</h2>
         <p className="campo__ayuda">
           Un cierre que no sea posterior a la apertura se entiende de madrugada: de 12:30
-          a 00:00 es hasta medianoche, no cerrado todo el dia.
+          a 00:00 es hasta medianoche, no cerrado todo el día.
         </p>
 
         <table className="tabla tabla--horarios">
           <thead>
             <tr>
-              <th>Dia</th>
+              <th>Día</th>
               <th>Abre</th>
               <th>Cierra</th>
               <th className="tabla__centro">Cerrado</th>
@@ -377,7 +377,7 @@ export default function Locales() {
           </Campo>
           <Campo
             etiqueta="Reservas por fuera"
-            ayuda="Si las reservas van a otra web. Vacio para usar el formulario de la casa."
+            ayuda="Si las reservas van a otra web. Vacío para usar el formulario de la casa."
           >
             <Entrada {...campo('url_reservas')} placeholder="https://..." maxLength={500} />
           </Campo>

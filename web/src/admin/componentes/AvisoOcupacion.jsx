@@ -78,7 +78,7 @@ export default function AvisoOcupacion() {
     <aside className="aforo" role="status" aria-live="polite">
       <div className="aforo__interior">
         <div className="aforo__texto">
-          <strong>Como esta el local ahora?</strong>
+          <strong>¿Cómo está el local ahora?</strong>
           <span className="apagado">Tramo de las {hora}</span>
           {error && <span className="aforo__error">{error}</span>}
         </div>
@@ -113,7 +113,7 @@ export default function AvisoOcupacion() {
             />
           ) : (
             <button type="button" className="enlace" onClick={() => setDetalle(true)}>
-              Anadir comensales
+              Añadir comensales
             </button>
           )}
 

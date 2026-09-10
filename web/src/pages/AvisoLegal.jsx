@@ -32,7 +32,7 @@ export default function AvisoLegal() {
           </div>
         )}
 
-        <h2>Quien es el titular de esta web</h2>
+        <h2>Quién es el titular de esta web</h2>
         <ul className="legal__datos">
           <li>
             <strong>Titular:</strong> {LEGAL.razonSocial}
@@ -47,7 +47,7 @@ export default function AvisoLegal() {
             <strong>Email:</strong> <a href={`mailto:${GRUPO.email}`}>{GRUPO.email}</a>
           </li>
           <li>
-            <strong>Telefono:</strong> {GRUPO.whatsapp}
+            <strong>Teléfono:</strong> {GRUPO.whatsapp}
           </li>
           {LEGAL.registro && (
             <li>
@@ -58,7 +58,7 @@ export default function AvisoLegal() {
 
         <h2>Para que sirve este sitio</h2>
         <p>
-          Aqui se publican las cartas, los horarios y la informacion de los locales del{' '}
+          Aquí se publican las cartas, los horarios y la información de los locales del{' '}
           {GRUPO.nombre}, y se pueden solicitar reservas de mesa. No se vende nada por
           internet ni se cobra nada a traves de la web.
         </p>
@@ -66,47 +66,47 @@ export default function AvisoLegal() {
         <h2>Las reservas son solicitudes</h2>
         <p>
           Pedir mesa desde la web es una <strong>solicitud</strong>, no una reserva cerrada.
-          Queda confirmada cuando el local te lo comunica. Hasta ese momento no hay mesa
+          Queda confirmada cuándo el local te lo comunica. Hasta ese momento no hay mesa
           garantizada, y el local puede no poder atenderla si no queda sitio a esa hora.
         </p>
 
         <h2>La carta y los precios</h2>
         <p>
-          Los platos, precios e informacion de alergenos se actualizan a menudo y pueden
+          Los platos, precios e información de alérgenos se actualizan a menudo y pueden
           cambiar sin previo aviso. La carta que manda es la del local. Si tienes una
-          alergia o una intolerancia, <strong>diselo siempre al personal de sala</strong>:
-          la cocina es compartida y la web no puede descartar la contaminacion cruzada.
+          alergia o una intolerancia, <strong>díselo siempre al personal de sala</strong>:
+          la cocina es compartida y la web no puede descartar la contaminación cruzada.
         </p>
 
         <h2>Propiedad intelectual</h2>
         <p>
-          Los textos, fotografias, logotipos y el diseno de este sitio pertenecen a su
+          Los textos, fotografias, logotipos y el diseño de este sitio pertenecen a su
           titular o se usan con permiso. Puedes compartir enlaces libremente, pero no
-          reproducir el contenido con fines comerciales sin autorizacion.
+          reproducir el contenido con fines comerciales sin autorización.
         </p>
 
         <h2>Enlaces a otros sitios</h2>
         <p>
           Esta web enlaza a servicios de terceros (mapas, redes sociales, WhatsApp). No
           controlamos esos sitios ni respondemos de su contenido ni de como tratan tus
-          datos: cuando sales de aqui, se aplican sus propias condiciones.
+          datos: cuándo sales de aquí, se aplican sus propias condiciones.
         </p>
 
         <h2>Responsabilidad</h2>
         <p>
-          Ponemos cuidado en que la informacion este al dia, pero no podemos garantizar que
-          en todo momento este libre de errores. Si ves algo mal, avisanos a{' '}
+          Ponemos cuidado en que la información esté al día, pero no podemos garantizar que
+          en todo momento esté libre de errores. Si ves algo mal, avísanos a{' '}
           <a href={`mailto:${GRUPO.email}`}>{GRUPO.email}</a> y lo corregimos.
         </p>
 
         <h2>Ley aplicable</h2>
         <p>
           Se aplica la legislacion espanola. Para cualquier conflicto, seran competentes los
-          juzgados que correspondan segun la ley; si eres consumidor, los de tu domicilio.
+          juzgados que correspondan según la ley; si eres consumidor, los de tu domicilio.
         </p>
 
         <p className="legal__pie">
-          Ver tambien la <Link to="/privacidad">politica de privacidad</Link>.
+          Ver también la <Link to="/privacidad">política de privacidad</Link>.
         </p>
       </div>
     </section>

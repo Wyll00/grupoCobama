@@ -62,7 +62,7 @@ export default function Home() {
             </Link>
             <a
               className="boton hero__whatsapp"
-              href={enlaceWhatsApp('Hola, me gustaria hacer una reserva.')}
+              href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}
             >
               WhatsApp {GRUPO.whatsapp}
             </a>
@@ -77,7 +77,7 @@ export default function Home() {
             */}
             {(locales ?? []).some((l) => l.fotos > 0) && (
               <Link className="boton hero__galeria" to="/galeria">
-                Galeria
+                Galería
               </Link>
             )}
 
@@ -115,7 +115,7 @@ export default function Home() {
           <div className="seccion__intro">
             <h2>Nuestros locales</h2>
             <p className="apagado">
-              Cada casa tiene su carta y su caracter. Elige la que te pille mas cerca.
+              Cada casa tiene su carta y su carácter. Elige la que te pille más cerca.
             </p>
 
             {/*

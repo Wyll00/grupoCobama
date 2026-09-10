@@ -95,7 +95,7 @@ export function RutaProtegida({ children, soloAdmin = false }) {
   if (soloAdmin && !esAdmin) {
     return (
       <div className="admin-aviso admin-aviso--error">
-        Esta seccion es solo para administradores del grupo.
+        Esta sección es solo para administradores del grupo.
       </div>
     );
   }

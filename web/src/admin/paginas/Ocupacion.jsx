@@ -53,7 +53,7 @@ export default function Ocupacion() {
         <div>
           <h1>Ocupacion</h1>
           <p className="apagado">
-            Cada hora, sala responde desde el comandero como esta el local. Con eso salen
+            Cada hora, sala responde desde el comandero cómo está el local. Con eso salen
             las horas punta reales de esta casa.
           </p>
         </div>
@@ -77,9 +77,9 @@ export default function Ocupacion() {
             onChange={(e) => setDias(Number(e.target.value))}
             aria-label="Periodo"
           >
-            <option value={30}>Ultimos 30 dias</option>
-            <option value={90}>Ultimos 90 dias</option>
-            <option value={365}>Ultimo ano</option>
+            <option value={30}>Últimos 30 días</option>
+            <option value={90}>Últimos 90 días</option>
+            <option value={365}>Último año</option>
           </Seleccion>
         </div>
       </header>
@@ -88,9 +88,9 @@ export default function Ocupacion() {
 
       {patron.datos?.resumen.lecturas === 0 ? (
         <p className="admin-vacio">
-          Todavia no hay lecturas de este local.
+          Todavía no hay lecturas de este local.
           <br />
-          Aparecen aqui segun sala vaya respondiendo el aviso del comandero.
+          Aparecen aquí según sala vaya respondiendo el aviso del comandero.
         </p>
       ) : (
         <>
@@ -143,24 +143,24 @@ export default function Ocupacion() {
 
           <p className="apagado nota-seccion">
             Media de 0 (vacio) a 4 (a tope). Las casillas en blanco son horas sin ninguna
-            lectura todavia.
+            lectura todavía.
           </p>
         </>
       )}
 
-      <h2 className="subtitulo">Ultimas lecturas</h2>
+      <h2 className="subtitulo">Últimas lecturas</h2>
 
       {registros.length === 0 ? (
-        <p className="admin-vacio">Sin lecturas en los ultimos 14 dias.</p>
+        <p className="admin-vacio">Sin lecturas en los últimos 14 días.</p>
       ) : (
         <table className="tabla">
           <thead>
             <tr>
-              <th>Cuando</th>
+              <th>Cuándo</th>
               <th>Nivel</th>
               <th className="tabla__centro">Comensales</th>
               <th>Nota</th>
-              <th>Quien</th>
+              <th>Quién</th>
             </tr>
           </thead>
           <tbody>

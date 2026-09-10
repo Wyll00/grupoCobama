@@ -123,7 +123,7 @@ export default function Restaurante() {
       <section className="seccion">
         <div className="contenedor datos">
           <div className="bloque-dato">
-            <h2>Donde estamos</h2>
+            <h2>Dónde estamos</h2>
 
             {/* Misma tarjeta que el horario, para que las dos columnas pesen
                 igual. El parking se marca como dato util, no como frase: en
@@ -147,7 +147,7 @@ export default function Restaurante() {
                   municipio, que son las otras dos cosas que se miran de un
                   vistazo.
 
-                  Envuelto en el <li> en vez de llevar sus clases: asi la
+                  Envuelto en el <li> en vez de llevar sus clases: así la
                   pastilla la pinta la fila y el color del estado lo pinta el
                   <span>, sin que una regla le gane a la otra por
                   especificidad.

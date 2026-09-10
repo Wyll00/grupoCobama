@@ -17,7 +17,7 @@ import { Aviso, Boton, Entrada, Seleccion } from '../componentes/Campos.jsx';
  * pararse a pensar si son la misma lista.
  */
 const QUE_FALTA = {
-  alergenos: 'sin alergenos ni confirmar',
+  alergenos: 'sin alérgenos ni confirmar',
   foto: 'sin foto',
   idiomas: 'sin traducir',
   carta: 'fuera de toda carta',
@@ -70,10 +70,10 @@ export default function Platos() {
     <>
       <header className="pagina__cabecera">
         <div>
-          <h1>Catalogo del grupo</h1>
+          <h1>Catálogo del grupo</h1>
           <p className="apagado">
-            Un plato se da de alta una sola vez aqui. Cada local decide despues si lo
-            sirve y a que precio.
+            Un plato se da de alta una sola vez aquí. Cada local decide después si lo
+            sirve y a qué precio.
           </p>
         </div>
 
@@ -89,10 +89,10 @@ export default function Platos() {
 
       {!esAdmin && (
         <Aviso>
-          Aqui estan los platos de las cuatro casas. Puedes editar los que solo sirvas tu;
+          Aqui están los platos de las cuatro casas. Puedes editar los que solo sirvas tu;
           los que comparten varios locales los mantiene la administracion del grupo,
-          porque el nombre y la descripcion son los mismos para todos. Para dar de alta
-          uno nuevo, ve a <strong>Cartas</strong> → <strong>Anadir plato</strong>.
+          porque el nombre y la descripción son los mismos para todos. Para dar de alta
+          uno nuevo, ve a <strong>Cartas</strong> → <strong>Añadir plato</strong>.
         </Aviso>
       )}
 
@@ -112,7 +112,7 @@ export default function Platos() {
             Solo los platos <strong>{QUE_FALTA[falta]}</strong>
             {resultado ? ` · ${resultado.paginacion.total}` : ''}
           </span>
-          <Boton onClick={quitarFiltroPendiente}>Ver todo el catalogo</Boton>
+          <Boton onClick={quitarFiltroPendiente}>Ver todo el catálogo</Boton>
         </p>
       )}
 
@@ -121,7 +121,7 @@ export default function Platos() {
           type="search"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar por nombre o descripcion..."
+          placeholder="Buscar por nombre o descripción..."
           aria-label="Buscar"
         />
         <Seleccion
@@ -129,7 +129,7 @@ export default function Platos() {
           onChange={(e) => setFiltros((f) => ({ ...f, categoria: e.target.value, pagina: 1 }))}
           aria-label="Categoria"
         >
-          <option value="">Todas las categorias</option>
+          <option value="">Todas las categorías</option>
           {(categorias.datos ?? []).map((c) => (
             <option key={c.id} value={c.slug}>
               {c.nombre}
@@ -150,7 +150,7 @@ export default function Platos() {
       {platos.cargando && <p className="admin-cargando">Cargando catalogo...</p>}
 
       {resultado?.datos.length === 0 && (
-        <p className="admin-vacio">Ningun plato coincide con estos filtros.</p>
+        <p className="admin-vacio">Ningún plato coincide con estos filtros.</p>
       )}
 
       {resultado?.datos.length > 0 && (

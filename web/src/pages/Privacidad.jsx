@@ -13,7 +13,7 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
  */
 export default function Privacidad() {
   useMetadatos({
-    descripcion: 'Que datos tratamos, para que, cuanto tiempo y como ejercer tus derechos.',
+    descripcion: 'Qué datos tratamos, para qué, cuánto tiempo y cómo ejercer tus derechos.',
   });
 
   const { conservacion, autoridad } = LEGAL;
@@ -21,7 +21,7 @@ export default function Privacidad() {
   return (
     <section className="seccion">
       <div className="contenedor legal">
-        <h1>Politica de privacidad</h1>
+        <h1>Política de privacidad</h1>
 
         {/* A la vista y en produccion tambien, a proposito. Un "PENDIENTE" en
             mitad del aviso legal es feo, pero es justo lo que hace que nadie
@@ -35,10 +35,10 @@ export default function Privacidad() {
           </div>
         )}
         <p className="legal__version">
-          Version del {VERSION_POLITICA}. Si la cambiamos, avisamos en esta misma pagina.
+          Versión del {VERSION_POLITICA}. Si la cambiamos, avisamos en esta misma página.
         </p>
 
-        <h2>Quien trata tus datos</h2>
+        <h2>Quién trata tus datos</h2>
         <ul className="legal__datos">
           <li>
             <strong>Responsable:</strong> {LEGAL.razonSocial}
@@ -55,37 +55,37 @@ export default function Privacidad() {
           </li>
           {LEGAL.delegadoProteccionDatos && (
             <li>
-              <strong>Delegado de proteccion de datos:</strong> {LEGAL.delegadoProteccionDatos}
+              <strong>Delegado de protección de datos:</strong> {LEGAL.delegadoProteccionDatos}
             </li>
           )}
         </ul>
 
-        <h2>Que datos recogemos y para que</h2>
+        <h2>Qué datos recogemos y para qué</h2>
         <p>
-          Solo tratamos datos cuando reservas mesa. Navegar por la carta no recoge nada
+          Solo tratamos datos cuándo reservas mesa. Navegar por la carta no recoge nada
           tuyo.
         </p>
 
         <table className="legal__tabla">
           <thead>
             <tr>
-              <th>Para que</th>
-              <th>Que datos</th>
-              <th>Con que base legal</th>
+              <th>Para qué</th>
+              <th>Qué datos</th>
+              <th>Con qué base legal</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Gestionar tu reserva: guardarte la mesa, avisarte y atenderte al llegar</td>
-              <td>Nombre, telefono, email si lo das, dia, hora, numero de comensales y lo que nos cuentes en observaciones</td>
+              <td>Nombre, teléfono, email si lo das, día, hora, número de comensales y lo que nos cuentes en observaciones</td>
               <td>
-                <strong>Ejecucion de un contrato</strong> (art. 6.1.b RGPD). Reservar es un
+                <strong>Ejecución de un contrato</strong> (art. 6.1.b RGPD). Reservar es un
                 acuerdo entre tu y el local, asi que no te pedimos permiso para esto: sin
                 estos datos no hay reserva posible.
               </td>
             </tr>
             <tr>
-              <td>Mandarte novedades, promociones o menus especiales</td>
+              <td>Mandarte novedades, promociones o menús especiales</td>
               <td>Nombre y email</td>
               <td>
                 <strong>Tu consentimiento</strong> (art. 6.1.a RGPD), que das marcando la
@@ -99,15 +99,15 @@ export default function Privacidad() {
         <div className="aviso">
           <strong>Cuidado con lo que escribes en observaciones.</strong> Ese campo es libre
           y a veces la gente cuenta ahi una alergia o una condicion medica, que son datos
-          de salud y estan especialmente protegidos. Ponlo solo si hace falta para
-          atenderte bien; lo usamos unicamente para eso y no lo guardamos mas alla de la
+          de salud y están especialmente protegidos. Ponlo solo si hace falta para
+          atenderte bien; lo usamos únicamente para eso y no lo guardamos más allá de la
           reserva.
         </div>
 
-        <h2>Cuanto tiempo los guardamos</h2>
+        <h2>Cuánto tiempo los guardamos</h2>
         <p>
           Los datos de la reserva se conservan <strong>{conservacion.reservaMeses} meses</strong>{' '}
-          desde el dia de la reserva, {conservacion.reservaMotivo}. Pasado ese plazo se
+          desde el día de la reserva, {conservacion.reservaMotivo}. Pasado ese plazo se
           borran automaticamente.
         </p>
         <p>
@@ -118,7 +118,7 @@ export default function Privacidad() {
           .
         </p>
 
-        <h2>Quien mas ve tus datos</h2>
+        <h2>Quién más ve tus datos</h2>
         <p>
           No vendemos ni cedemos tus datos a nadie. Si los ven terceros es porque nos
           prestan un servicio necesario para la reserva, y en ese caso solo pueden usarlos
@@ -139,7 +139,7 @@ export default function Privacidad() {
         <h2>Tus derechos</h2>
         <p>
           Puedes pedirnos <strong>acceder</strong> a tus datos, <strong>rectificarlos</strong>{' '}
-          si estan mal, <strong>borrarlos</strong>, <strong>limitar</strong> su uso,{' '}
+          si están mal, <strong>borrarlos</strong>, <strong>limitar</strong> su uso,{' '}
           <strong>oponerte</strong> a que los tratemos y pedir su{' '}
           <strong>portabilidad</strong>. Si nos diste permiso para mandarte novedades,
           puedes <strong>retirarlo</strong> cuando quieras, sin que eso afecte a lo hecho
@@ -148,33 +148,33 @@ export default function Privacidad() {
         <p>
           Escribe a <a href={`mailto:${LEGAL.emailPrivacidad}`}>{LEGAL.emailPrivacidad}</a>{' '}
           diciendo que quieres. Te contestamos como mucho en un mes. Puede que te pidamos
-          algo para confirmar que eres tu, porque si no cualquiera podria pedir tus datos.
+          algo para confirmar que eres tú, porque si no cualquiera podría pedir tus datos.
         </p>
         <p>
           Si crees que no lo hemos hecho bien, puedes reclamar ante la{' '}
           <a href={autoridad.web} target="_blank" rel="noreferrer">
             {autoridad.nombre}
           </a>
-          . Nos gustaria que antes nos lo dijeras a nosotros, para poder arreglarlo.
+          . Nos gustaría que antes nos lo dijeras a nosotros, para poder arreglarlo.
         </p>
 
         <h2>Cookies</h2>
         <p>
-          Esta web <strong>no usa cookies de analitica, de publicidad ni de terceros</strong>,
-          asi que no hay ningun banner que aceptar. La unica cookie que existe es la de
+          Esta web <strong>no usa cookies de analítica, de publicidad ni de terceros</strong>,
+          así que no hay ningún banner que aceptar. La única cookie que existe es la de
           inicio de sesion del panel interno del grupo, que es tecnica e imprescindible
           para que la sesion funcione; los clientes nunca la reciben.
         </p>
 
         <h2>Cambios</h2>
         <p>
-          Si cambiamos esta politica, cambia tambien la version de arriba. Guardamos que
-          version estaba vigente cuando hiciste tu reserva, para que siempre se pueda
-          saber que texto se te enseno.
+          Si cambiamos esta política, cambia también la versión de arriba. Guardamos qué
+          versión estaba vigente cuando hiciste tu reserva, para que siempre se pueda
+          saber qué texto se te enseñó.
         </p>
 
         <p className="legal__pie">
-          Ver tambien el <Link to="/aviso-legal">aviso legal</Link>. Para cualquier otra
+          Ver también el <Link to="/aviso-legal">aviso legal</Link>. Para cualquier otra
           cosa, <a href={`mailto:${GRUPO.email}`}>{GRUPO.email}</a>.
         </p>
       </div>

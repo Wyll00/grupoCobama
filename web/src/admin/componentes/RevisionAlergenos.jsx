@@ -53,13 +53,13 @@ export default function RevisionAlergenos({ plato, soloLectura, onConfirmado }) 
       <div className="revision__texto">
         {confirmado ? (
           <>
-            <strong>Alergenos confirmados</strong> el {fecha}
+            <strong>Alérgenos confirmados</strong> el {fecha}
             {plato.alergenos_revisados_por && ` por ${plato.alergenos_revisados_por}`}.
           </>
         ) : (
           <>
-            <strong>Alergenos sin confirmar.</strong> Estan transcritos de la carta
-            impresa y nadie de cocina los ha comprobado todavia.
+            <strong>Alérgenos sin confirmar.</strong> Están transcritos de la carta
+            impresa y nadie de cocina los ha comprobado todavía.
           </>
         )}
       </div>

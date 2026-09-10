@@ -62,7 +62,7 @@ export default function CartaLocal() {
           <h1>Carta</h1>
           <p className="apagado">
             Los precios y la disponibilidad son de este local. El nombre y la
-            descripcion del plato salen del catalogo del grupo.
+            descripción del plato salen del catálogo del grupo.
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export default function CartaLocal() {
             </Seleccion>
           )}
           <Boton variante="principal" onClick={() => setAnadiendo(true)} disabled={!localId}>
-            Anadir plato
+            Añadir plato
           </Boton>
           <Boton onClick={() => setMostrandoQr(true)} disabled={!localId}>
             Compartir carta
@@ -95,7 +95,7 @@ export default function CartaLocal() {
 
       {carta.datos?.total === 0 && (
         <p className="admin-vacio">
-          Esta carta esta vacia. Anade platos desde el catalogo del grupo.
+          Esta carta está vacía. Añade platos desde el catálogo del grupo.
         </p>
       )}
 
@@ -162,7 +162,7 @@ export default function CartaLocal() {
                         </button>
                         {!item.plato_activo && (
                           <span className="etiqueta-mini etiqueta-mini--alerta">
-                            retirado del catalogo
+                            retirado del catálogo
                           </span>
                         )}
                       </div>
@@ -291,7 +291,7 @@ function AnadirPlato({ localId, nombreLocal, onCerrar, onHecho }) {
           className={`pestana ${modo === 'catalogo' ? 'pestana--activa' : ''}`}
           onClick={() => setModo('catalogo')}
         >
-          Del catalogo del grupo
+          Del catálogo del grupo
         </button>
         <button
           type="button"
@@ -344,7 +344,7 @@ function DesdeCatalogo({ localId, onCerrar, onHecho }) {
     <>
       <Aviso tipo="error">{error}</Aviso>
 
-      <Campo etiqueta="Buscar en el catalogo del grupo">
+      <Campo etiqueta="Buscar en el catálogo del grupo">
         <Entrada
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
@@ -358,8 +358,8 @@ function DesdeCatalogo({ localId, onCerrar, onHecho }) {
       {!disponibles.cargando && lista.length === 0 && (
         <p className="admin-vacio">
           {busqueda
-            ? 'Ningun plato coincide con la busqueda.'
-            : 'Este local ya sirve todos los platos del catalogo.'}
+            ? 'Ningún plato coincide con la búsqueda.'
+            : 'Este local ya sirve todos los platos del catálogo.'}
         </p>
       )}
 
@@ -398,7 +398,7 @@ function DesdeCatalogo({ localId, onCerrar, onHecho }) {
           onClick={guardar}
           disabled={!elegido || precio === '' || enviando}
         >
-          {enviando ? 'Anadiendo...' : 'Anadir a la carta'}
+          {enviando ? 'Anadiendo...' : 'Añadir a la carta'}
         </Boton>
       </div>
     </>
@@ -459,9 +459,9 @@ function PlatoNuevo({ localId, onCerrar, onHecho }) {
     <>
       <Aviso tipo="error">{error}</Aviso>
       <Aviso>
-        El plato se da de alta en el catalogo del grupo y entra en esta carta. Mientras
-        solo lo sirvas tu, es tuyo y puedes editarlo. Si otra casa lo anade a su carta,
-        pasa a mantenerlo la administracion del grupo, porque el nombre y la descripcion
+        El plato se da de alta en el catálogo del grupo y entra en esta carta. Mientras
+        solo lo sirvas tú, es tuyo y puedes editarlo. Si otra casa lo añade a su carta,
+        pasa a mantenerlo la administración del grupo, porque el nombre y la descripción
         son los mismos para todos.
       </Aviso>
 
@@ -476,7 +476,7 @@ function PlatoNuevo({ localId, onCerrar, onHecho }) {
         </Campo>
         <Campo etiqueta="Categoria">
           <Seleccion value={form.categoria_id} onChange={cambiar('categoria_id')}>
-            <option value="">Elige una categoria</option>
+            <option value="">Elige una categoría</option>
             {(categorias.datos ?? []).map((c) => (
               <option key={c.id} value={c.id}>
                 {c.nombre}
@@ -542,7 +542,7 @@ function PlatoNuevo({ localId, onCerrar, onHecho }) {
       </Campo>
 
       <p className="apagado nota-seccion">
-        La foto se sube despues desde <strong>Catalogo</strong>, abriendo el plato.
+        La foto se sube después desde <strong>Catalogo</strong>, abriendo el plato.
       </p>
 
       <div className="acciones-modal">
@@ -550,7 +550,7 @@ function PlatoNuevo({ localId, onCerrar, onHecho }) {
           Cancelar
         </Boton>
         <Boton variante="principal" onClick={guardar} disabled={!completo || enviando}>
-          {enviando ? 'Creando...' : 'Crear y anadir a la carta'}
+          {enviando ? 'Creando...' : 'Crear y añadir a la carta'}
         </Boton>
       </div>
     </>

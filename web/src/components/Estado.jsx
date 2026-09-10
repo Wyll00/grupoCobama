@@ -8,7 +8,7 @@ export function Cargando({ texto = 'Cargando...' }) {
 
 export function Error({ error }) {
   return (
-    <div className="contenedor seccion">
+    <div className="contenedor sección">
       <div className="aviso">
         <strong>No se han podido cargar los datos.</strong>
         <br />

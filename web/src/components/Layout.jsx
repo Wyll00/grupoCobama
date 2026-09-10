@@ -59,7 +59,7 @@ export default function Layout() {
               <h2>Reservas</h2>
               <ul className="pie__lista">
                 <li>
-                  <a href={enlaceWhatsApp('Hola, me gustaria hacer una reserva.')}>
+                  <a href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}>
                     WhatsApp {GRUPO.whatsapp}
                   </a>
                 </li>
@@ -82,7 +82,7 @@ export default function Layout() {
                 <h2>Fotos</h2>
                 <ul className="pie__lista">
                   <li>
-                    <Link to="/galeria">Galeria del grupo</Link>
+                    <Link to="/galeria">Galería del grupo</Link>
                   </li>
                   {(locales ?? [])
                     .filter((local) => local.fotos > 0)

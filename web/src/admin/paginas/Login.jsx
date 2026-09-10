@@ -38,7 +38,7 @@ export default function Login() {
         <h1>
           Cobama <span>Panel</span>
         </h1>
-        <p className="entrar__intro">Gestion de cartas y precios del grupo.</p>
+        <p className="entrar__intro">Gestión de cartas y precios del grupo.</p>
 
         <Aviso tipo="error">{error}</Aviso>
 

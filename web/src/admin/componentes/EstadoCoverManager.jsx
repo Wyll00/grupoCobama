@@ -17,7 +17,7 @@ const TEXTOS = {
   pendiente: { etiqueta: 'Enviando...', clase: 'cm--pendiente' },
   enviando: { etiqueta: 'Enviando...', clase: 'cm--pendiente' },
   enviada: { etiqueta: 'En CoverManager', clase: 'cm--ok' },
-  error: { etiqueta: 'NO esta en CoverManager', clase: 'cm--error' },
+  error: { etiqueta: 'NO está en CoverManager', clase: 'cm--error' },
 };
 
 export default function EstadoCoverManager({ reserva, onCambio }) {

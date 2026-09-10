@@ -21,7 +21,7 @@ export default function Panel() {
           <h1>Hola, {usuario?.nombre?.split(' ')[0]}</h1>
           <p className="apagado">
             {esAdmin
-              ? 'Tienes acceso a los cuatro locales y al catalogo maestro.'
+              ? 'Tienes acceso a los cuatro locales y al catálogo maestro.'
               : 'Gestionas la carta y los precios de tu local.'}
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function Panel() {
               // puestos ni confirmacion de que no lleva. Un plato con sus
               // alergenos asignados ya esta resuelto, y el agua mineral se
               // quita de la lista pulsando confirmar una vez.
-              { n: d.alergenos_pendientes, grave: true, texto: 'sin alergenos ni confirmar', a: '/admin/platos?falta=alergenos' },
+              { n: d.alergenos_pendientes, grave: true, texto: 'sin alérgenos ni confirmar', a: '/admin/platos?falta=alergenos' },
               { n: d.reservas_pendientes, texto: 'reservas por confirmar', a: '/admin/reservas' },
               { n: d.sin_traducir, texto: 'sin traducir', a: '/admin/platos?falta=idiomas' },
               { n: d.sin_foto, texto: 'sin foto', a: '/admin/platos?falta=foto' },
@@ -54,7 +54,7 @@ export default function Panel() {
             ].filter((t) => t.n > 0);
 
             if (tareas.length === 0) {
-              return <p className="pendientes-panel__ok">La carta esta al dia. Nada pendiente.</p>;
+              return <p className="pendientes-panel__ok">La carta está al día. Nada pendiente.</p>;
             }
             return (
               <ul className="pendientes-panel__lista">
@@ -102,7 +102,7 @@ export default function Panel() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Ver publica
+                Ver pública
               </a>
               <PortadaLocal local={local} onCambio={() => locales.recargar()} />
               <ReservasExternas local={local} onCambio={() => locales.recargar()} />
@@ -113,15 +113,15 @@ export default function Panel() {
 
       {esAdmin && (
         <section className="panel-resumen">
-          <h2>Catalogo maestro</h2>
+          <h2>Catálogo maestro</h2>
           <p className="apagado">
             {catalogo.datos
               ? `${catalogo.datos.paginacion.total} platos dados de alta en el grupo.`
               : 'Cargando...'}{' '}
-            Un plato se crea una vez aqui y cada local decide si lo sirve y a que precio.
+            Un plato se crea una vez aquí y cada local decide si lo sirve y a qué precio.
           </p>
           <Link className="btn btn--secundario" to="/admin/platos">
-            Ir al catalogo
+            Ir al catálogo
           </Link>
         </section>
       )}

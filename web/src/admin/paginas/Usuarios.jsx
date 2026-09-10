@@ -25,7 +25,7 @@ export default function Usuarios() {
   // una pantalla rota mientras tanto.
   if (!esAdmin) {
     return (
-      <Aviso tipo="error">Esta seccion es solo para administradores del grupo.</Aviso>
+      <Aviso tipo="error">Esta sección es solo para administradores del grupo.</Aviso>
     );
   }
 
@@ -36,7 +36,7 @@ export default function Usuarios() {
           <h1>Usuarios</h1>
           <p className="apagado">
             Un encargado solo ve y edita la carta de su local. Un admin de grupo llega a
-            los cuatro y al catalogo maestro.
+            los cuatro y al catálogo maestro.
           </p>
         </div>
         <div className="pagina__acciones">
@@ -58,7 +58,7 @@ export default function Usuarios() {
               <th>Email</th>
               <th>Rol</th>
               <th>Local</th>
-              <th>Ultimo acceso</th>
+              <th>Último acceso</th>
               <th className="tabla__centro">Estado</th>
               <th />
             </tr>
@@ -200,11 +200,11 @@ function EditorUsuario({ id, usuarios, locales, yo, onCerrar, onGuardado }) {
       </Campo>
 
       <Campo
-        etiqueta={esNuevo ? 'Contrasena' : 'Nueva contrasena'}
+        etiqueta={esNuevo ? 'Contrasena' : 'Nueva contraseña'}
         ayuda={
           esNuevo
-            ? 'Minimo 10 caracteres'
-            : 'Dejalo vacio para no cambiarla. Al cambiarla se cierran sus sesiones abiertas.'
+            ? 'Mínimo 10 caracteres'
+            : 'Déjalo vacío para no cambiarla. Al cambiarla se cierran sus sesiones abiertas.'
         }
       >
         <Entrada

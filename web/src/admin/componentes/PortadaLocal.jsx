@@ -76,15 +76,15 @@ export default function PortadaLocal({ local, onCambio }) {
         <Modal titulo={`Portada de ${local.nombre}`} onCerrar={() => setFichero(null)} ancho="760px">
           <Aviso>
             Se ve de fondo en la cabecera de la ficha, con el nombre encima y una capa
-            oscura, asi que funciona mejor una foto del espacio que un plato de cerca.
+            oscura, así que funciona mejor una foto del espacio que un plato de cerca.
             Tiene que ser una foto vuestra: una bajada de internet os expone a una
-            reclamacion de derechos.
+            reclamación de derechos.
           </Aviso>
           <RecorteImagen
             fichero={fichero}
             proporcion={PROPORCION}
             enviando={enviando}
-            nota="Se guardara panoramica en 1920x1000, convertida a WebP."
+            nota="Se guardará panorámica en 1920x1000, convertida a WebP."
             onCancelar={() => setFichero(null)}
             onConfirmar={subir}
           />

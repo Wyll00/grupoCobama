@@ -173,12 +173,12 @@ export default function Reservar() {
           </p>
 
           <div className="aviso">
-            <strong>Todavia no esta confirmada.</strong> El local la revisa y te avisa. Si
-            es para dentro de poco, mejor llama por telefono y lo cerramos al momento.
+            <strong>Todavía no está confirmada.</strong> El local la revisa y te avisa. Si
+            es para dentro de poco, mejor llama por teléfono y lo cerramos al momento.
           </div>
 
           <p className="apagado">
-            Guarda el codigo <strong>{hecha.codigo}</strong>: con el te localizamos la
+            Guarda el código <strong>{hecha.codigo}</strong>: con el te localizamos la
             reserva si nos llamas.
           </p>
 
@@ -214,8 +214,8 @@ export default function Reservar() {
         <div className="contenedor">
           <h1>Reservar mesa</h1>
           <p>
-            Dinos cuando y cuantos sois. El local te confirma en cuanto lo vea. Si es para
-            dentro de un rato, llama mejor por telefono.
+            Dinos cuándo y cuántos sois. El local te confirma en cuanto lo vea. Si es para
+            dentro de un rato, llama mejor por teléfono.
           </p>
         </div>
       </section>
@@ -249,7 +249,7 @@ export default function Reservar() {
                 <div className="derivacion">
                   <p>
                     <strong>{local.nombre}</strong> lleva sus reservas en su propio sistema.
-                    Se abre en otra pestana y esta pagina se queda aqui.
+                    Se abre en otra pestaña y esta página se queda aquí.
                   </p>
                   <a
                     className="boton boton--principal"
@@ -268,7 +268,7 @@ export default function Reservar() {
                 <>
               <div className="reserva__fila">
                 <label className="reserva__campo">
-                  <span>Dia</span>
+                  <span>Día</span>
                   <input
                     className="buscador"
                     type="date"
@@ -295,9 +295,9 @@ export default function Reservar() {
                         : tramos.cargando
                           ? 'Cargando...'
                           : tramos.datos?.cerrado
-                            ? 'Ese dia esta cerrado'
+                            ? 'Ese día está cerrado'
                             : horasDisponibles.length === 0
-                              ? 'No quedan horas ese dia'
+                              ? 'No quedan horas ese día'
                               : 'Elige una hora'}
                     </option>
                     {horasDisponibles.map((h) => (
@@ -324,7 +324,7 @@ export default function Reservar() {
 
               {local && tramos.datos?.cerrado && (
                 <div className="aviso">
-                  {local.nombre} cierra ese dia. Prueba otra fecha u otro local.
+                  {local.nombre} cierra ese día. Prueba otra fecha u otro local.
                 </div>
               )}
 
@@ -345,10 +345,10 @@ export default function Reservar() {
                   <strong>
                     {ultimaAntesDelHueco
                       ? `Ese dia la ultima mesa a mediodia es a las ${ultimaAntesDelHueco}, y volvemos a reservar a partir de las ${primeraDespuesDelHueco}.`
-                      : `Ese dia no cogemos reservas hasta las ${primeraDespuesDelHueco}.`}
+                      : `Ese día no cogemos reservas hasta las ${primeraDespuesDelHueco}.`}
                   </strong>{' '}
-                  La cocina esta abierta: esas mesas las guardamos para quien llega sin
-                  reservar. Puedes venirte igual, o reservar antes o despues.
+                  La cocina está abierta: esas mesas las guardamos para quien llega sin
+                  reservar. Puedes venirte igual, o reservar antes o después.
                 </div>
               )}
 
@@ -378,7 +378,7 @@ export default function Reservar() {
                 </label>
 
                 <label className="reserva__campo">
-                  <span>Telefono</span>
+                  <span>Teléfono</span>
                   <input
                     className="buscador"
                     type="tel"
@@ -403,7 +403,7 @@ export default function Reservar() {
                   autoComplete="email"
                   value={form.email}
                   onChange={cambiar('email')}
-                  placeholder="Para mandarte la confirmacion"
+                  placeholder="Para mandarte la confirmación"
                 />
               </label>
 
@@ -416,7 +416,7 @@ export default function Reservar() {
                   rows={3}
                   value={form.observaciones}
                   onChange={cambiar('observaciones')}
-                  placeholder="Alergias, trona, celebracion, si venis con perro..."
+                  placeholder="Alergias, trona, celebración, si venís con perro..."
                 />
               </label>
 
@@ -430,7 +430,7 @@ export default function Reservar() {
                   <a href={`mailto:${LEGAL.emailPrivacidad}`}>{LEGAL.emailPrivacidad}</a>.
                   Lo tienes todo detallado en la{' '}
                   <Link to="/privacidad" target="_blank">
-                    politica de privacidad
+                    política de privacidad
                   </Link>
                   .
                 </p>
@@ -445,7 +445,7 @@ export default function Reservar() {
                   <span>
                     He leido y entiendo la{' '}
                     <Link to="/privacidad" target="_blank">
-                      politica de privacidad
+                      política de privacidad
                     </Link>
                     .
                   </span>
@@ -459,7 +459,7 @@ export default function Reservar() {
                       onChange={marcar('marketing')}
                     />
                     <span>
-                      Quiero recibir novedades y menus especiales por email.{' '}
+                      Quiero recibir novedades y menús especiales por email.{' '}
                       <span className="apagado">
                         Es voluntario, tu reserva funciona igual, y puedes darte de baja
                         cuando quieras.
@@ -480,8 +480,8 @@ export default function Reservar() {
               )}
 
               <p className="apagado" style={{ fontSize: '0.85rem' }}>
-                Tambien puedes reservar por WhatsApp al{' '}
-                <a href={enlaceWhatsApp('Hola, me gustaria hacer una reserva.')}>
+                También puedes reservar por WhatsApp al{' '}
+                <a href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}>
                   {GRUPO.whatsapp}
                 </a>
                 .
