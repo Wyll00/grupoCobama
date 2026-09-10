@@ -67,7 +67,15 @@ export default function Home() {
               className="boton hero__whatsapp"
               href={enlaceWhatsApp(ui('nav.saludoWhatsApp', idioma))}
             >
-              WhatsApp {GRUPO.whatsapp}
+              {/*
+                El numero va en su propio span para poder esconderlo en el
+                movil. Ahi no aporta -no se lee, se pulsa, y el enlace ya
+                lleva al chat- y en cambio hacia el boton tan ancho que
+                "Reservar mesa" se caia a la linea de abajo. En el ordenador
+                se queda: ahi hay sitio y hay quien prefiere copiarlo y
+                escribir desde otro telefono.
+              */}
+              WhatsApp <span className="hero__whatsapp-numero">{GRUPO.whatsapp}</span>
             </a>
             {/*
               El boton de la galeria solo si hay alguna foto publicada.

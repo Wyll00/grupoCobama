@@ -152,6 +152,14 @@ html {
   scroll-padding-top: 6.5rem;
 }
 
+/* En el movil la cabecera no va pegada -ver la regla de .cabecera mas abajo-,
+   asi que no tapa nada y el hueco sobra. */
+@media (max-width: 48rem) {
+  html {
+    scroll-padding-top: 1rem;
+  }
+}
+
 body {
   margin: 0;
   font-family: var(--fuente-texto);
@@ -400,6 +408,55 @@ button {
 }
 .nav::-webkit-scrollbar { display: none; }
 
+/*
+  En el movil la navegacion baja a su propia fila.
+
+  Medido a 390 px: la barra de enlaces se quedaba en 56 px de ancho con 522 px
+  de contenido. Se cortaban 466. Tecnicamente hay `overflow-x: auto` y se puede
+  arrastrar, pero por una ventana de dos dedos y sin nada que lo anuncie: en la
+  practica cuatro de los cinco enlaces no existian. La primera pastilla salia
+  partida a mitad de palabra -"Como en"-, que ademas se lee como una web rota.
+
+  La fila de arriba se queda con el sello y los mandos, que es lo que tiene que
+  estar siempre a mano. Los enlaces van debajo, a lo ancho y envolviendo: dos
+  lineas de pastillas se ven enteras, y ver es lo unico que hace que se pulsen.
+*/
+@media (max-width: 48rem) {
+  .cabecera__fila {
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+    padding-block: 0.6rem;
+    /* Sin altura minima fija: con dos filas, las 5rem de antes dejaban un
+       hueco muerto debajo de los enlaces. */
+    min-height: 0;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+    /* Ya no hace falta arrastrar: cabe todo. */
+    overflow-x: visible;
+  }
+
+  /*
+    Y con dos filas, la cabecera deja de ir pegada arriba.
+
+    Mide 166 px. Fija, en una pantalla de 844, son 166 px menos para siempre:
+    el 20% del movil ocupado por algo que ya se ha leido. Cambiar un problema
+    -cuatro enlaces inalcanzables- por otro peor no es arreglarlo.
+
+    Suelta, esos 166 px se pagan una vez, al principio, y luego la pantalla es
+    entera. Para volver arriba estan el gesto de siempre y el pie, que lleva
+    los mismos enlaces.
+  */
+  .cabecera {
+    position: static;
+  }
+}
+
 .nav a {
   /* Pastilla con borde en vez de texto suelto.
      El filete que crecia al pasar el raton era demasiado discreto, y en movil
@@ -477,6 +534,42 @@ button {
   flex-wrap: wrap;
   gap: 0.7rem;
   margin-top: 1.75rem;
+}
+
+/*
+  En el movil, "Reservar mesa" y WhatsApp en la MISMA linea.
+
+  Se caian uno debajo del otro porque el de WhatsApp llevaba el numero
+  entero -"WhatsApp +34822680304"- y entre los dos no cabian en 375 px. Dos
+  botones apilados a pantalla completa empujaban la primera foto fuera de
+  vista: habia que hacer scroll para ver de que come uno aqui.
+
+  El numero se esconde, no se borra. En el movil no se lee, se pulsa, y el
+  enlace ya abre el chat; en el ordenador se queda, que ahi hay sitio y hay
+  quien prefiere copiarlo.
+
+  `flex: 1` reparte el ancho entre los dos en vez de dejarlos del tamano de
+  su texto: asi quedan iguales y ocupan la fila entera, que es mas facil de
+  acertar con el dedo que dos pastillas de anchos distintos.
+*/
+@media (max-width: 40rem) {
+  .hero__whatsapp-numero {
+    display: none;
+  }
+
+  .hero__acciones {
+    flex-wrap: nowrap;
+  }
+
+  .hero__acciones .boton {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 0.9rem;
+    text-align: center;
+    /* El nombre del boton no se parte en dos lineas: prefiero que se
+       encoja el hueco a los lados. */
+    white-space: nowrap;
+  }
 }
 
 /* ------------------------------------------------------ tarjetas ----- */
