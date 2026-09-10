@@ -61,7 +61,15 @@ export default function MosaicoPortada() {
               // lector de pantalla se lleva la misma informacion que quien la
               // ve, que es de que se come aqui.
               alt={nombre}
-              loading={principal ? 'eager' : 'lazy'}
+              // Las tres en eager, no solo la grande.
+              //
+              // `lazy` aplaza lo que esta fuera de pantalla, y estas tres
+              // estan en el hero: siempre a la vista nada mas abrir. Con
+              // lazy, el navegador espera a decidir que si hacen falta y las
+              // pide despues, asi que la portada se ve un momento con dos
+              // huecos oscuros. La prioridad alta se la queda solo la grande,
+              // que es la que decide cuando se considera pintada la pagina.
+              loading="eager"
               // En minuscula a proposito: React 18 no conoce `fetchPriority`
               // en camelCase y lo tiraria con un aviso por consola.
               fetchpriority={principal ? 'high' : 'auto'}
