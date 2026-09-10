@@ -86,7 +86,7 @@ export default function Reservas() {
           <h1>Reservas</h1>
           <p className="apagado">
             Lo que llega por la web entra como <strong>pendiente</strong> hasta que alguien
-            lo confirma. Lo que se apunta aqui a mano ya cuenta como confirmado.
+            lo confirma. Lo que se apunta aquí a mano ya cuenta como confirmado.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function Reservas() {
       <Aviso tipo="error">{error ?? reservas.error?.message}</Aviso>
 
       <div className="dia">
-        <Boton onClick={() => actualizar('fecha', sumarDias(fecha, -1))}>← Dia anterior</Boton>
+        <Boton onClick={() => actualizar('fecha', sumarDias(fecha, -1))}>← Día anterior</Boton>
         <div className="dia__centro">
           <strong>{enLargo(fecha)}</strong>
           <input
@@ -121,7 +121,7 @@ export default function Reservas() {
             type="date"
             value={fecha}
             onChange={(e) => actualizar('fecha', e.target.value)}
-            aria-label="Dia"
+            aria-label="Día"
           />
           {fecha !== hoy() && (
             <button type="button" className="enlace" onClick={() => actualizar('fecha', hoy())}>
@@ -129,7 +129,7 @@ export default function Reservas() {
             </button>
           )}
         </div>
-        <Boton onClick={() => actualizar('fecha', sumarDias(fecha, 1))}>Dia siguiente →</Boton>
+        <Boton onClick={() => actualizar('fecha', sumarDias(fecha, 1))}>Día siguiente →</Boton>
       </div>
 
       {r && (
@@ -171,7 +171,7 @@ export default function Reservas() {
       {reservas.cargando && <p className="admin-cargando">Cargando...</p>}
 
       {!reservas.cargando && lista.length === 0 && (
-        <p className="admin-vacio">No hay reservas para este dia.</p>
+        <p className="admin-vacio">No hay reservas para este día.</p>
       )}
 
       {lista.length > 0 && (
@@ -324,7 +324,7 @@ function EditorReserva({ localId, reserva, fechaPorDefecto, onCerrar, onHecho })
       <Aviso tipo="error">{error}</Aviso>
       {esNueva && (
         <Aviso>
-          Lo que se apunta aqui entra ya confirmado: se supone que estas hablando con el
+          Lo que se apunta aquí entra ya confirmado: se supone que estas hablando con el
           cliente.
         </Aviso>
       )}
@@ -360,7 +360,7 @@ function EditorReserva({ localId, reserva, fechaPorDefecto, onCerrar, onHecho })
         {esNueva && (
           <Campo etiqueta="Por donde entro">
             <Seleccion value={form.origen} onChange={cambiar('origen')}>
-              <option value="telefono">Telefono</option>
+              <option value="telefono">Teléfono</option>
               <option value="whatsapp">WhatsApp</option>
               <option value="web">Web</option>
             </Seleccion>
@@ -376,7 +376,7 @@ function EditorReserva({ localId, reserva, fechaPorDefecto, onCerrar, onHecho })
         <Entrada
           value={form.observaciones}
           onChange={cambiar('observaciones')}
-          placeholder="Alergias, trona, celebracion..."
+          placeholder="Alergias, trona, celebración..."
         />
       </Campo>
 
@@ -384,7 +384,7 @@ function EditorReserva({ localId, reserva, fechaPorDefecto, onCerrar, onHecho })
         <Entrada
           value={form.notas_internas}
           onChange={cambiar('notas_internas')}
-          placeholder="Prefieren terraza, el ano pasado no aparecieron..."
+          placeholder="Prefieren terraza, el año pasado no aparecieron..."
         />
       </Campo>
     </Modal>

@@ -63,7 +63,7 @@ export default function Categorias({ onCerrar, onCambio }) {
 
       <p className="apagado nota-seccion">
         El orden de esta lista es el orden en que el cliente ve las secciones en la carta.
-        Una seccion oculta no sale en la web, pero sus platos siguen ahi.
+        Una sección oculta no sale en la web, pero sus platos siguen ahí.
       </p>
 
       {categorias.cargando && <p className="admin-cargando">Cargando...</p>}
@@ -137,8 +137,8 @@ export default function Categorias({ onCerrar, onCambio }) {
                     disabled={ocupado}
                     title={
                       categoria.platos > 0
-                        ? 'Tiene platos, asi que se ocultara en lugar de borrarse'
-                        : 'Se borrara: no tiene ningun plato'
+                        ? 'Tiene platos, así que se ocultará en lugar de borrarse'
+                        : 'Se borrará: no tiene ningún plato'
                     }
                   >
                     {categoria.platos > 0 ? 'Ocultar' : 'Borrar'}
@@ -151,7 +151,7 @@ export default function Categorias({ onCerrar, onCambio }) {
       )}
 
       <div className="alta-rapida">
-        <Campo etiqueta="Nueva seccion">
+        <Campo etiqueta="Nueva sección">
           <Entrada
             value={nueva}
             onChange={(e) => setNueva(e.target.value)}
@@ -194,7 +194,7 @@ function NombreEditable({ valor, onGuardar, disabled }) {
           e.currentTarget.blur();
         }
       }}
-      aria-label="Nombre de la seccion"
+      aria-label="Nombre de la sección"
     />
   );
 }

@@ -209,7 +209,7 @@ export default function Carta() {
 
               <p className="filtros__aviso">
                 Filtrar esconde platos, no garantiza que el resto sea apto: la cocina es
-                compartida y puede haber contaminacion cruzada. Avisa siempre al personal.
+                compartida y puede haber contaminación cruzada. Avisa siempre al personal.
               </p>
 
               {(hayFiltros || categoria) && (

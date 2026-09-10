@@ -54,7 +54,7 @@ export default function Galeria() {
           <h1>{slug ? `Fotos de ${nombre}` : 'Galeria'}</h1>
           <p className="apagado">
             {slug
-              ? 'Los platos, la sala y lo que se cuece por aqui.'
+              ? 'Los platos, la sala y lo que se cuece por aquí.'
               : 'Las cuatro casas: sus platos, sus salas y sus celebraciones.'}
           </p>
 
@@ -86,7 +86,7 @@ export default function Galeria() {
             <Cargando texto="Cargando fotos..." />
           ) : fotos.length === 0 ? (
             <p className="aviso" style={{ marginTop: '1.5rem' }}>
-              Todavia no hay fotos publicadas aqui.
+              Todavía no hay fotos publicadas aquí.
             </p>
           ) : (
             <ul className="galeria">

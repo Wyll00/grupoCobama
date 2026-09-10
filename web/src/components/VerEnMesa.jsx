@@ -30,7 +30,7 @@ export default function VerEnMesa({ plato, onCerrar }) {
       .then(([, respuesta]) => {
         if (!vigente) return;
         if (!respuesta.disponible) {
-          setError('Este plato todavia no se puede ver en la mesa.');
+          setError('Este plato todavía no se puede ver en la mesa.');
           return;
         }
         setDatos(respuesta);
@@ -119,18 +119,18 @@ export default function VerEnMesa({ plato, onCerrar }) {
         <footer className="mesa__pie">
           {datos?.modo === 'foto' && (
             <p>
-              Es la foto del plato a tamano real, para hacerse una idea de la racion. Apunta
-              con el movil a la mesa y pulsa <strong>Ponerlo en mi mesa</strong>.
+              Es la foto del plato a tamaño real, para hacerse una idea de la ración. Apunta
+              con el móvil a la mesa y pulsa <strong>Ponerlo en mi mesa</strong>.
             </p>
           )}
           {datos?.modo === 'modelo' && (
             <p>
-              Modelo del plato a tamano real. Apunta con el movil a la mesa y pulsa{' '}
+              Modelo del plato a tamaño real. Apunta con el móvil a la mesa y pulsa{' '}
               <strong>Ponerlo en mi mesa</strong>.
             </p>
           )}
           <p className="mesa__nota">
-            La camara solo se abre desde el movil. En el ordenador se ve el modelo, pero no
+            La cámara solo se abre desde el móvil. En el ordenador se ve el modelo, pero no
             se puede poner en la mesa.
           </p>
         </footer>

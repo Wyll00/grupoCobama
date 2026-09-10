@@ -72,11 +72,13 @@ export function texto(objeto, campo, idioma) {
  * que falta por traducir: con las cadenas sueltas, el dia que se anada un
  * cuarto idioma hay que recorrer la aplicacion entera buscandolas.
  *
- * Solo estan los de la CARTA, que es donde vive el selector de idioma y a
- * donde llega un turista con el QR de la mesa. El resto de la web sigue en
- * castellano: traducir a medias el formulario de reservas seria peor, porque
- * ahi hay que entenderlo todo -incluida la politica de privacidad- y no solo
- * la mitad.
+ * Cubren la navegacion, el pie, la ficha del local, la carta y el formulario
+ * de reservas: todo lo que un cliente lee para decidir y para reservar.
+ *
+ * NO cubren los textos legales -aviso legal y politica de privacidad-. Esos
+ * se quedan en castellano a proposito: una politica de privacidad mal
+ * traducida no es un detalle de estilo, es informacion legal incorrecta. Van
+ * con un aviso que dice en que idioma estan y por que.
  */
 const UI = {
   'leyenda.titulo': {
@@ -100,6 +102,44 @@ const UI = {
   'etiqueta.vegano': { es: 'Vegano', en: 'Vegan', de: 'Vegan' },
   'etiqueta.vegetariano': { es: 'Vegetariano', en: 'Vegetarian', de: 'Vegetarisch' },
   'etiqueta.canario': { es: 'Producto canario', en: 'Canarian produce', de: 'Kanarisches Produkt' },
+  'nav.locales': { es: 'Nuestros locales', en: 'Our restaurants', de: 'Unsere Lokale' },
+  'nav.reservas': { es: 'Reservas', en: 'Bookings', de: 'Reservierungen' },
+  'nav.fotos': { es: 'Fotos', en: 'Photos', de: 'Fotos' },
+  'nav.siguenos': { es: 'Siguenos', en: 'Follow us', de: 'Folgen Sie uns' },
+  'nav.galeriaGrupo': { es: 'Galeria del grupo', en: 'Group gallery', de: 'Galerie der Gruppe' },
+  'nav.privacidad': { es: 'Privacidad', en: 'Privacy', de: 'Datenschutz' },
+  'nav.avisoLegal': { es: 'Aviso legal', en: 'Legal notice', de: 'Impressum' },
+  'nav.reservar': { es: 'Reservar', en: 'Book a table', de: 'Reservieren' },
+
+  'ficha.donde': { es: 'Donde estamos', en: 'Where we are', de: 'Wo wir sind' },
+  'ficha.horario': { es: 'Horario', en: 'Opening hours', de: 'Offnungszeiten' },
+  'ficha.comoLlegar': { es: 'Como llegar', en: 'Get directions', de: 'Anfahrt' },
+  'ficha.reservarMesa': { es: 'Reservar mesa', en: 'Book a table', de: 'Tisch reservieren' },
+  'ficha.verCarta': { es: 'Ver la carta', en: 'See the menu', de: 'Zur Speisekarte' },
+  'ficha.verFotos': { es: 'Ver fotos', en: 'See photos', de: 'Fotos ansehen' },
+  'ficha.parking': { es: 'Parking propio', en: 'Own car park', de: 'Eigener Parkplatz' },
+  'ficha.sinParking': { es: 'Sin parking propio', en: 'No car park', de: 'Kein Parkplatz' },
+  'ficha.abierto': { es: 'Abierto ahora', en: 'Open now', de: 'Jetzt geoffnet' },
+  'ficha.cerrado': { es: 'Cerrado ahora', en: 'Closed now', de: 'Jetzt geschlossen' },
+  'ficha.recomienda': {
+    es: 'Lo que recomienda la casa',
+    en: 'What the house recommends',
+    de: 'Empfehlungen des Hauses',
+  },
+  'ficha.verCartaEntera': {
+    es: 'Ver la carta entera',
+    en: 'See the full menu',
+    de: 'Ganze Karte ansehen',
+  },
+  'ficha.hoy': { es: 'hoy', en: 'today', de: 'heute' },
+  'ficha.cerradoDia': { es: 'Cerrado', en: 'Closed', de: 'Geschlossen' },
+
+  'legal.soloCastellano': {
+    es: null,
+    en: 'This page is only available in Spanish. It is a legal text, and a rough translation could say something different from what it means.',
+    de: 'Diese Seite gibt es nur auf Spanisch. Es ist ein Rechtstext, und eine ungenaue Ubersetzung konnte etwas anderes aussagen.',
+  },
+
   'alergeno.trazas': { es: 'trazas', en: 'traces', de: 'Spuren' },
   'carta.titulo': { es: 'Carta', en: 'Menu', de: 'Speisekarte' },
   'carta.todo': { es: 'Todo', en: 'All', de: 'Alle' },

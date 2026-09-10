@@ -54,7 +54,7 @@ export default function Agotado({ item, onCambiar, disabled }) {
         className="btn btn--agotar"
         onClick={() => onCambiar('hoy')}
         disabled={disabled}
-        title="Se marca agotado y vuelve solo manana"
+        title="Se marca agotado y vuelve solo mañana"
       >
         Se acabo
       </button>
@@ -90,7 +90,7 @@ export default function Agotado({ item, onCambiar, disabled }) {
           }
         >
           <p className="apagado nota-seccion">
-            El plato sigue en la carta, marcado como agotado, y vuelve solo ese dia. Si lo
+            El plato sigue en la carta, marcado como agotado, y vuelve solo ese día. Si lo
             que quieres es sacarlo de la carta sin fecha, usa la casilla{' '}
             <strong>En carta</strong>.
           </p>

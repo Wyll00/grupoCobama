@@ -175,7 +175,7 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
           <>
             {!esNuevo && form.activo && (
               <Boton onClick={retirar} disabled={enviando}>
-                Retirar del catalogo
+                Retirar del catálogo
               </Boton>
             )}
             <Boton onClick={onCerrar} disabled={enviando}>
@@ -197,14 +197,14 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
           <Campo etiqueta="Nombre">
             <Entrada value={form.nombre} onChange={cambiar('nombre')} />
           </Campo>
-          <Campo etiqueta="Nombre en ingles" ayuda="Se puede rellenar mas adelante">
+          <Campo etiqueta="Nombre en inglés" ayuda="Se puede rellenar más adelante">
             <Entrada value={form.nombre_en} onChange={cambiar('nombre_en')} />
           </Campo>
         </div>
 
         <Campo etiqueta="Categoria">
           <Seleccion value={form.categoria_id} onChange={cambiar('categoria_id')}>
-            <option value="">Elige una categoria</option>
+            <option value="">Elige una categoría</option>
             {(listaCategorias.datos ?? []).map((c) => (
               <option key={c.id} value={c.id}>
                 {c.nombre}
@@ -217,7 +217,7 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
           <AreaTexto value={form.descripcion} onChange={cambiar('descripcion')} />
         </Campo>
 
-        <Campo etiqueta="Descripcion en ingles">
+        <Campo etiqueta="Descripción en inglés">
           <AreaTexto value={form.descripcion_en} onChange={cambiar('descripcion_en')} />
         </Campo>
 
@@ -229,7 +229,7 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
             onChange={cambiar('es_vegetariano')}
           />
           <Interruptor etiqueta="Vegano" checked={form.es_vegano} onChange={cambiar('es_vegano')} />
-          <Interruptor etiqueta="Activo en el catalogo" checked={form.activo} onChange={cambiar('activo')} />
+          <Interruptor etiqueta="Activo en el catálogo" checked={form.activo} onChange={cambiar('activo')} />
         </div>
 
         <Campo
@@ -299,7 +299,7 @@ export default function EditorPlato({ id, onCerrar, onGuardado }) {
           <h3 className="subtitulo">Precio por local</h3>
           <p className="apagado nota-seccion">
             El precio no es del plato, es de cada carta: el mismo plato puede costar
-            distinto en cada casa. Cambiarlo queda registrado en el historico.
+            distinto en cada casa. Cambiarlo queda registrado en el histórico.
           </p>
           {plato && (
             <PreciosPorLocal

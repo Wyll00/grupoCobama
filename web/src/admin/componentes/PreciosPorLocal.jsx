@@ -46,7 +46,7 @@ export default function PreciosPorLocal({ platoId, platoActivo, enCartas, onCamb
     const texto = nuevosPrecios[localId] ?? '';
     const precio = Number(texto.replace(',', '.'));
     if (!Number.isFinite(precio) || precio < 0 || texto === '') {
-      setError('Escribe un precio valido para anadirlo a esa carta');
+      setError('Escribe un precio válido para añadirlo a esa carta');
       return;
     }
     conError(async () => {
@@ -64,8 +64,8 @@ export default function PreciosPorLocal({ platoId, platoActivo, enCartas, onCamb
 
       {!platoActivo && (
         <Aviso>
-          Este plato esta retirado del catalogo, asi que no se puede anadir ni reactivar
-          en ninguna carta. Reactivalo arriba para volver a servirlo.
+          Este plato está retirado del catálogo, así que no se puede añadir ni reactivar
+          en ninguna carta. Reactívalo arriba para volver a servirlo.
         </Aviso>
       )}
 

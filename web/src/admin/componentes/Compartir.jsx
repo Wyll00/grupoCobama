@@ -55,10 +55,10 @@ export default function Compartir({ restauranteId, nombreLocal, onCerrar }) {
         <>
           {!datos.listoParaImprimir && (
             <Aviso tipo="error">
-              <strong>Este enlace todavia no sirve fuera de aqui.</strong> Apunta a{' '}
+              <strong>Este enlace todavía no sirve fuera de aquí.</strong> Apunta a{' '}
               <code>localhost</code>, que solo funciona en este ordenador. Cuando la web
-              este publicada hay que cambiar <code>WEB_BASE_URL</code> en la configuracion
-              de la API y este enlace pasara a ser el definitivo.
+              este publicada hay que cambiar <code>WEB_BASE_URL</code> en la configuración
+              de la API y este enlace pasará a ser el definitivo.
             </Aviso>
           )}
 
@@ -103,7 +103,7 @@ export default function Compartir({ restauranteId, nombreLocal, onCerrar }) {
             )}
           </div>
 
-          <h3 className="subtitulo">Codigo QR</h3>
+          <h3 className="subtitulo">Código QR</h3>
           <p className="apagado nota-seccion">
             El mismo enlace, para el adhesivo de la mesa o el cartel de la entrada.
           </p>

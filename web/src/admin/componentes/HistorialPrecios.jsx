@@ -24,7 +24,7 @@ export default function HistorialPrecios({ cartaItemId, titulo, onCerrar }) {
 
       {!historico.cargando && registros.length === 0 && (
         <p className="admin-vacio">
-          Este plato no ha cambiado de precio desde que esta en la carta.
+          Este plato no ha cambiado de precio desde que está en la carta.
         </p>
       )}
 
@@ -34,7 +34,7 @@ export default function HistorialPrecios({ cartaItemId, titulo, onCerrar }) {
             <tr>
               <th>Fecha</th>
               <th>Cambio</th>
-              <th>Quien</th>
+              <th>Quién</th>
             </tr>
           </thead>
           <tbody>

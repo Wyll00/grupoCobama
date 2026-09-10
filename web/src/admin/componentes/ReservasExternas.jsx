@@ -44,11 +44,11 @@ export default function ReservasExternas({ local, onCambio }) {
   return (
     <div className="reservas-externas">
       <Campo
-        etiqueta="Boton de reservar"
+        etiqueta="Botón de reservar"
         ayuda={
           original
-            ? 'Ahora mismo lleva fuera. Borra la direccion para volver al formulario de la web.'
-            : 'Vacio: lleva al formulario de la web. Pon una direccion para mandarlo a otro sistema.'
+            ? 'Ahora mismo lleva fuera. Borra la dirección para volver al formulario de la web.'
+            : 'Vacío: lleva al formulario de la web. Pon una dirección para mandarlo a otro sistema.'
         }
       >
         <Entrada
@@ -64,8 +64,8 @@ export default function ReservasExternas({ local, onCambio }) {
 
       {original && (
         <p className="reservas-externas__aviso">
-          <strong>Estas reservas no entran aqui.</strong> No salen en la bandeja, no
-          llega el aviso al local y no cuentan para el historico. Hay que mirarlas en el
+          <strong>Estas reservas no entran aquí.</strong> No salen en la bandeja, no
+          llega el aviso al local y no cuentan para el histórico. Hay que mirarlas en el
           otro sistema.
         </p>
       )}

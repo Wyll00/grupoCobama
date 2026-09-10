@@ -31,7 +31,7 @@ export default function AdminLayout() {
             <NavLink to="/admin/reservas">Reservas</NavLink>
             <NavLink to="/admin/carta">Cartas</NavLink>
             <NavLink to="/admin/platos">Catalogo</NavLink>
-            <NavLink to="/admin/galeria">Galeria</NavLink>
+            <NavLink to="/admin/galeria">Galería</NavLink>
             <NavLink to="/admin/ocupacion">Ocupacion</NavLink>
             <NavLink to="/admin/locales">Locales</NavLink>
             <NavLink to="/admin/estadisticas">Estadisticas</NavLink>
@@ -73,7 +73,7 @@ function CambiarPassword({ onCerrar, onHecho }) {
 
   const guardar = async () => {
     if (nueva !== repetida) {
-      setError('Las dos contrasenas nuevas no coinciden');
+      setError('Las dos contraseñas nuevas no coinciden');
       return;
     }
     setEnviando(true);
@@ -90,7 +90,7 @@ function CambiarPassword({ onCerrar, onHecho }) {
 
   return (
     <Modal
-      titulo="Cambiar contrasena"
+      titulo="Cambiar contraseña"
       onCerrar={onCerrar}
       ancho="420px"
       pie={
@@ -105,12 +105,12 @@ function CambiarPassword({ onCerrar, onHecho }) {
       }
     >
       <Aviso tipo="error">{error}</Aviso>
-      <Aviso>Al cambiarla se cierran todas las sesiones y habra que entrar de nuevo.</Aviso>
+      <Aviso>Al cambiarla se cierran todas las sesiones y habrá que entrar de nuevo.</Aviso>
 
-      <Campo etiqueta="Contrasena actual">
+      <Campo etiqueta="Contraseña actual">
         <Entrada type="password" value={actual} onChange={(e) => setActual(e.target.value)} />
       </Campo>
-      <Campo etiqueta="Nueva contrasena" ayuda="Minimo 10 caracteres">
+      <Campo etiqueta="Nueva contraseña" ayuda="Mínimo 10 caracteres">
         <Entrada type="password" value={nueva} onChange={(e) => setNueva(e.target.value)} />
       </Campo>
       <Campo etiqueta="Repite la nueva">
