@@ -1598,8 +1598,17 @@
    numero se lee antes que una grafica con eje.
    ===================================================================== */
 
+/*
+  Un ancho maximo para todo el bloque.
+
+  Sin el, en un monitor de 2000 px las tres columnas se estiran hasta que una
+  barra de cuatro reservas mide medio metro y hay que mover la cabeza para ir
+  del titulo al numero. Los datos no crecen con la pantalla: lo que crece es
+  el hueco entre ellos.
+*/
 .seccion-panel {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.75rem;
+  max-width: 68rem;
 }
 
 .seccion-panel > h2 {
@@ -1611,7 +1620,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 2.5rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Por donde entra lo que no viene de la web. En una linea y en pequeno: es
+   contexto de la cifra de arriba, no una cifra mas. */
+.cifras__resto {
+  margin: 0 0 1.75rem;
+  font-size: 0.875rem;
 }
 
 .cifra {
@@ -1656,9 +1672,10 @@
 
 .barra {
   display: grid;
-  /* Etiqueta, carril y numero. El numero con ancho fijo para que las cifras
-     queden en columna y se puedan comparar de un vistazo. */
-  grid-template-columns: 6.5rem 1fr 2.2rem;
+  /* Etiqueta, carril y numero. La etiqueta a 9rem porque "La Casa del Mago"
+     se cortaba en "La Casa del Ma..."; el numero con ancho fijo para que las
+     cifras queden en columna y se puedan comparar de un vistazo. */
+  grid-template-columns: 9rem 1fr 2.2rem;
   align-items: center;
   gap: 0.6rem;
   font-size: 0.875rem;
@@ -1699,12 +1716,51 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Un cero no se destaca: esta para que se vea que se ha contado, no para
+   llamar la atencion. */
+.barra__valor--cero {
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+
+/* La linea que dice de cuantas habla un bloque. */
+.bloque-dato__nota {
+  margin: -0.35rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
 @media (max-width: 30rem) {
   .barra {
-    grid-template-columns: 5rem 1fr 2rem;
+    grid-template-columns: 6.5rem 1fr 2rem;
   }
 
   .cifras {
     gap: 1.5rem;
   }
+}
+
+/* "Por mes" ocupa la fila entera: es la linea de tiempo, y con una barra de un
+   tercio de pantalla no se comparan bien doce meses. */
+.bloque-dato--ancho {
+  margin-bottom: 1.25rem;
+}
+
+/* Las otras dos, a la mitad cada una. Se escriben en dos columnas fijas y no
+   con auto-fit: son SIEMPRE dos, y auto-fit las mandaba a una sola cuando la
+   cuenta salia unos pixeles corta. */
+.estado-bloques--dos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 46rem) {
+  .estado-bloques--dos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* En la fila ancha, la etiqueta del mes no necesita 9rem: son tres letras y un
+   ano. Lo que sobra se lo queda la barra, que es lo que hay que comparar. */
+.barras--anchas .barra {
+  grid-template-columns: 4.5rem 1fr 2.2rem;
 }

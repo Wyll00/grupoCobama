@@ -35,15 +35,68 @@ async function porMes(restauranteId, meses) {
     restauranteId ? [meses, restauranteId] : [meses]
   );
 
-  return filas.map((f) => ({
-    mes: f.mes,
-    total: Number(f.total),
-    web: Number(f.web),
-    whatsapp: Number(f.whatsapp),
-    telefono: Number(f.telefono),
-    comensales: Number(f.comensales ?? 0),
-    comensalesWeb: Number(f.comensales_web ?? 0),
-  }));
+  const porClave = new Map(
+    filas.map((f) => [
+      f.mes,
+      {
+        mes: f.mes,
+        total: Number(f.total),
+        web: Number(f.web),
+        whatsapp: Number(f.whatsapp),
+        telefono: Number(f.telefono),
+        comensales: Number(f.comensales ?? 0),
+        comensalesWeb: Number(f.comensales_web ?? 0),
+      },
+    ])
+  );
+
+  /*
+    Los meses SIN reservas salen igual, en cero.
+
+    Con solo los que tienen algo, un mes suelto se pinta como una barra al
+    100% y parece que ese mes fue un exito. Un mes a cero es un dato -no vino
+    nadie- y hay que poder verlo: es la diferencia entre una linea de tiempo y
+    una lista de los meses buenos.
+
+    Se rellenan desde hace `meses` hasta hoy. Los que vengan despues -hay
+    reservas para fechas futuras- se quedan como esten, sin inventar meses por
+    delante.
+  */
+  const vacio = (clave) => ({
+    mes: clave, total: 0, web: 0, whatsapp: 0, telefono: 0, comensales: 0, comensalesWeb: 0,
+  });
+
+  const hoy = new Date();
+  const serie = [];
+  for (let i = meses - 1; i >= 0; i -= 1) {
+    const d = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth() - i, 1));
+    const clave = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+    serie.push(porClave.get(clave) ?? vacio(clave));
+    porClave.delete(clave);
+  }
+  /*
+    Se quitan los meses vacios de ANTES de la primera reserva.
+
+    Con doce meses fijos, una web que lleva dos meses funcionando salia con
+    diez barras a cero delante. Eso no es un dato: es el tiempo en el que la
+    web no existia, y llena la pantalla de nada.
+
+    Los ceros de DENTRO se quedan -un mes sin reservas teniendo la web abierta
+    si es un dato- y siempre se ensenan al menos seis meses, para que la
+    grafica tenga forma de linea de tiempo desde el primer dia.
+  */
+  const MINIMO_MESES = 6;
+  const primeroConDatos = serie.findIndex((m) => m.total > 0);
+  const desde =
+    primeroConDatos === -1
+      ? Math.max(0, serie.length - MINIMO_MESES)
+      : Math.min(primeroConDatos, Math.max(0, serie.length - MINIMO_MESES));
+
+  // Y lo que caiga fuera del rango -reservas para mas adelante- detras.
+  return [
+    ...serie.slice(desde),
+    ...[...porClave.values()].sort((a, b) => a.mes.localeCompare(b.mes)),
+  ];
 }
 
 /** El reparto por local, para ver que casa tira mas de la web. */
@@ -93,6 +146,16 @@ async function comoAcaban(restauranteId, meses) {
 
   const fuera = { pendiente: 0, confirmada: 0, cancelada: 0, no_presentado: 0 };
   for (const f of filas) fuera[f.estado] = Number(f.n);
+  /*
+    El total va aqui dentro y CUENTA LAS CANCELADAS.
+
+    El titular de la pagina no las cuenta -son mesas que no se ocupan-, asi
+    que los dos numeros no coinciden y no tienen por que: uno dice cuanta
+    gente viene y el otro en que acaba lo que se pide. Pero sin este total la
+    pantalla se contradecia sola: arriba 4 y abajo cuatro cifras que sumaban
+    5, sin nada que explicara la diferencia.
+  */
+  fuera.total = Object.values(fuera).reduce((n, v) => n + v, 0);
   return fuera;
 }
 

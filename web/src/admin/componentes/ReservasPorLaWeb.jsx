@@ -11,8 +11,8 @@ import { Aviso } from './Campos.jsx';
  * UNA SOLA SERIE a proposito. La primera version iba a pintar web, WhatsApp y
  * telefono en la misma barra, pero la pregunta no es "por donde entran las
  * reservas", es "cuantas entran por la web": con tres colores hay que buscar
- * el que interesa antes de leer nada. El reparto va arriba en numeros, que
- * para tres cifras se lee antes que una leyenda.
+ * el que interesa antes de leer nada. Los otros caminos van en una linea
+ * debajo de las cifras, que para dos numeros se lee antes que una leyenda.
  *
  * El mes se cuenta por la FECHA DE LA RESERVA y no por cuando se pidio: lo
  * que le importa a una casa es cuanta gente se sento en marzo, no cuanta
@@ -40,9 +40,16 @@ function Barra({ etiqueta, valor, maximo, titulo }) {
     <li className="barra" title={titulo}>
       <span className="barra__etiqueta">{etiqueta}</span>
       <span className="barra__carril">
-        <span className="barra__relleno" style={{ width: `${porcentaje}%` }} />
+        {/*
+          A cero no se pinta nada. Antes salia un muñoncito de 3 px -el minimo
+          para que un 1 entre 40 se viera- y en las casas sin reservas parecia
+          que habia una poquita. Cero tiene que verse como cero: carril vacio.
+        */}
+        {valor > 0 && (
+          <span className="barra__relleno" style={{ width: `${porcentaje}%` }} />
+        )}
       </span>
-      <span className="barra__valor">{valor}</span>
+      <span className={`barra__valor ${valor === 0 ? 'barra__valor--cero' : ''}`}>{valor}</span>
     </li>
   );
 }
@@ -79,9 +86,13 @@ function Contenido({ datos }) {
   return (
     <>
       {/*
-        El titular es un numero, no una grafica. Es la respuesta a la unica
-        pregunta que se viene a hacer aqui, y una grafica para contestar
-        "cuantas" obliga a leer un eje para sacar un numero que cabe entero.
+        El titular es un numero, no una grafica: para contestar "cuantas", un
+        numero se lee entero y una grafica obliga a mirar un eje.
+
+        Las dos cifras que importan, y debajo en pequeño por donde entra el
+        resto. "Por otros caminos" estaba de tercera columna sin numero grande
+        y se descolgaba: tres cajas alineadas arriba, dos con un numero de 50
+        px y una sin nada.
       */}
       <div className="cifras">
         <p className="cifra">
@@ -98,30 +109,35 @@ function Contenido({ datos }) {
           <span className="cifra__que">comensales</span>
           <span className="cifra__nota">sentados gracias a la web</span>
         </p>
-        <p className="cifra cifra--menor">
-          <span className="cifra__que">Por otros caminos</span>
-          <span className="cifra__nota">
-            WhatsApp {resumen.whatsapp} · teléfono {resumen.telefono}
-          </span>
-        </p>
       </div>
 
-      <div className="estado-bloques">
-        <section className="bloque-dato">
-          <h3>Por mes</h3>
-          <ul className="barras">
-            {porMes.map((m) => (
-              <Barra
-                key={m.mes}
-                etiqueta={nombreDeMes(m.mes)}
-                valor={m.web}
-                maximo={topMes}
-                titulo={`${m.web} por la web de ${m.total} en total · ${m.comensalesWeb} comensales`}
-              />
-            ))}
-          </ul>
-        </section>
+      <p className="apagado cifras__resto">
+        Por otros caminos: WhatsApp {resumen.whatsapp} · teléfono {resumen.telefono}
+      </p>
 
+      {/*
+        "Por mes" va en su propia fila y las otras dos debajo.
+
+        Las tres en columnas dejaban un bloque de doce filas al lado de dos de
+        cuatro: la fila quedaba desparejo y las barras del mes, apretadas en un
+        tercio de pantalla, se hacian demasiado cortas para comparar.
+      */}
+      <section className="bloque-dato bloque-dato--ancho">
+        <h3>Por mes</h3>
+        <ul className="barras barras--anchas">
+          {porMes.map((m) => (
+            <Barra
+              key={m.mes}
+              etiqueta={nombreDeMes(m.mes)}
+              valor={m.web}
+              maximo={topMes}
+              titulo={`${m.web} por la web de ${m.total} en total · ${m.comensalesWeb} comensales`}
+            />
+          ))}
+        </ul>
+      </section>
+
+      <div className="estado-bloques estado-bloques--dos">
         <section className="bloque-dato">
           <h3>Por casa</h3>
           <ul className="barras">
@@ -139,6 +155,11 @@ function Contenido({ datos }) {
 
         <section className="bloque-dato">
           <h3>Cómo acaban</h3>
+          {/* Con su propio total: aqui SI cuentan las canceladas, y sin
+              decirlo la pantalla se contradecia -arriba 4, abajo 5-. */}
+          <p className="bloque-dato__nota">
+            De las {comoAcaban.total} que ha recibido la web
+          </p>
           {/*
             Sirve para saber si la web trae gente o trae ruido: muchas
             reservas y muchos "no se presentó" no es una web que funciona, es
@@ -147,7 +168,9 @@ function Contenido({ datos }) {
           <ul className="estado-lineas">
             <li className="estado-linea">
               <span className="estado-linea__que">Confirmadas</span>
-              <span className="estado-linea__valor es-si">{comoAcaban.confirmada}</span>
+              <span className={`estado-linea__valor ${comoAcaban.confirmada > 0 ? 'es-si' : ''}`}>
+                {comoAcaban.confirmada}
+              </span>
             </li>
             <li className="estado-linea">
               <span className="estado-linea__que">Sin confirmar todavía</span>
