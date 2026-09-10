@@ -2842,7 +2842,14 @@ button {
   align-items: center;
   gap: 0.15rem;
 
-  margin: 0;
+  /* margin-block y NO `margin: 0`.
+     Este parrafo lleva tambien la clase .contenedor, que lo centra con
+     `margin-inline: auto`. Un `margin: 0` de aqui anulaba ese auto -misma
+     especificidad y esta regla va mas abajo en la hoja-, y el cartel se
+     quedaba 93 px a la izquierda del centro de la banda. Se veia poco porque
+     el texto SI estaba centrado dentro de su caja; lo que estaba descolocado
+     era la caja. */
+  margin-block: 0;
   padding-block: 1.4rem;
   text-align: center;
 }
