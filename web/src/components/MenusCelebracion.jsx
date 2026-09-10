@@ -1,6 +1,6 @@
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
-import { ui } from '../datos/idioma.js';
+import { texto, ui } from '../datos/idioma.js';
 import { useIdioma } from '../hooks/useIdioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
@@ -78,8 +78,10 @@ function Menu({ menu, minimoArriba, idioma }) {
       <header className="menu__cabecera">
         <div className="menu__identidad">
           <p className="menu__tipo">{ui('menus.tipo', idioma)}</p>
-          <h3>{menu.nombre}</h3>
-          {menu.descripcion ? <p className="menu__descripcion">{menu.descripcion}</p> : null}
+          <h3>{texto(menu, 'nombre', idioma)}</h3>
+          {texto(menu, 'descripcion', idioma) ? (
+            <p className="menu__descripcion">{texto(menu, 'descripcion', idioma)}</p>
+          ) : null}
         </div>
 
         {/* El precio dentro del circulo y la unidad debajo, en la misma
@@ -100,17 +102,21 @@ function Menu({ menu, minimoArriba, idioma }) {
 
       {menu.secciones.map((seccion) => (
         <section key={seccion.id} className="menu__seccion">
-          <h4>{seccion.titulo}</h4>
-          {seccion.nota ? <p className="menu__nota">{seccion.nota}</p> : null}
+          <h4>{texto(seccion, 'titulo', idioma)}</h4>
+          {texto(seccion, 'nota', idioma) ? (
+            <p className="menu__nota">{texto(seccion, 'nota', idioma)}</p>
+          ) : null}
           <ul className="menu__lineas">
             {seccion.lineas.map((linea) => (
-              <li key={linea.id}>{linea.texto}</li>
+              <li key={linea.id}>{texto(linea, 'texto', idioma)}</li>
             ))}
           </ul>
         </section>
       ))}
 
-      {menu.incluye ? <p className="menu__incluye">{menu.incluye}</p> : null}
+      {texto(menu, 'incluye', idioma) ? (
+        <p className="menu__incluye">{texto(menu, 'incluye', idioma)}</p>
+      ) : null}
     </article>
   );
 }

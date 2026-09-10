@@ -442,10 +442,12 @@ const UI = {
 
   // ---- menus de celebracion ----
   //
-  // Solo el armazon. Lo que lleva cada menu -"Papas arrugadas con mojos"- es
-  // texto libre que escribe cada casa en el panel y no tiene columnas de
-  // traduccion: sale en castellano, igual que un plato de la carta sin
-  // traducir.
+  // Aqui solo el armazon; el CONTENIDO de cada menu -sus secciones y sus
+  // lineas- se traduce en la base, no en este diccionario, porque lo escribe
+  // cada casa. Ver la migracion 027 y el seed 015.
+  //
+  // Los nombres de los menus -Clasico, Familiar, Casona, Arrocero- se quedan
+  // en castellano a proposito: son como los llama la casa.
   'menus.titulo': {
     es: 'Menús de celebración',
     en: 'Set menus for celebrations',

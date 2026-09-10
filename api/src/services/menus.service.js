@@ -17,8 +17,10 @@ import { pool } from '../config/db.js';
  */
 export async function menusDeCelebracion(slug) {
   const [menus] = await pool.execute(
-    `SELECT id, slug, nombre, descripcion, precio_por_persona, unidad_precio,
-            minimo_comensales, incluye
+    `SELECT id, slug, nombre, nombre_en, nombre_de,
+            descripcion, descripcion_en, descripcion_de,
+            precio_por_persona, unidad_precio, minimo_comensales,
+            incluye, incluye_en, incluye_de
        FROM menus_grupo
       WHERE activo = 1
         AND (restaurante_id IS NULL
@@ -32,7 +34,7 @@ export async function menusDeCelebracion(slug) {
 
   const huecosMenus = menus.map(() => '?').join(', ');
   const [secciones] = await pool.execute(
-    `SELECT id, menu_id, titulo, nota
+    `SELECT id, menu_id, titulo, titulo_en, titulo_de, nota, nota_en, nota_de
        FROM menu_grupo_secciones
       WHERE menu_id IN (${huecosMenus})
       ORDER BY menu_id, orden, id`,
@@ -47,7 +49,11 @@ export async function menusDeCelebracion(slug) {
     seccionesPorMenu.get(s.menu_id).push({
       id: s.id,
       titulo: s.titulo,
+      titulo_en: s.titulo_en,
+      titulo_de: s.titulo_de,
       nota: s.nota,
+      nota_en: s.nota_en,
+      nota_de: s.nota_de,
       lineas: lineasPorSeccion.get(s.id) ?? [],
     });
   }
@@ -57,11 +63,17 @@ export async function menusDeCelebracion(slug) {
       id: m.id,
       slug: m.slug,
       nombre: m.nombre,
+      nombre_en: m.nombre_en,
+      nombre_de: m.nombre_de,
       descripcion: m.descripcion,
+      descripcion_en: m.descripcion_en,
+      descripcion_de: m.descripcion_de,
       precio: Number(m.precio_por_persona),
       unidad_precio: m.unidad_precio,
       minimo_comensales: m.minimo_comensales,
       incluye: m.incluye,
+      incluye_en: m.incluye_en,
+      incluye_de: m.incluye_de,
       secciones: seccionesPorMenu.get(m.id) ?? [],
     }))
     // Un menu sin secciones es una tarjeta con nombre y precio y nada mas:
@@ -76,7 +88,7 @@ async function cargarLineas(seccionIds) {
 
   const huecos = seccionIds.map(() => '?').join(', ');
   const [filas] = await pool.execute(
-    `SELECT id, seccion_id, texto
+    `SELECT id, seccion_id, texto, texto_en, texto_de
        FROM menu_grupo_lineas
       WHERE seccion_id IN (${huecos})
       ORDER BY seccion_id, orden, id`,
@@ -85,7 +97,12 @@ async function cargarLineas(seccionIds) {
 
   for (const f of filas) {
     if (!mapa.has(f.seccion_id)) mapa.set(f.seccion_id, []);
-    mapa.get(f.seccion_id).push({ id: f.id, texto: f.texto });
+    mapa.get(f.seccion_id).push({
+      id: f.id,
+      texto: f.texto,
+      texto_en: f.texto_en,
+      texto_de: f.texto_de,
+    });
   }
 
   return mapa;
