@@ -32,12 +32,26 @@ export default function Layout() {
             <Logo descriptor="GASTRONOMÍA CANARIA" />
           </Link>
 
+          {/*
+            En el movil de esta barra solo queda "Reservar".
+
+            Los cinco enlaces no caben en 390 px: la barra se quedaba en 56 px
+            de ancho con 522 de contenido y cuatro de los cinco no se podian
+            alcanzar. Y bajarlos a una segunda fila hacia la cabecera de 167
+            px, que fija se come el 20% de la pantalla.
+
+            Asi que en el movil se esconden los locales -clase `nav__local`- y
+            la cabecera se queda en una fila, que si puede ir fija. A los
+            cuatro locales se llega por las tarjetas de la portada y por el
+            pie, que los lista enteros. Lo que tiene que estar SIEMPRE a mano
+            en un telefono es reservar, no elegir casa.
+          */}
           <nav className="nav" aria-label="Locales">
             {(locales ?? []).map((local) => (
               <NavLink
                 key={local.slug}
                 to={`/${local.slug}`}
-                className={({ isActive }) => (isActive ? 'activo' : undefined)}
+                className={({ isActive }) => `nav__local${isActive ? ' activo' : ''}`}
               >
                 {local.nombre}
               </NavLink>
