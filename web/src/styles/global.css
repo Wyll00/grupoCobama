@@ -30,6 +30,12 @@
   --ocre-hover: #a86a20;
   --ocre: #c07d2a;
   --ocre-claro: #e0a94f;
+  /* Ocre para TEXTO pequeno, no para rellenos.
+     --ocre (#c07d2a) sobre el crema de la pagina da 3,01 de contraste, y un
+     rotulo de 11 px necesita 4,5. Este da 4,69. No sustituye a --ocre: los
+     botones rellenos y los bordes siguen con aquel, que es el color de la
+     casa; este es solo para cuando el ocre tiene que leerse como letra. */
+  --ocre-texto: #96601d;
   --mojo-rojo: #a63a2b;
   --mojo-verde: #4f6b43;
   --texto: #2b2622;
@@ -85,6 +91,8 @@
      bien sobre crema queda apagado y sucio sobre carbon. */
   --ocre: #d9954a;
   --ocre-claro: #eab868;
+  /* De noche el ocre claro ya pasa de sobra sobre el fondo oscuro. */
+  --ocre-texto: #eab868;
   --mojo-rojo: #d05f4c;
   --mojo-verde: #7e9d6d;
 
@@ -465,11 +473,10 @@ button {
    automatico, las de arriba mandan y Galeria ocupa las dos: los bordes
    cuadran solos, midan lo que midan los textos. */
 .hero__acciones {
-  flex: none;
-  display: grid;
-  grid-template-columns: auto auto;
-  justify-content: end;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.7rem;
+  margin-top: 1.75rem;
 }
 
 /* ------------------------------------------------------ tarjetas ----- */
@@ -1844,11 +1851,25 @@ button {
 
 /* --------------------------------- boton de galeria en la portada --- */
 
+/* Dos columnas: el texto manda y el mosaico ocupa lo que sobra.
+
+   `minmax(0, ...)` en las dos y no `auto`: una rejilla con contenido que no
+   se puede encoger -una foto- se desborda por la derecha en cuanto la
+   ventana baja de lo que mide la foto, y el minimo automatico de una columna
+   de rejilla es el tamano del contenido, no cero. */
 .hero__fila {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+/* En pantallas estrechas el mosaico va debajo del texto. Encima seria lo
+   primero que se ve, y lo primero tiene que ser de que va esto. */
+@media (max-width: 60rem) {
+  .hero__fila {
+    grid-template-columns: 1fr;
+  }
 }
 
 .hero__texto { min-width: 0; }
@@ -2617,135 +2638,147 @@ button {
 }
 
 /*
-  Interruptor de tres posiciones: espanol, ingles, aleman.
+  Selector de idioma: un desplegable.
 
-  Una sola pastilla que se desliza, no tres botones que se encienden. Es la
-  diferencia entre "hay tres cosas y una esta marcada" y "esto es un mando con
-  tres posiciones": lo segundo se entiende sin leer nada, que es de lo que se
-  trata cuando quien lo mira no habla el idioma en el que esta escrito.
+  Antes eran tres banderas en fila, un interruptor de tres posiciones. Se leia
+  bien pero ocupaba el ancho de tres botones en una cabecera que ya lleva
+  cinco enlaces y el interruptor de tema, y en el movil empujaba la
+  navegacion a una segunda linea.
 
-  Las tres columnas son iguales -1fr cada una- porque la corredera se mueve un
-  100% de su propio ancho por posicion. Con columnas de anchos distintos
-  habria que calcular el desplazamiento en pixeles y volveria a descuadrarse
-  cada vez que cambie una etiqueta.
+  El desplegable ocupa uno. Y dice antes lo que hay que saber -en que idioma
+  estas- porque es lo unico que se ve cerrado; las otras dos opciones
+  aparecen cuando se van a usar.
 */
 .idiomas {
   position: relative;
-  display: grid;
-  /* auto-fit y no un 3 fijo: una carta puede ofrecer dos idiomas en vez de
-     tres, y con las columnas escritas a mano quedaria un hueco vacio con la
-     corredera moviendose por sitios donde no hay nada. */
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  flex-shrink: 0;
-  padding: 3px;
-  border: 1px solid rgba(250, 246, 240, 0.28);
-  border-radius: 999px;
-  background: rgba(250, 246, 240, 0.08);
+  flex: none;
 }
 
-.idiomas__corredera {
-  position: absolute;
-  /* Los 3px del padding, para que la pastilla quede dentro del carril. */
-  top: 3px;
-  left: 3px;
-  bottom: 3px;
-  /* El ancho lo pone el numero de posiciones que haya, no un 3 fijo: se
-     calcula en el componente con --posiciones. */
-  width: calc((100% - 6px) / var(--posiciones, 3));
-  border-radius: 999px;
-  background: var(--ocre-claro);
-  /*
-    Mas larga y con una curva que frena al final en vez de cortarse en seco.
-    Los 0,28 de antes se leian como un salto; a 0,45 se sigue con la vista, que
-    es de lo que se trata: el movimiento explica que las tres posiciones son
-    del mismo mando.
-
-    El ultimo tramo de la curva pasa de 1 -sobrepasa un poco y vuelve-. Es lo
-    que hace que parezca que la pastilla tiene peso en vez de teletransportarse.
-  */
-  transition: transform 0.45s cubic-bezier(0.34, 1.35, 0.4, 1);
-  pointer-events: none;
-}
-
-/* Con el sistema puesto en "menos animaciones" salta en vez de deslizarse: ahi
-   el usuario ya ha dicho que no quiere movimiento. */
-@media (prefers-reduced-motion: reduce) {
-  .idiomas__corredera {
-    transition: none;
-  }
-}
-
-.idioma {
-  /* Por encima de la corredera, que va en el mismo sitio. */
-  position: relative;
-  z-index: 1;
-
+.idiomas__actual {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.32rem 0.6rem;
-  border: none;
+  gap: 0.4rem;
+  /* 44 de alto: es lo que acierta un dedo sin apuntar. La cabecera es lo
+     primero que se toca en el movil y este boton esta pegado al borde. */
+  min-height: 44px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--borde);
   border-radius: 999px;
   background: transparent;
-  color: var(--crema);
+  color: var(--tinta);
   font-family: var(--fuente-texto);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-/*
-  El elegido va en tinta oscura porque debajo tiene la pastilla ocre clara. El
-  crema de los otros dos sobre ocre daria 1,9 de contraste: ilegible justo en
-  el unico que hay que poder leer.
-*/
-.idioma--activo {
-  color: var(--carbon);
+.idiomas__actual:hover {
+  border-color: var(--ocre);
+  background: color-mix(in srgb, var(--ocre) 10%, transparent);
 }
 
-.idioma:not(.idioma--activo) {
-  opacity: 0.6;
+.idiomas__actual:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
 }
 
-.idioma:not(.idioma--activo):hover {
-  opacity: 0.9;
+.idiomas__flecha {
+  flex: none;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.idiomas__actual[aria-expanded='true'] .idiomas__flecha {
+  transform: rotate(180deg);
+}
+
+/* El menu, colgando del boton y alineado por la derecha: el selector esta en
+   la esquina, y abriendolo hacia la izquierda no se sale de la pantalla. */
+.idiomas__menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 60;
+
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem;
+  min-width: 11rem;
+
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--superficie);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+.idiomas__opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 40px;
+  padding: 0.4rem 0.55rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.idiomas__opcion:hover,
+.idiomas__opcion:focus-visible {
+  background: color-mix(in srgb, var(--ocre) 14%, transparent);
+  outline: none;
+}
+
+/* El puesto se marca con el fondo y con el nombre en negrita, no solo con el
+   color: quien no distingue bien los colores tiene que poder ver cual esta. */
+.idiomas__opcion--puesta {
+  background: color-mix(in srgb, var(--ocre) 20%, transparent);
+  font-weight: 700;
+}
+
+.idiomas__nombre {
+  flex: 1;
+}
+
+.idiomas__opcion .idioma__codigo {
+  opacity: 0.65;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .idioma__bandera {
   width: 22px;
   height: 11px;
-  /* El borde separa la bandera del fondo oscuro: el blanco de la del Reino
-     Unido y el negro de la alemana se comen el canto contra la cabecera. */
-  outline: 1px solid rgba(250, 246, 240, 0.35);
+  /* El borde separa la bandera del fondo: el blanco de la del Reino Unido y
+     el negro de la alemana se comen el canto contra cualquiera de los dos. */
+  outline: 1px solid var(--borde);
   outline-offset: -1px;
   border-radius: 1px;
   flex: none;
 }
 
+/* En el boton cerrado, sobre la cabecera. */
+.idiomas__actual .idioma__bandera {
+  outline-color: rgba(128, 128, 128, 0.45);
+}
+
 /*
-  En movil se quedan las banderas y se va el codigo. La cabecera es estrecha y
-  "EN"/"DE" al lado del dibujo no anade nada que el dibujo no diga ya.
+  En movil se queda la bandera y se va el codigo del boton cerrado. La
+  cabecera es estrecha y "EN" al lado del dibujo no anade nada. Dentro del
+  menu si se queda: ahi hay sitio y es lo que de verdad identifica al idioma,
+  porque una bandera es un pais.
 */
 @media (max-width: 560px) {
-  .idioma__codigo {
+  .idiomas__actual .idioma__codigo {
     display: none;
-  }
-
-  /*
-    Sin el codigo el boton se quedaba en 37x24, que para un dedo es poco: lo
-    razonable son 44. Hoy da igual porque estan apagados, pero el tamano del
-    blanco no es algo que uno se acuerde de revisar el dia que los enciende,
-    y para entonces ya esta publicado.
-  */
-  .idioma {
-    min-width: 44px;
-    min-height: 44px;
-    justify-content: center;
-    padding: 0.35rem 0.4rem;
   }
 }
 
@@ -2785,21 +2818,25 @@ button {
   el ocre normal se queda corto de contraste, asi que va el claro: es el mismo
   tono subido de luz que ya usan el boton de galeria y los titulos del pie.
 */
+/* La banda de la casa que viene, entre el hero y los locales.
+
+   Va a todo lo ancho y con la linea de arriba y abajo en discontinuo: lo que
+   todavia no esta abierto no se dibuja con la misma linea firme que lo que ya
+   se puede usar. */
+.proxima-banda {
+  background: rgba(224, 169, 79, 0.07);
+  border-block: 1px dashed rgba(224, 169, 79, 0.45);
+}
+
 .proxima {
-  /* Ocupa las dos columnas de la rejilla de botones: el mismo ancho que
-     "Galeria", que es el que tiene justo encima. */
-  grid-column: 1 / -1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem 1rem;
 
-  margin: 0.35rem 0 0;
-  padding: 0.85rem 1rem;
-
-  border: 1px dashed rgba(224, 169, 79, 0.55);
-  border-radius: var(--radio-s);
-  background: rgba(224, 169, 79, 0.08);
+  margin: 0;
+  padding-block: 1.1rem;
   text-align: center;
 }
 
@@ -2811,20 +2848,25 @@ button {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ocre-claro);
+  /* --ocre-texto y no --ocre-claro: son 11 px, y el ocre claro sobre el fondo
+     de dia da 2,2 de contraste. Medido, no a ojo. */
+  color: var(--ocre-texto);
 }
 
+/* --tinta y no --crema: la banda ya no vive dentro del hero, que es oscuro
+   en los dos temas. Con --crema, "El Baifo" quedaba en crema sobre crema y no
+   se leia de dia. Los tres colores de aqui siguen el tema. */
 .proxima__nombre {
   font-family: var(--fuente-titulo);
-  font-size: 1.7rem;
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--crema);
+  color: var(--tinta);
   line-height: 1.2;
 }
 
 .proxima__nota {
   font-size: 0.9rem;
-  color: #b9afa4;
+  color: var(--texto-suave);
 }
 
 
@@ -3139,4 +3181,88 @@ button {
   background: color-mix(in srgb, var(--ocre) 10%, transparent);
   border-radius: 0 var(--radio-s, 6px) var(--radio-s, 6px) 0;
   font-size: 0.9rem;
+}
+
+/* =====================================================================
+   El mosaico de fotos de la portada
+
+   Tres platos en un bloque: uno grande a la izquierda y dos apilados a la
+   derecha. Es lo unico de la portada que dice a que sabe esto; el resto son
+   nombres, direcciones y horarios.
+
+   Las alturas van por `aspect-ratio` y no en pixeles, y las fotos con
+   `object-fit: cover`: asi el bloque se estira y se encoge con la columna
+   sin que haya que tocar numeros, y sin que ninguna foto salga deformada.
+   ===================================================================== */
+
+.mosaico {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.85rem;
+  /* La proporcion del bloque entero. Sin esto, las dos filas de la derecha
+     se reparten la altura del contenido y la grande manda; con esto mandan
+     las tres a la vez y el bloque no da saltos al cargar. */
+  aspect-ratio: 5 / 4.6;
+}
+
+.mosaico__pieza {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  /* Sobre el fondo carbon del hero, un borde muy tenue separa la foto oscura
+     del fondo oscuro sin dibujar un marco. */
+  box-shadow: inset 0 0 0 1px rgba(224, 169, 79, 0.18);
+  background: #2a231d;
+}
+
+.mosaico__pieza--grande {
+  grid-row: 1 / -1;
+}
+
+.mosaico__pieza img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* El nombre del plato, sobre un degradado y no sobre una barra opaca: una
+   banda solida encima de la foto tapa justo la parte de abajo, que en una
+   foto de comida suele ser el plato. */
+.mosaico__nombre {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 1.6rem 0.85rem 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  color: var(--crema);
+  background: linear-gradient(to top, rgba(20, 16, 13, 0.88), rgba(20, 16, 13, 0));
+}
+
+.mosaico__pieza--grande .mosaico__nombre {
+  font-size: 0.95rem;
+  padding: 2rem 1rem 0.85rem;
+}
+
+/* En el movil el bloque se tumba: la grande arriba a todo lo ancho y las dos
+   pequenas debajo. Manteniendo la rejilla de escritorio, la grande se
+   quedaria en una columna de dos dedos de ancho. */
+@media (max-width: 60rem) {
+  .mosaico {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    aspect-ratio: auto;
+  }
+
+  .mosaico__pieza--grande {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    aspect-ratio: 16 / 10;
+  }
+
+  .mosaico__pieza:not(.mosaico__pieza--grande) {
+    aspect-ratio: 4 / 3;
+  }
 }

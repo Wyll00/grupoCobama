@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 import TarjetaLocal from '../components/TarjetaLocal.jsx';
+import MosaicoPortada from '../components/MosaicoPortada.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 import { ui } from '../datos/idioma.js';
@@ -50,13 +51,15 @@ export default function Home() {
           <div className="hero__texto">
             <h1>{ui('home.titulo', idioma)}</h1>
             <p className="hero__entradilla">{ui('home.entradilla', idioma)}</p>
-          </div>
 
-          {/* Las tres acciones juntas arriba a la derecha. Cada una con su
-              peso: la reserva rellena en ocre, WhatsApp en el verde mojo
-              (que ademas es el color con el que la gente reconoce WhatsApp)
-              y la galeria contorneada, que es la menos urgente de las tres. */}
-          <div className="hero__acciones">
+            {/* Los botones debajo del texto y no en la esquina de enfrente:
+                se leen en el orden en que se decide -que es esto, donde
+                esta, como reservo- y no obligan a cruzar la pantalla. Cada
+                uno con su peso: la reserva rellena en ocre, WhatsApp en el
+                verde mojo (que ademas es el color con el que la gente
+                reconoce WhatsApp) y la galeria contorneada, que es la menos
+                urgente de las tres. */}
+            <div className="hero__acciones">
             <Link className="boton boton--principal" to="/reservar">
               {ui('ficha.reservarMesa', idioma)}
             </Link>
@@ -75,35 +78,44 @@ export default function Home() {
               resto de la pagina. El dia que se suba la primera foto vuelve
               solo, sin tocar nada.
             */}
-            {(locales ?? []).some((l) => l.fotos > 0) && (
-              <Link className="boton hero__galeria" to="/galeria">
-                {ui('home.galeria', idioma)}
-              </Link>
-            )}
-
-            {/*
-              La casa que viene, debajo de galeria y del ancho de los botones.
-
-              NO es un boton: esquinas de panel y no de pastilla -en esta web
-              las de pastilla son siempre algo que se pulsa- y borde
-              discontinuo. No lleva a ningun sitio todavia porque no hay nada
-              que enseniar, y un cartel con forma de boton se acaba pulsando:
-              la gente pulsa, no pasa nada, y se queda pensando que la web
-              esta rota.
-
-              Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una
-              fecha, esa fecha es una promesa que alguien tiene que cumplir, y
-              las aperturas se mueven.
-            */}
-            <p className="proxima">
-              <span className="proxima__aviso">{ui('home.proximamente', idioma)}</span>
-              <span className="proxima__nombre">El Baifo</span>
-              <span className="proxima__nota">{ui('home.quintaCasa', idioma)}</span>
-            </p>
+              {(locales ?? []).some((l) => l.fotos > 0) && (
+                <Link className="boton hero__galeria" to="/galeria">
+                  {ui('home.galeria', idioma)}
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
 
+          {/* Tres platos, no uno. Es lo unico de la portada que dice a que
+              sabe esto: el resto son nombres, direcciones y horarios. */}
+          <MosaicoPortada />
+        </div>
       </section>
+
+      {/*
+        La casa que viene, en una banda propia entre el hero y los locales.
+
+        Estaba metida en la columna de botones y ahi competia con "Reservar
+        mesa", que es la accion que da dinero. En su propia banda se lee
+        entera de una pasada y no le quita sitio a nada.
+
+        NO es un boton: esquinas de panel y no de pastilla -en esta web las de
+        pastilla son siempre algo que se pulsa- y borde discontinuo. No lleva
+        a ningun sitio todavia porque no hay nada que ensenar, y un cartel con
+        forma de boton se acaba pulsando: la gente pulsa, no pasa nada, y se
+        queda pensando que la web esta rota.
+
+        Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una fecha,
+        esa fecha es una promesa que alguien tiene que cumplir, y las
+        aperturas se mueven.
+      */}
+      <aside className="proxima-banda">
+        <p className="contenedor proxima">
+          <span className="proxima__aviso">{ui('home.proximamente', idioma)}</span>
+          <span className="proxima__nombre">El Baifo</span>
+          <span className="proxima__nota">{ui('home.quintaCasa', idioma)}</span>
+        </p>
+      </aside>
 
       <section className="seccion">
         <div className="contenedor">

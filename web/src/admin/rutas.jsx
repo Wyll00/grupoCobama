@@ -15,6 +15,7 @@ const Reservas = lazy(() => import('./paginas/Reservas.jsx'));
 const Ocupacion = lazy(() => import('./paginas/Ocupacion.jsx'));
 const GaleriaAdmin = lazy(() => import('./paginas/Galeria.jsx'));
 const Usuarios = lazy(() => import('./paginas/Usuarios.jsx'));
+const Estado = lazy(() => import('./paginas/Estado.jsx'));
 
 /**
  * Arbol de rutas del panel.
@@ -39,6 +40,7 @@ export function rutasAdmin() {
         <Route path="ocupacion" element={<Ocupacion />} />
         <Route path="galeria" element={<GaleriaAdmin />} />
         <Route path="usuarios" element={<Usuarios />} />
+        <Route path="estado" element={<Estado />} />
       </Route>
     </Route>
   );

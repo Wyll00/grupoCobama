@@ -30,12 +30,15 @@ export default function AdminLayout() {
             </NavLink>
             <NavLink to="/admin/reservas">Reservas</NavLink>
             <NavLink to="/admin/carta">Cartas</NavLink>
-            <NavLink to="/admin/platos">Catalogo</NavLink>
+            <NavLink to="/admin/platos">Catálogo</NavLink>
             <NavLink to="/admin/galeria">Galería</NavLink>
-            <NavLink to="/admin/ocupacion">Ocupacion</NavLink>
+            <NavLink to="/admin/ocupacion">Ocupación</NavLink>
             <NavLink to="/admin/locales">Locales</NavLink>
-            <NavLink to="/admin/estadisticas">Estadisticas</NavLink>
+            <NavLink to="/admin/estadisticas">Estadísticas</NavLink>
             {esAdmin && <NavLink to="/admin/usuarios">Usuarios</NavLink>}
+            {/* Solo admin_grupo: la API lo rechaza para los demas, asi que
+                ensenar el enlace seria mandarlos a un 403. */}
+            {esAdmin && <NavLink to="/admin/estado">Estado</NavLink>}
           </nav>
 
           <div className="admin__usuario">
@@ -43,7 +46,7 @@ export default function AdminLayout() {
               <strong>{usuario?.nombre}</strong>
               <span>{esAdmin ? 'Admin de grupo' : 'Encargado'}</span>
             </div>
-            <Boton onClick={() => setCambiandoPassword(true)}>Contrasena</Boton>
+            <Boton onClick={() => setCambiandoPassword(true)}>Contraseña</Boton>
             <Boton onClick={alSalir}>Salir</Boton>
           </div>
         </div>
