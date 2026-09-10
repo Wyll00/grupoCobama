@@ -1589,3 +1589,122 @@
 .estado-linea__valor.es-no {
   color: #c0703b;
 }
+
+/* =====================================================================
+   Reservas por la web
+
+   Un numero grande y unas barras de UNA sola serie. La pregunta que se viene
+   a hacer aqui es "cuantas entran por la web", y para contestar "cuantas" un
+   numero se lee antes que una grafica con eje.
+   ===================================================================== */
+
+.seccion-panel {
+  margin-bottom: 2.5rem;
+}
+
+.seccion-panel > h2 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.cifra {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+}
+
+.cifra__numero {
+  font-family: var(--fuente-titulo);
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1;
+  /* El ocre de texto, no el de relleno: son cifras, y a este tamano el ocre
+     normal sobre el fondo claro se queda corto de contraste. */
+  color: var(--ocre-texto);
+}
+
+.cifra__que {
+  font-weight: 600;
+}
+
+.cifra__nota {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.cifra--menor {
+  justify-content: flex-end;
+}
+
+/* ---- las barras ---- */
+
+.barras {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.barra {
+  display: grid;
+  /* Etiqueta, carril y numero. El numero con ancho fijo para que las cifras
+     queden en columna y se puedan comparar de un vistazo. */
+  grid-template-columns: 6.5rem 1fr 2.2rem;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+}
+
+.barra__etiqueta {
+  color: var(--texto-suave);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* El carril solo se insinua: no lleva dato, asi que no compite con la barra.
+   Va sin exigencia de contraste a proposito. */
+.barra__carril {
+  height: 10px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--texto-suave) 18%, transparent);
+  overflow: hidden;
+}
+
+.barra__relleno {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--ocre);
+  /* Minimo visible: un valor de 1 sobre 40 daria una barra de medio pixel, y
+     media barra se lee como cero. */
+  min-width: 3px;
+}
+
+/* El numero SIEMPRE escrito, no solo al pasar el raton. Esta pantalla se mira
+   de reojo entre servicio y servicio: obligar a apuntar para saber cuanto
+   vale una barra es no dar el dato. */
+.barra__valor {
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 30rem) {
+  .barra {
+    grid-template-columns: 5rem 1fr 2rem;
+  }
+
+  .cifras {
+    gap: 1.5rem;
+  }
+}

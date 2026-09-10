@@ -108,6 +108,9 @@ export const adminApi = {
   // Que esta conectado de verdad: CoverManager, correo, purga. Solo
   // admin_grupo; el servidor lo rechaza para los demas.
   estado: (opts) => get('/admin/estado', opts),
+  // Cuantas reservas entran y por donde. El alcance -grupo o un local- lo
+  // decide el token, no se le pasa.
+  estadisticasReservas: (meses = 12) => get(`/admin/reservas/estadisticas?meses=${meses}`),
   // Mapa de alergenos de la carta, para la pagina de estadisticas.
   mapaAlergenos: () => get('/admin/alergenos/mapa'),
   categorias: () => get('/categorias'),

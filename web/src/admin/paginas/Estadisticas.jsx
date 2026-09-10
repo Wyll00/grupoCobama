@@ -2,14 +2,18 @@ import { adminApi } from '../api.js';
 import { useDatos } from '../useDatos.js';
 import { Aviso } from '../componentes/Campos.jsx';
 import IconoAlergeno from '../../components/IconoAlergeno.jsx';
+import ReservasPorLaWeb from '../componentes/ReservasPorLaWeb.jsx';
 
 /**
- * Estadisticas de la carta.
+ * Estadisticas.
  *
- * De momento solo el mapa de alergenos. Las cifras de reservas, ocupacion o
- * evolucion de precios no caben todavia: con cinco reservas y cero registros de
- * ocupacion saldrian graficas vacias, y una pantalla llena de ceros parece un
- * producto sin usar aunque el producto este bien.
+ * Dos bloques y en este orden: primero las reservas que entran por la web,
+ * que es lo que se viene a mirar, y debajo el mapa de alergenos de la carta.
+ *
+ * Las cifras de reservas estuvieron fuera un tiempo porque con cinco filas
+ * saldrian graficas vacias. Se ponen igual: con pocas se ven pocas, y eso ya
+ * es un dato. Lo que no se hace es inventar un cero bonito -sin ninguna
+ * reserva la pantalla lo dice con palabras, no con una grafica plana-.
  */
 export default function Estadisticas() {
   const mapa = useDatos(() => adminApi.mapaAlergenos(), []);
@@ -19,12 +23,21 @@ export default function Estadisticas() {
     <>
       <header className="pagina__cabecera">
         <div>
-          <h1>Estadísticas de la carta</h1>
+          <h1>Estadísticas</h1>
           <p className="apagado">
-            Que puede comer alguien con una intolerancia, plato a plato.
+            Cuántas reservas entran por la web, y qué puede comer alguien con una
+            intolerancia.
           </p>
         </div>
       </header>
+
+      <section className="seccion-panel">
+        <h2>Reservas por la web</h2>
+        <ReservasPorLaWeb />
+      </section>
+
+      <section className="seccion-panel">
+        <h2>Alérgenos de la carta</h2>
 
       <Aviso tipo="error">{mapa.error?.message}</Aviso>
 
@@ -86,6 +99,7 @@ export default function Estadisticas() {
           </section>
         </>
       )}
+      </section>
     </>
   );
 }

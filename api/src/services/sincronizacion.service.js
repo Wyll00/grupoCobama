@@ -93,10 +93,24 @@ export async function intentarUna(reservaId) {
       local: { id: fila.local_id, nombre: fila.local_nombre, covermanager_id: fila.covermanager_id },
     });
 
+    /*
+      Al entrar en CoverManager, la reserva queda CONFIRMADA sola.
+
+      Antes se quedaba en 'pendiente' y alguien del grupo tenia que darle a
+      confirmar en el panel. Eso era pedir el trabajo dos veces: CoverManager
+      es el libro de mesas de verdad, y si el la ha aceptado, la mesa esta
+      dada. Volver a validarla aqui no anade informacion, solo retrasa.
+
+      Solo se confirma lo que estaba PENDIENTE. Una reserva que alguien ya
+      cancelo o marco como no presentada no vuelve atras porque un reintento
+      de envio salga bien: el estado lo puso una persona mirando, y eso pesa
+      mas que esto.
+    */
     await pool.execute(
       `UPDATE reservas
           SET cm_estado = 'enviada', cm_id = ?, cm_enviada_en = NOW(),
-              cm_ultimo_error = NULL, cm_proximo_intento = NULL
+              cm_ultimo_error = NULL, cm_proximo_intento = NULL,
+              estado = IF(estado = 'pendiente', 'confirmada', estado)
         WHERE id = ?`,
       [id, reservaId]
     );
