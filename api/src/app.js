@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import { join } from 'node:path';
 
 import { env } from './config/env.js';
 import { router } from './routes/index.js';
@@ -49,9 +50,32 @@ app.use('/api', router);
 app.get('/robots.txt', asyncHandler(getRobots));
 app.get('/sitemap.xml', asyncHandler(getSitemap));
 
-// index: false para que sea el prerenderizado quien sirva el HTML, no el
-// middleware de estaticos.
-app.use(express.static(DIST, { index: false, maxAge: '1y' }));
+/*
+  DOS CACHES, y la diferencia importa.
+
+  Vite pone en /assets/ los ficheros con el contenido metido en el nombre
+  -index-DvAHrce7.js-, asi que cambiar el codigo cambia la URL. Esos se pueden
+  cachear un ano y marcarlos `immutable`: nunca van a cambiar bajo esa URL.
+
+  Lo que sale de web/public/ -los iconos de alergenos, las fotos de la
+  portada- se copia a dist TAL CUAL, con la URL fija. Con un ano de cache,
+  cambiar el icono de la mostaza no lo veria nadie que ya hubiera entrado a la
+  web: seguiria sirviendo el viejo desde su navegador durante un ano. Paso de
+  verdad al cambiarlo.
+
+  Esos van con `no-cache`, que no significa "no lo guardes" sino "guardalo
+  pero preguntame antes de usarlo". La respuesta habitual es un 304 sin
+  cuerpo, o sea que no se descargan otra vez: se paga una peticion y se gana
+  poder cambiar una imagen y que se vea.
+
+  index: false para que sea el prerenderizado quien sirva el HTML, no el
+  middleware de estaticos.
+*/
+app.use(
+  '/assets',
+  express.static(join(DIST, 'assets'), { index: false, immutable: true, maxAge: '1y' })
+);
+app.use(express.static(DIST, { index: false, maxAge: 0, etag: true }));
 app.use(prerender());
 
 app.use(noEncontrado);
