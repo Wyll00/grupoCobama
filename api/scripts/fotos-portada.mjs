@@ -24,9 +24,22 @@ import { join } from 'node:path';
 
 const DESTINO = '../web/public/portada';
 
-// La grande es vertical y las dos pequenas apaisadas, que es como estan
-// pensados los huecos del mosaico. La proporcion se fija aqui y no en el CSS
-// para no servir pixeles que el recorte va a tirar.
+/*
+  Las proporciones SALEN DE LOS HUECOS del mosaico, y los huecos estan
+  calculados para que sean casi las de las fotos. Es al reves de como se hizo
+  la primera vez -primero el mosaico bonito, luego a ver que cabe- y por eso
+  la primera vez las fotos salian cortadas: el hueco grande pedia 0,61 con
+  fotos de 0,80, y los pequenos 0,93 con fotos de 1,50. Ahi se iba casi el 40%
+  del ancho de cada plato.
+
+  Ahora:
+
+    grande    0,80  =  exactamente la de las papas, no se recorta nada
+    pequenas  1,40  =  las fuentes son 1,50, o sea un 7% de recorte
+
+  Si se cambian las columnas del mosaico en global.css hay que volver aqui:
+  las dos cosas son la misma decision escrita en dos sitios.
+*/
 const FOTOS = [
   {
     origen: 'papas-arrugadas-con-mojo.png',
@@ -37,14 +50,14 @@ const FOTOS = [
   {
     origen: 'queso-asado-con-mojos-y-arandanos.png',
     nombre: 'queso-asado',
-    ancho: 620,
-    alto: 560,
+    ancho: 700,
+    alto: 500,
   },
   {
     origen: 'carne-de-cabra-compuesta.png',
     nombre: 'carne-de-cabra',
-    ancho: 620,
-    alto: 560,
+    ancho: 700,
+    alto: 500,
   },
 ];
 

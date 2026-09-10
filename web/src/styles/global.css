@@ -2828,15 +2828,22 @@ button {
   border-block: 1px dashed rgba(224, 169, 79, 0.45);
 }
 
+/*
+  Apilada y centrada, no los tres trozos en una linea.
+
+  En linea, los tres pesos distintos -un rotulo de 11 px, un nombre de 27 y
+  una nota de 14- se leen como una frase que empieza a la izquierda, aunque la
+  caja este centrada. Apilados, cada uno cae sobre el eje y el bloque se lee
+  como lo que es: un cartel.
+*/
 .proxima {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.35rem 1rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
 
   margin: 0;
-  padding-block: 1.1rem;
+  padding-block: 1.4rem;
   text-align: center;
 }
 
@@ -3195,15 +3202,29 @@ button {
    sin que haya que tocar numeros, y sin que ninguna foto salga deformada.
    ===================================================================== */
 
+/*
+  LAS COLUMNAS Y LA PROPORCION VAN JUNTAS. Cambiar una sin la otra corta las
+  fotos, que es justo lo que paso la primera vez: el hueco grande pedia 0,61
+  con fotos de 0,80 y los pequenos 0,93 con fotos de 1,50, asi que el recorte
+  se comia casi el 40% del ancho de cada plato.
+
+  Con 1,2fr / 1fr, hueco de 1rem y el bloque en 1,52 sale:
+
+    grande    0,80  =  la proporcion nativa de la foto, no se recorta nada
+    pequenas  1,39 - 1,44 segun el ancho, sobre fotos de 1,50
+
+  Si se toca esto hay que tocar tambien api/scripts/fotos-portada.mjs, que es
+  donde se recortan las fotos: son la misma decision escrita en dos sitios.
+*/
 .mosaico {
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
+  grid-template-columns: 1.2fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 0.85rem;
-  /* La proporcion del bloque entero. Sin esto, las dos filas de la derecha
-     se reparten la altura del contenido y la grande manda; con esto mandan
-     las tres a la vez y el bloque no da saltos al cargar. */
-  aspect-ratio: 5 / 4.6;
+  gap: 1rem;
+  /* Sin esto, las dos filas de la derecha se reparten la altura del contenido
+     y la grande manda; con esto mandan las tres a la vez y el bloque no da
+     saltos al cargar. */
+  aspect-ratio: 1.52;
 }
 
 .mosaico__pieza {
@@ -3256,13 +3277,31 @@ button {
     aspect-ratio: auto;
   }
 
+  /*
+    1,2 y no 16/10.
+
+    La foto grande es VERTICAL (0,80). Pedirle 1,60 en el movil era cortarla
+    en una tira horizontal: se veia una franja del centro y desaparecian el
+    cuenco y los mojos. A 1,20 se recorta arriba y abajo, que es donde hay
+    mesa, y el plato entra entero.
+
+    Mas alta que esto tampoco: en una pantalla de movil, la foto se comeria
+    la pantalla y el titulo se iria fuera de vista.
+  */
   .mosaico__pieza--grande {
     grid-column: 1 / -1;
     grid-row: auto;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 1.2;
   }
 
+  /* 1,4: la misma que traen recortadas, o sea sin recorte extra. */
   .mosaico__pieza:not(.mosaico__pieza--grande) {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1.4;
+  }
+
+  /* El plato esta en la mitad de abajo en las tres fotos; los cuencos de mojo
+     y la mesa, arriba. Al recortar, se sacrifica lo de arriba. */
+  .mosaico__pieza--grande img {
+    object-position: center 62%;
   }
 }
