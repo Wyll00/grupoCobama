@@ -71,10 +71,14 @@ app.get('/sitemap.xml', asyncHandler(getSitemap));
   index: false para que sea el prerenderizado quien sirva el HTML, no el
   middleware de estaticos.
 */
-app.use(
-  '/assets',
-  express.static(join(DIST, 'assets'), { index: false, immutable: true, maxAge: '1y' })
-);
+const CACHE_LARGA = { index: false, immutable: true, maxAge: '1y' };
+
+// Lo que compila Vite: el nombre lleva el contenido, no puede cambiar.
+app.use('/assets', express.static(join(DIST, 'assets'), CACHE_LARGA));
+
+// Los iconos de alergenos, desde que llevan huella en el nombre
+// -mostaza-7355c6b7.webp-, estan en el mismo caso.
+app.use('/alergenos', express.static(join(DIST, 'alergenos'), CACHE_LARGA));
 app.use(express.static(DIST, { index: false, maxAge: 0, etag: true }));
 app.use(prerender());
 

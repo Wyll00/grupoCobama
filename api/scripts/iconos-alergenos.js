@@ -15,7 +15,8 @@
  * licencia); lo que se versiona es el WebP resultante, que es lo que necesita
  * el build de la web.
  */
-import { readdir, mkdir, writeFile } from 'node:fs/promises';
+import { readdir, mkdir, writeFile, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { dirname, join, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -62,6 +63,9 @@ function aSlug(nombreFichero) {
 
 async function main() {
   await mkdir(DESTINO, { recursive: true });
+  // Lo que ya hay en la carpeta, para poder borrar las versiones anteriores
+  // de cada icono cuando se genere la nueva.
+  const existentes = await readdir(DESTINO).catch(() => []);
 
   const [alergenos] = await pool.execute('SELECT id, slug, nombre FROM alergenos ORDER BY id');
   const porSlug = new Map(alergenos.map((a) => [a.slug, a]));
@@ -94,12 +98,37 @@ async function main() {
       continue;
     }
 
-    const salida = `${slug}.webp`;
     const buffer = await sharp(join(ORIGEN, fichero))
       .trim() // fuera el margen transparente: si no, cada icono se ve de un tamano
       .resize(LADO, LADO, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .webp({ quality: CALIDAD, alphaQuality: 100 })
       .toBuffer();
+
+    /*
+      EL NOMBRE LLEVA UN TROZO DEL CONTENIDO. mostaza-3f7c1a9e.webp
+
+      Con el nombre fijo, cambiar un icono no lo veia nadie que ya hubiera
+      entrado a la web: su navegador tenia guardado el fichero viejo bajo esa
+      misma direccion y lo seguia usando. Paso de verdad al cambiar la
+      mostaza, y no se arregla desde el servidor -el navegador ni pregunta-.
+
+      Con el hash, otra imagen es otra direccion, asi que no hay nada
+      guardado que estorbe: se ve al instante y para todo el mundo, sin pedirle
+      a nadie que vacie la cache. Es lo mismo que hace Vite con el JavaScript.
+
+      Y como la direccion ya no se repite, este fichero SI puede cachearse a
+      lo bruto. Ver la regla de /alergenos en api/src/app.js.
+    */
+    const huella = createHash('sha256').update(buffer).digest('hex').slice(0, 8);
+    const salida = `${slug}-${huella}.webp`;
+
+    // Fuera las versiones anteriores de este mismo alergeno, que si no se
+    // quedan para siempre ocupando sitio en el repositorio.
+    for (const viejo of existentes) {
+      if (viejo !== salida && (viejo === `${slug}.webp` || viejo.startsWith(`${slug}-`))) {
+        await rm(join(DESTINO, viejo), { force: true });
+      }
+    }
 
     await writeFile(join(DESTINO, salida), buffer);
     await pool.execute('UPDATE alergenos SET icono = ? WHERE id = ?', [salida, alergeno.id]);
