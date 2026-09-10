@@ -3,7 +3,8 @@ import { estaAbiertoAhora, resumirHorarios } from '../utils/horarios.js';
 
 const CAMPOS_LISTADO = `
   r.id, r.slug, r.nombre, r.municipio, r.direccion, r.telefono, r.email,
-  r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.imagen_portada, r.imagen_portada_movil, r.portada_estilo,
+  r.whatsapp, r.lat, r.lng, r.reclamo, r.reclamo_en, r.reclamo_de,
+  r.imagen_portada, r.imagen_portada_movil, r.portada_estilo,
   r.tiene_parking, r.orden, r.url_reservas,
 
   -- Cuantas fotos ensenaria SU galeria. Incluye las del grupo -las que no
@@ -54,7 +55,7 @@ export async function listarRestaurantes() {
 
 export async function obtenerRestaurantePorSlug(slug) {
   const [filas] = await pool.execute(
-    `SELECT ${CAMPOS_LISTADO}, r.descripcion, r.descripcion_en
+    `SELECT ${CAMPOS_LISTADO}, r.descripcion, r.descripcion_en, r.descripcion_de
        FROM restaurantes r
       WHERE r.slug = ? AND r.activo = 1
       LIMIT 1`,

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import Carrusel from './Carrusel.jsx';
+import { texto, ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -7,11 +9,10 @@ const formatoPrecio = new Intl.NumberFormat('es-ES', {
 });
 
 /** Que significa el precio. Igual que en la carta: sin esto, engaña. */
-const UNIDAD = {
-  kg: 'el kilo',
-  ud: 'la unidad',
-  persona: 'por persona',
-};
+// La condicion de precio sale del diccionario comun y no de una tabla de
+// aqui: estaba escrita dos veces, en la carta y en este carrusel, y el dia
+// que se cambie una se olvida la otra.
+const CLAVE_UNIDAD = { kg: 'unidad.kg', ud: 'unidad.ud', persona: 'unidad.persona' };
 
 /**
  * Lo que la casa recomienda, en tarjetas.
@@ -57,6 +58,7 @@ function IconoPlato() {
 }
 
 export default function Recomendados({ local, platos }) {
+  const [idioma] = useIdioma();
   if (!platos || platos.length === 0) return null;
 
   return (
@@ -64,18 +66,18 @@ export default function Recomendados({ local, platos }) {
       <div className="contenedor">
         <Carrusel
           total={platos.length}
-          queSon="recomendaciones"
+          queSon={ui('carrusel.recomendaciones', idioma)}
           className="carrusel--fichas"
           cabecera={
             <>
               <div>
-                <h2>Lo que recomienda la casa</h2>
+                <h2>{ui('ficha.recomienda', idioma)}</h2>
                 <p className="apagado" style={{ maxWidth: '54ch' }}>
-                  Los arroces y las carnes que mejor salen de esta cocina.
+                  {ui('reco.intro', idioma)}
                 </p>
               </div>
               <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
-                Ver la carta entera
+                {ui('ficha.verCartaEntera', idioma)}
               </Link>
             </>
           }
@@ -91,12 +93,12 @@ export default function Recomendados({ local, platos }) {
                   )}
                 </div>
 
-                <p className="ficha-plato__seccion">{plato.categoria_nombre}</p>
+                <p className="ficha-plato__seccion">{texto(plato, 'categoria_nombre', idioma)}</p>
 
-                <h3 className="ficha-plato__nombre">{plato.nombre}</h3>
+                <h3 className="ficha-plato__nombre">{texto(plato, 'nombre', idioma)}</h3>
 
-                {plato.descripcion && (
-                  <p className="ficha-plato__desc">{plato.descripcion}</p>
+                {texto(plato, 'descripcion', idioma) && (
+                  <p className="ficha-plato__desc">{texto(plato, 'descripcion', idioma)}</p>
                 )}
 
                 <div className="ficha-plato__pie">
@@ -106,9 +108,13 @@ export default function Recomendados({ local, platos }) {
                         "21,00 EUR" a secas se entiende como el plato entero, y
                         en la mesa le dicen que va por persona y de dos en dos.
                         Eso no es informacion incompleta, induce a error. */}
-                    {(UNIDAD[plato.unidad] || plato.minimo_personas) && (
+                    {(CLAVE_UNIDAD[plato.unidad] || plato.minimo_personas) && (
                       <span className="ficha-plato__condicion">
-                        {[UNIDAD[plato.unidad], plato.minimo_personas && `mín. ${plato.minimo_personas} personas`]
+                        {[
+                          CLAVE_UNIDAD[plato.unidad] && ui(CLAVE_UNIDAD[plato.unidad], idioma),
+                          plato.minimo_personas &&
+                            ui('unidad.minimo', idioma, { n: plato.minimo_personas }),
+                        ]
                           .filter(Boolean)
                           .join(' · ')}
                       </span>

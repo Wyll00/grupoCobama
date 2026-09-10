@@ -2,17 +2,33 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 import Logo from './Logo.jsx';
 import Platito from './Platito.jsx';
+import Idiomas from './Idiomas.jsx';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
+
+/*
+  La cabecera y el pie, que salen en todas las pantallas.
+
+  Aqui vive el selector de idioma. Estaba dentro de la carta, y por eso al
+  elegir ingles la navegacion, el pie y todo lo demas seguian en castellano:
+  quien entraba por la portada no tenia ni donde cambiarlo. Es lo que senalo
+  la revision.
+
+  Los nombres de los locales NO se traducen: son nombres propios. "Como en
+  Casa" se llama asi en Hamburgo tambien.
+*/
 
 export default function Layout() {
   const { datos: locales } = useApi((opts) => api.restaurantes(opts), []);
+  const [idioma] = useIdioma();
 
   return (
     <div className="app">
       <header className="cabecera">
         <div className="contenedor cabecera__fila">
-          <Link to="/" className="marca" aria-label="Grupo Cobama, ir al inicio">
+          <Link to="/" className="marca" aria-label={ui('nav.inicio', idioma)}>
             <Logo descriptor="GASTRONOMÍA CANARIA" />
           </Link>
 
@@ -27,11 +43,14 @@ export default function Layout() {
               </NavLink>
             ))}
             <NavLink to="/reservar" className={({ isActive }) => (isActive ? 'activo' : undefined)}>
-              Reservar
+              {ui('nav.reservar', idioma)}
             </NavLink>
           </nav>
 
-          <Platito />
+          <div className="cabecera__mandos">
+            <Idiomas />
+            <Platito />
+          </div>
         </div>
       </header>
 
@@ -43,7 +62,7 @@ export default function Layout() {
         <div className="contenedor">
           <div className="pie__rejilla">
             <div>
-              <h2>Nuestros locales</h2>
+              <h2>{ui('nav.locales', idioma)}</h2>
               <ul className="pie__lista">
                 {(locales ?? []).map((local) => (
                   <li key={local.slug}>
@@ -56,10 +75,10 @@ export default function Layout() {
             </div>
 
             <div>
-              <h2>Reservas</h2>
+              <h2>{ui('nav.reservas', idioma)}</h2>
               <ul className="pie__lista">
                 <li>
-                  <a href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}>
+                  <a href={enlaceWhatsApp(ui('nav.saludoWhatsApp', idioma))}>
                     WhatsApp {GRUPO.whatsapp}
                   </a>
                 </li>
@@ -79,16 +98,18 @@ export default function Layout() {
             */}
             {(locales ?? []).some((l) => l.fotos > 0) && (
               <div>
-                <h2>Fotos</h2>
+                <h2>{ui('nav.fotos', idioma)}</h2>
                 <ul className="pie__lista">
                   <li>
-                    <Link to="/galeria">Galería del grupo</Link>
+                    <Link to="/galeria">{ui('nav.galeriaGrupo', idioma)}</Link>
                   </li>
                   {(locales ?? [])
                     .filter((local) => local.fotos > 0)
                     .map((local) => (
                       <li key={local.slug}>
-                        <Link to={`/${local.slug}/galeria`}>Fotos de {local.nombre}</Link>
+                        <Link to={`/${local.slug}/galeria`}>
+                          {ui('nav.fotosDe', idioma, { local: local.nombre })}
+                        </Link>
                       </li>
                     ))}
                 </ul>
@@ -96,7 +117,7 @@ export default function Layout() {
             )}
 
             <div>
-              <h2>Siguenos</h2>
+              <h2>{ui('nav.siguenos', idioma)}</h2>
               <ul className="pie__lista">
                 <li>
                   <a href={GRUPO.instagram} target="_blank" rel="noreferrer">
@@ -115,9 +136,9 @@ export default function Layout() {
           <p className="pie__legal">
             © {new Date().getFullYear()} {GRUPO.nombre} · {GRUPO.sede}
             {' · '}
-            <Link to="/aviso-legal">Aviso legal</Link>
+            <Link to="/aviso-legal">{ui('nav.avisoLegal', idioma)}</Link>
             {' · '}
-            <Link to="/privacidad">Privacidad</Link>
+            <Link to="/privacidad">{ui('nav.privacidad', idioma)}</Link>
           </p>
         </div>
       </footer>

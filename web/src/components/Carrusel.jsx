@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
  * Carrusel de fotos que pasa solo.
@@ -32,9 +34,12 @@ export default function Carrusel({
   // exactamente lo que medía el dia que se ajusto.
   cabecera = null,
   // Las flechas tienen que decir de que van: "siguientes" a secas no le dice
-  // nada a quien navega con lector de pantalla.
-  queSon = 'elementos',
+  // nada a quien navega con lector de pantalla. Sin valor, la palabra
+  // generica en el idioma de quien mira.
+  queSon = null,
 }) {
+  const [idioma] = useIdioma();
+  const que = queSon ?? ui('carrusel.elementos', idioma);
   const pista = useRef(null);
   const [parado, setParado] = useState(false);
 
@@ -91,10 +96,10 @@ export default function Carrusel({
           {cabecera}
           {total > 1 && (
             <div className="carrusel__mandos">
-              <button type="button" onClick={() => mover(-1)} aria-label={`Ver ${queSon} anteriores`}>
+              <button type="button" onClick={() => mover(-1)} aria-label={ui('carrusel.anteriores', idioma, { que })}>
                 ‹
               </button>
-              <button type="button" onClick={() => mover(1)} aria-label={`Ver ${queSon} siguientes`}>
+              <button type="button" onClick={() => mover(1)} aria-label={ui('carrusel.siguientes', idioma, { que })}>
                 ›
               </button>
             </div>

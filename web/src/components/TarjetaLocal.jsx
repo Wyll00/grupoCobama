@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
 import BotonReservar from './BotonReservar.jsx';
 import { enlaceTelefono } from '../datos/grupo.js';
+import { texto, ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 export default function TarjetaLocal({ local }) {
+  const [idioma] = useIdioma();
+
   return (
     <article className="tarjeta">
       <div className="tarjeta__cuerpo">
@@ -28,12 +32,12 @@ export default function TarjetaLocal({ local }) {
         </div>
 
         <p className="apagado" style={{ marginTop: '0.75rem' }}>
-          {local.reclamo}
+          {texto(local, 'reclamo', idioma)}
         </p>
 
         <p className="apagado" style={{ fontSize: '0.875rem' }}>
           {local.direccion}
-          {local.tiene_parking && ' · Parking propio'}
+          {local.tiene_parking && ` · ${ui('ficha.parking', idioma)}`}
         </p>
 
         {/*
@@ -42,13 +46,13 @@ export default function TarjetaLocal({ local }) {
           con pulsar la tarjeta, asi que no hace falta un boton para eso.
         */}
         <div className="tarjeta__acciones">
-          <BotonReservar local={local}>Reservar</BotonReservar>
+          <BotonReservar local={local}>{ui('tarjeta.reservar', idioma)}</BotonReservar>
           <Link className="boton boton--secundario" to={`/${local.slug}/carta`}>
-            Ver la carta
+            {ui('ficha.verCarta', idioma)}
           </Link>
           {local.telefono && (
             <a className="boton boton--secundario" href={enlaceTelefono(local.telefono)}>
-              Llamar
+              {ui('tarjeta.llamar', idioma)}
             </a>
           )}
         </div>

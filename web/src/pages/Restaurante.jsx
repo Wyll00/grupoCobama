@@ -8,6 +8,8 @@ import MenusCelebracion from '../components/MenusCelebracion.jsx';
 import { Cargando, Error, EstadoApertura } from '../components/Estado.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
 import { enlaceMapa, enlaceTelefono, enlaceWhatsApp } from '../datos/grupo.js';
+import { texto, ui, etiquetaDias } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -23,6 +25,7 @@ export default function Restaurante() {
   // Aparte de la ficha y sin bloquearla: si el local no ha marcado ninguno,
   // la seccion no se pinta y la pagina sigue estando entera.
   const destacados = useApi((opts) => api.destacados(slug, opts), [slug]);
+  const [idioma] = useIdioma();
 
   // Sin `titulo`: la pestana dice "Grupo Cobama" en toda la web, que es lo
   // que pone el <title> del index.html. La descripcion si es de cada pagina,
@@ -30,7 +33,7 @@ export default function Restaurante() {
   useMetadatos({ descripcion: local?.reclamo ?? undefined });
 
   if (error) return <Error error={error} />;
-  if (cargando) return <Cargando texto="Cargando el local..." />;
+  if (cargando) return <Cargando texto={ui('ficha.cargando', idioma)} />;
 
   return (
     <>
@@ -72,7 +75,7 @@ export default function Restaurante() {
               impulso justo donde estan Reservar y Ver la carta, y ademas es
               informacion de horario, que ya esta -y con la tabla entera al
               lado- mas abajo en su bloque. */}
-          <p style={{ marginTop: '1rem' }}>{local.descripcion}</p>
+          <p style={{ marginTop: '1rem' }}>{texto(local, 'descripcion', idioma)}</p>
 
           {/*
             Reservar es la accion principal y lleva al formulario con este
@@ -88,7 +91,7 @@ export default function Restaurante() {
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
               to={`/${local.slug}/carta`}
             >
-              Ver la carta
+              {ui('ficha.verCarta', idioma)}
             </Link>
             {/* Solo si esta casa tiene fotos que ensenar. Ver Home.jsx. */}
             {local.fotos > 0 && (
@@ -97,13 +100,13 @@ export default function Restaurante() {
                 style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
                 to={`/${local.slug}/galeria`}
               >
-                Ver fotos
+                {ui('ficha.verFotos', idioma)}
               </Link>
             )}
             <a
               className="boton boton--secundario"
               style={{ borderColor: '#4a413a', color: 'var(--crema)' }}
-              href={enlaceWhatsApp(`Hola, me gustaria reservar mesa en ${local.nombre}.`)}
+              href={enlaceWhatsApp(ui('ficha.whatsappReserva', idioma, { local: local.nombre }))}
             >
               WhatsApp
             </a>
@@ -123,7 +126,7 @@ export default function Restaurante() {
       <section className="seccion">
         <div className="contenedor datos">
           <div className="bloque-dato">
-            <h2>Dónde estamos</h2>
+            <h2>{ui('ficha.donde', idioma)}</h2>
 
             {/* Misma tarjeta que el horario, para que las dos columnas pesen
                 igual. El parking se marca como dato util, no como frase: en
@@ -133,7 +136,7 @@ export default function Restaurante() {
 
               <ul className="sitio__datos">
                 <li className={local.tiene_parking ? 'sitio__dato--si' : 'sitio__dato--no'}>
-                  {local.tiene_parking ? 'Parking propio' : 'Sin parking propio'}
+                  {ui(local.tiene_parking ? 'ficha.parking' : 'ficha.sinParking', idioma)}
                 </li>
                 <li className="sitio__dato--si">{local.municipio}</li>
 
@@ -163,13 +166,13 @@ export default function Restaurante() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Como llegar
+                {ui('ficha.comoLlegar', idioma)}
               </a>
             </div>
           </div>
 
           <div className="bloque-dato">
-            <h2>Horario</h2>
+            <h2>{ui('ficha.horario', idioma)}</h2>
 
             {/*
               El dia de hoy va marcado: quien mira un horario casi siempre
@@ -183,11 +186,13 @@ export default function Restaurante() {
                   className={`horario__tramo ${tramo.es_hoy ? 'horario__tramo--hoy' : ''}`}
                 >
                   <span className="horario__dias">
-                    {tramo.dias}
-                    {tramo.es_hoy && <span className="horario__hoy">hoy</span>}
+                    {etiquetaDias(tramo.indices, idioma, tramo.dias)}
+                    {tramo.es_hoy && (
+                      <span className="horario__hoy">{ui('ficha.hoy', idioma)}</span>
+                    )}
                   </span>
                   <span className={`horario__horas ${tramo.cerrado ? 'horario__horas--cerrado' : ''}`}>
-                    {tramo.horario}
+                    {tramo.cerrado ? ui('ficha.cerradoDia', idioma) : tramo.horario}
                   </span>
                 </li>
               ))}
