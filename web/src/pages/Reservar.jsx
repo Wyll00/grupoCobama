@@ -6,6 +6,9 @@ import { api } from '../api/client.js';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp, enlaceTelefono } from '../datos/grupo.js';
 import { LEGAL, VERSION_POLITICA } from '../datos/legal.js';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
+import Frase from '../components/Frase.jsx';
 
 /** Hoy en formato AAAA-MM-DD, que es lo que espera <input type="date">. */
 const hoy = () => new Date().toLocaleDateString('en-CA');
@@ -16,8 +19,18 @@ const maximo = () => {
   return d.toLocaleDateString('en-CA');
 };
 
-const enLargo = (fecha) =>
-  new Date(`${fecha}T12:00:00Z`).toLocaleDateString('es-ES', {
+const LOCALE = { es: 'es-ES', en: 'en-GB', de: 'de-DE' };
+
+/*
+  La fecha, escrita larga y en el idioma de quien mira.
+
+  El navegador ya sabe hacerlo: "sábado, 4 de octubre" en aleman es
+  "Samstag, 4. Oktober", y no solo cambian los nombres, tambien el orden y el
+  punto detras del numero. Escribirlo a mano seria reimplementar un
+  calendario por idioma.
+*/
+const enLargo = (fecha, idioma = 'es') =>
+  new Date(`${fecha}T12:00:00Z`).toLocaleDateString(LOCALE[idioma] ?? LOCALE.es, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -54,10 +67,9 @@ export default function Reservar() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
   const [hecha, setHecha] = useState(null);
+  const [idioma] = useIdioma();
 
-  useMetadatos({
-    descripcion: 'Reserva mesa en cualquiera de los cuatro locales del Grupo Cobama.',
-  });
+  useMetadatos({ descripcion: ui('res.metaDescripcion', idioma) });
 
   const lista = locales.datos ?? [];
 
@@ -162,34 +174,45 @@ export default function Reservar() {
     return (
       <section className="seccion">
         <div className="contenedor reserva-hecha">
-          <h1>Reserva enviada</h1>
+          <h1>{ui('res.enviada', idioma)}</h1>
           <p className="reserva-hecha__codigo">{hecha.codigo}</p>
 
           <p>
-            Hemos recibido tu solicitud para <strong>{hecha.restaurante}</strong> el{' '}
-            <strong>{enLargo(hecha.fecha)}</strong> a las{' '}
-            <strong>{hecha.hora.slice(0, 5)}</strong>, para {hecha.comensales}{' '}
-            {hecha.comensales === 1 ? 'persona' : 'personas'}.
+            <Frase
+              clave="res.recibido"
+              valores={{
+                local: hecha.restaurante,
+                fecha: enLargo(hecha.fecha, idioma),
+                hora: hecha.hora.slice(0, 5),
+                comensales: ui(
+                  hecha.comensales === 1 ? 'res.unaPersona' : 'res.variasPersonas',
+                  idioma,
+                  { n: hecha.comensales }
+                ),
+              }}
+            />
           </p>
 
           <div className="aviso">
-            <strong>Todavía no está confirmada.</strong> El local la revisa y te avisa. Si
-            es para dentro de poco, mejor llama por teléfono y lo cerramos al momento.
+            <strong>{ui('res.sinConfirmar', idioma)}</strong>{' '}
+            {ui('res.sinConfirmarDetalle', idioma)}
           </div>
 
           <p className="apagado">
-            Guarda el código <strong>{hecha.codigo}</strong>: con el te localizamos la
-            reserva si nos llamas.
+            <Frase clave="res.guardaCodigo" valores={{ codigo: hecha.codigo }} />
           </p>
 
           <div className="hero__acciones">
             <a
               className="boton boton--principal"
               href={enlaceWhatsApp(
-                `Hola, acabo de reservar con el codigo ${hecha.codigo} a nombre de ${form.nombre}.`
+                ui('res.whatsappHecha', idioma, {
+                  codigo: hecha.codigo,
+                  nombre: form.nombre,
+                })
               )}
             >
-              Escribir por WhatsApp
+              {ui('res.escribirWhatsApp', idioma)}
             </a>
             <button
               type="button"
@@ -200,7 +223,7 @@ export default function Reservar() {
                 setForm({ ...VACIO, fecha: hoy() });
               }}
             >
-              Hacer otra reserva
+              {ui('res.otraReserva', idioma)}
             </button>
           </div>
         </div>
@@ -212,31 +235,28 @@ export default function Reservar() {
     <>
       <section className="ficha__cabecera" style={{ paddingBlock: '2.5rem' }}>
         <div className="contenedor">
-          <h1>Reservar mesa</h1>
-          <p>
-            Dinos cuándo y cuántos sois. El local te confirma en cuanto lo vea. Si es para
-            dentro de un rato, llama mejor por teléfono.
-          </p>
+          <h1>{ui('res.titulo', idioma)}</h1>
+          <p>{ui('res.entradilla', idioma)}</p>
         </div>
       </section>
 
       <section className="seccion">
         <div className="contenedor">
           {locales.cargando ? (
-            <Cargando texto="Cargando locales..." />
+            <Cargando texto={ui('home.cargandoLocales', idioma)} />
           ) : (
             <form className="reserva" onSubmit={enviar}>
               {error && <div className="aviso aviso--error">{error}</div>}
 
               <label className="reserva__campo">
-                <span>Local</span>
+                <span>{ui('res.local', idioma)}</span>
                 <select
                   className="buscador"
                   value={form.restaurante_id}
                   onChange={cambiar('restaurante_id')}
                   required
                 >
-                  <option value="">Elige un local</option>
+                  <option value="">{ui('res.eligeLocal', idioma)}</option>
                   {lista.map((l) => (
                     <option key={l.id} value={l.id}>
                       {l.nombre} · {l.municipio}
@@ -248,8 +268,7 @@ export default function Reservar() {
               {reservaFuera ? (
                 <div className="derivacion">
                   <p>
-                    <strong>{local.nombre}</strong> lleva sus reservas en su propio sistema.
-                    Se abre en otra pestaña y esta página se queda aquí.
+                    <Frase clave="res.fuera" valores={{ local: local.nombre }} />
                   </p>
                   <a
                     className="boton boton--principal"
@@ -257,18 +276,24 @@ export default function Reservar() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Reservar en {local.nombre}
+                    {ui('res.reservarEn', idioma, { local: local.nombre })}
                   </a>
                   <p className="apagado" style={{ fontSize: '0.85rem' }}>
-                    Si prefieres, llama al{' '}
-                    <a href={enlaceTelefono(local.telefono)}>{local.telefono}</a>.
+                    <Frase
+                      clave="res.oLlama"
+                      valores={{
+                        telefono: (
+                          <a href={enlaceTelefono(local.telefono)}>{local.telefono}</a>
+                        ),
+                      }}
+                    />
                   </p>
                 </div>
               ) : (
                 <>
               <div className="reserva__fila">
                 <label className="reserva__campo">
-                  <span>Día</span>
+                  <span>{ui('res.dia', idioma)}</span>
                   <input
                     className="buscador"
                     type="date"
@@ -281,7 +306,7 @@ export default function Reservar() {
                 </label>
 
                 <label className="reserva__campo">
-                  <span>Hora</span>
+                  <span>{ui('res.hora', idioma)}</span>
                   <select
                     className="buscador"
                     value={form.hora}
@@ -290,15 +315,18 @@ export default function Reservar() {
                     required
                   >
                     <option value="">
-                      {!form.restaurante_id
-                        ? 'Elige primero el local'
-                        : tramos.cargando
-                          ? 'Cargando...'
-                          : tramos.datos?.cerrado
-                            ? 'Ese día está cerrado'
-                            : horasDisponibles.length === 0
-                              ? 'No quedan horas ese día'
-                              : 'Elige una hora'}
+                      {ui(
+                        !form.restaurante_id
+                          ? 'res.eligePrimeroLocal'
+                          : tramos.cargando
+                            ? 'res.cargando'
+                            : tramos.datos?.cerrado
+                              ? 'res.diaCerrado'
+                              : horasDisponibles.length === 0
+                                ? 'res.sinHoras'
+                                : 'res.eligeHora',
+                        idioma
+                      )}
                     </option>
                     {horasDisponibles.map((h) => (
                       <option key={h} value={h}>
@@ -309,7 +337,7 @@ export default function Reservar() {
                 </label>
 
                 <label className="reserva__campo">
-                  <span>Comensales</span>
+                  <span>{ui('res.comensales', idioma)}</span>
                   <input
                     className="buscador"
                     type="number"
@@ -324,7 +352,7 @@ export default function Reservar() {
 
               {local && tramos.datos?.cerrado && (
                 <div className="aviso">
-                  {local.nombre} cierra ese día. Prueba otra fecha u otro local.
+                  {ui('res.cierraEseDia', idioma, { local: local.nombre })}
                 </div>
               )}
 
@@ -344,11 +372,15 @@ export default function Reservar() {
                 <div className="aviso">
                   <strong>
                     {ultimaAntesDelHueco
-                      ? `Ese dia la ultima mesa a mediodia es a las ${ultimaAntesDelHueco}, y volvemos a reservar a partir de las ${primeraDespuesDelHueco}.`
-                      : `Ese día no cogemos reservas hasta las ${primeraDespuesDelHueco}.`}
+                      ? ui('res.huecoConAntes', idioma, {
+                          ultima: ultimaAntesDelHueco,
+                          primera: primeraDespuesDelHueco,
+                        })
+                      : ui('res.huecoSinAntes', idioma, {
+                          primera: primeraDespuesDelHueco,
+                        })}
                   </strong>{' '}
-                  La cocina está abierta: esas mesas las guardamos para quien llega sin
-                  reservar. Puedes venirte igual, o reservar antes o después.
+                  {ui('res.huecoMotivo', idioma)}
                 </div>
               )}
 
@@ -365,20 +397,20 @@ export default function Reservar() {
               */}
               <div className="reserva__fila">
                 <label className="reserva__campo">
-                  <span>Nombre de la reserva</span>
+                  <span>{ui('res.nombre', idioma)}</span>
                   <input
                     className="buscador"
                     name="nombre"
                     autoComplete="name"
                     value={form.nombre}
                     onChange={cambiar('nombre')}
-                    placeholder="A nombre de..."
+                    placeholder={ui('res.nombrePista', idioma)}
                     required
                   />
                 </label>
 
                 <label className="reserva__campo">
-                  <span>Teléfono</span>
+                  <span>{ui('res.telefono', idioma)}</span>
                   <input
                     className="buscador"
                     type="tel"
@@ -386,7 +418,7 @@ export default function Reservar() {
                     autoComplete="tel"
                     value={form.telefono}
                     onChange={cambiar('telefono')}
-                    placeholder="Para avisarte"
+                    placeholder={ui('res.telefonoPista', idioma)}
                     required
                   />
                 </label>
@@ -394,7 +426,8 @@ export default function Reservar() {
 
               <label className="reserva__campo">
                 <span>
-                  Email <span className="apagado">(opcional)</span>
+                  {ui('res.email', idioma)}{' '}
+                  <span className="apagado">{ui('res.opcional', idioma)}</span>
                 </span>
                 <input
                   className="buscador"
@@ -403,36 +436,44 @@ export default function Reservar() {
                   autoComplete="email"
                   value={form.email}
                   onChange={cambiar('email')}
-                  placeholder="Para mandarte la confirmación"
+                  placeholder={ui('res.emailPista', idioma)}
                 />
               </label>
 
               <label className="reserva__campo">
                 <span>
-                  Algo que debamos saber <span className="apagado">(opcional)</span>
+                  {ui('res.observaciones', idioma)}{' '}
+                  <span className="apagado">{ui('res.opcional', idioma)}</span>
                 </span>
                 <textarea
                   className="buscador"
                   rows={3}
                   value={form.observaciones}
                   onChange={cambiar('observaciones')}
-                  placeholder="Alergias, trona, celebración, si venís con perro..."
+                  placeholder={ui('res.observacionesPista', idioma)}
                 />
               </label>
 
               <div className="consentimiento">
                 <p className="consentimiento__info">
-                  Tus datos los trata <strong>{LEGAL.razonSocial}</strong> para gestionar
-                  esta reserva y avisarte, porque son necesarios para poder atenderte. Se
-                  guardan {LEGAL.conservacion.reservaMeses} meses y los ve el local y{' '}
-                  {LEGAL.encargados[0]?.nombre}, que nos lleva el libro de reservas. Puedes
-                  acceder a ellos, corregirlos o pedir que los borremos escribiendo a{' '}
-                  <a href={`mailto:${LEGAL.emailPrivacidad}`}>{LEGAL.emailPrivacidad}</a>.
-                  Lo tienes todo detallado en la{' '}
-                  <Link to="/privacidad" target="_blank">
-                    política de privacidad
-                  </Link>
-                  .
+                  <Frase
+                    clave="res.consentimiento"
+                    valores={{
+                      responsable: LEGAL.razonSocial,
+                      meses: LEGAL.conservacion.reservaMeses,
+                      encargado: LEGAL.encargados[0]?.nombre,
+                      email: (
+                        <a href={`mailto:${LEGAL.emailPrivacidad}`}>
+                          {LEGAL.emailPrivacidad}
+                        </a>
+                      ),
+                      politica: (
+                        <Link to="/privacidad" target="_blank">
+                          {ui('res.politica', idioma)}
+                        </Link>
+                      ),
+                    }}
+                  />
                 </p>
 
                 <label className="consentimiento__casilla">
@@ -443,11 +484,16 @@ export default function Reservar() {
                     required
                   />
                   <span>
-                    He leido y entiendo la{' '}
-                    <Link to="/privacidad" target="_blank">
-                      política de privacidad
-                    </Link>
-                    .
+                    <Frase
+                      clave="res.heLeido"
+                      valores={{
+                        politica: (
+                          <Link to="/privacidad" target="_blank">
+                            {ui('res.politica', idioma)}
+                          </Link>
+                        ),
+                      }}
+                    />
                   </span>
                 </label>
 
@@ -459,11 +505,8 @@ export default function Reservar() {
                       onChange={marcar('marketing')}
                     />
                     <span>
-                      Quiero recibir novedades y menús especiales por email.{' '}
-                      <span className="apagado">
-                        Es voluntario, tu reserva funciona igual, y puedes darte de baja
-                        cuando quieras.
-                      </span>
+                      {ui('res.marketing', idioma)}{' '}
+                      <span className="apagado">{ui('res.marketingNota', idioma)}</span>
                     </span>
                   </label>
                 )}
@@ -474,17 +517,22 @@ export default function Reservar() {
                 type="submit"
                 disabled={!completo || enviando}
               >
-                {enviando ? 'Enviando...' : 'Pedir la reserva'}
+                {ui(enviando ? 'res.enviando' : 'res.pedir', idioma)}
               </button>
                 </>
               )}
 
               <p className="apagado" style={{ fontSize: '0.85rem' }}>
-                También puedes reservar por WhatsApp al{' '}
-                <a href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}>
-                  {GRUPO.whatsapp}
-                </a>
-                .
+                <Frase
+                  clave="res.tambienWhatsApp"
+                  valores={{
+                    numero: (
+                      <a href={enlaceWhatsApp(ui('nav.saludoWhatsApp', idioma))}>
+                        {GRUPO.whatsapp}
+                      </a>
+                    ),
+                  }}
+                />
               </p>
             </form>
           )}

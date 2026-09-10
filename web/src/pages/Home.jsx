@@ -4,6 +4,8 @@ import { api } from '../api/client.js';
 import TarjetaLocal from '../components/TarjetaLocal.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
  * Reloj para el reclamo de cocina ininterrumpida.
@@ -38,6 +40,7 @@ function RelojAbierto() {
 
 export default function Home() {
   const { datos: locales, cargando, error } = useApi((opts) => api.restaurantes(opts), []);
+  const [idioma] = useIdioma();
   if (error) return <Error error={error} />;
 
   return (
@@ -45,11 +48,8 @@ export default function Home() {
       <section className="hero">
         <div className="contenedor hero__fila">
           <div className="hero__texto">
-            <h1>Cocina canaria de siempre, en cuatro casas</h1>
-            <p className="hero__entradilla">
-              Guamasa, Candelaria, La Laguna y La Orotava. Misma cocina, mismo trato,
-              cuatro sitios distintos donde sentarse a comer.
-            </p>
+            <h1>{ui('home.titulo', idioma)}</h1>
+            <p className="hero__entradilla">{ui('home.entradilla', idioma)}</p>
           </div>
 
           {/* Las tres acciones juntas arriba a la derecha. Cada una con su
@@ -58,11 +58,11 @@ export default function Home() {
               y la galeria contorneada, que es la menos urgente de las tres. */}
           <div className="hero__acciones">
             <Link className="boton boton--principal" to="/reservar">
-              Reservar mesa
+              {ui('ficha.reservarMesa', idioma)}
             </Link>
             <a
               className="boton hero__whatsapp"
-              href={enlaceWhatsApp('Hola, me gustaría hacer una reserva.')}
+              href={enlaceWhatsApp(ui('nav.saludoWhatsApp', idioma))}
             >
               WhatsApp {GRUPO.whatsapp}
             </a>
@@ -77,7 +77,7 @@ export default function Home() {
             */}
             {(locales ?? []).some((l) => l.fotos > 0) && (
               <Link className="boton hero__galeria" to="/galeria">
-                Galería
+                {ui('home.galeria', idioma)}
               </Link>
             )}
 
@@ -96,9 +96,9 @@ export default function Home() {
               las aperturas se mueven.
             */}
             <p className="proxima">
-              <span className="proxima__aviso">Próximamente</span>
+              <span className="proxima__aviso">{ui('home.proximamente', idioma)}</span>
               <span className="proxima__nombre">El Baifo</span>
-              <span className="proxima__nota">la quinta casa del grupo</span>
+              <span className="proxima__nota">{ui('home.quintaCasa', idioma)}</span>
             </p>
           </div>
         </div>
@@ -113,10 +113,8 @@ export default function Home() {
               izquierda, hace falta tambien el margen automatico, y las dos
               cosas juntas se leen mejor en un sitio que repartidas. */}
           <div className="seccion__intro">
-            <h2>Nuestros locales</h2>
-            <p className="apagado">
-              Cada casa tiene su carta y su carácter. Elige la que te pille más cerca.
-            </p>
+            <h2>{ui('nav.locales', idioma)}</h2>
+            <p className="apagado">{ui('home.localesIntro', idioma)}</p>
 
             {/*
               Cocina ininterrumpida.
@@ -137,15 +135,13 @@ export default function Home() {
             */}
             <p className="jornada">
               <RelojAbierto />
-              <strong className="jornada__titular">Cocina ininterrumpida</strong>
-              <span className="jornada__detalle">
-                No cerramos entre la comida y la cena, en las cuatro casas
-              </span>
+              <strong className="jornada__titular">{ui('home.jornadaTitular', idioma)}</strong>
+              <span className="jornada__detalle">{ui('home.jornadaDetalle', idioma)}</span>
             </p>
           </div>
 
           {cargando ? (
-            <Cargando texto="Cargando locales..." />
+            <Cargando texto={ui('home.cargandoLocales', idioma)} />
           ) : (
             <div className="rejilla-locales" style={{ marginTop: '1.75rem' }}>
               {locales.map((local) => (

@@ -282,6 +282,18 @@ button {
   min-height: 5rem;
 }
 
+/* El idioma y el tema, juntos en la esquina.
+
+   Van en su propia caja y no sueltos en la fila porque `justify-content:
+   space-between` los separaria a lo ancho de la cabecera, y son dos mandos
+   de la misma clase: se buscan juntos. */
+.cabecera__mandos {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: none;
+}
+
 .marca {
   display: inline-flex;
   text-decoration: none;
@@ -3098,4 +3110,33 @@ button {
   }
 
   .menu h3 { font-size: 1.4rem; }
+}
+
+/* El aviso de que esta carta no esta en el idioma elegido.
+
+   Discreto a proposito: es informacion util, no un error. Un aviso en rojo
+   sobre la cabecera de la carta daria a entender que algo se ha roto, y lo
+   que pasa es que esa cocina todavia no ha mandado sus traducciones. */
+.carta__sin-traducir {
+  margin: 0.85rem 0 0;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--ocre);
+  background: color-mix(in srgb, var(--ocre) 10%, transparent);
+  border-radius: 0 var(--radio-s, 6px) var(--radio-s, 6px) 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave, inherit);
+}
+
+/* "Esta pagina solo esta en castellano", en las dos paginas legales.
+
+   Mismo tratamiento que el aviso de la carta sin traducir: es un dato, no un
+   error. Va justo debajo del titulo porque su trabajo es que alguien que no
+   lee castellano no se ponga a leer tres pantallas antes de darse cuenta. */
+.legal__idioma {
+  margin: 0 0 1.5rem;
+  padding: 0.7rem 1rem;
+  border-left: 3px solid var(--ocre);
+  background: color-mix(in srgb, var(--ocre) 10%, transparent);
+  border-radius: 0 var(--radio-s, 6px) var(--radio-s, 6px) 0;
+  font-size: 0.9rem;
 }

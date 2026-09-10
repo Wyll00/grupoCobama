@@ -1,5 +1,7 @@
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 const formatoPrecio = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -13,10 +15,7 @@ const formatoPrecio = new Intl.NumberFormat('es-ES', {
  * menu infantil no es un precio incompleto, es un precio equivocado, porque
  * quien lo lee cuenta a todos los de la mesa.
  */
-const UNIDAD = {
-  persona: 'por persona',
-  nino: 'por niño',
-};
+const CLAVE_UNIDAD = { persona: 'unidad.persona', nino: 'unidad.nino' };
 
 /**
  * La linea que acompana al titulo de la seccion.
@@ -29,7 +28,6 @@ const UNIDAD = {
  * uno pidiera el suyo, una frase con un solo numero mentiria sobre el resto,
  * asi que en ese caso lo dice cada tarjeta.
  */
-const ENTRADILLA = 'Menús cerrados para grupos y celebraciones.';
 
 function minimoComun(menus) {
   const minimos = new Set(menus.map((m) => m.minimo_comensales).filter(Boolean));
@@ -38,6 +36,7 @@ function minimoComun(menus) {
 
 export default function MenusCelebracion({ slug }) {
   const { datos: menus, cargando, error } = useApi((opts) => api.menusCelebracion(slug, opts), [slug]);
+  const [idioma] = useIdioma();
 
   /*
     Sin menus no hay seccion, y no hay hueco donde estuvo.
@@ -56,15 +55,16 @@ export default function MenusCelebracion({ slug }) {
     <section className="seccion seccion--menus" aria-labelledby="menus-celebracion">
       <div className="contenedor">
         <div className="seccion__intro">
-          <h2 id="menus-celebracion">Menús de celebración</h2>
+          <h2 id="menus-celebracion">{ui('menus.titulo', idioma)}</h2>
           <p className="apagado">
-            {minimo ? `${ENTRADILLA} Mínimo ${minimo} comensales.` : ENTRADILLA}
+            {ui('menus.entradilla', idioma)}
+            {minimo ? ` ${ui('menus.minimo', idioma, { n: minimo })}` : ''}
           </p>
         </div>
 
         <div className="rejilla-menus">
           {menus.map((menu) => (
-            <Menu key={menu.id} menu={menu} minimoArriba={Boolean(minimo)} />
+            <Menu key={menu.id} menu={menu} minimoArriba={Boolean(minimo)} idioma={idioma} />
           ))}
         </div>
       </div>
@@ -72,12 +72,12 @@ export default function MenusCelebracion({ slug }) {
   );
 }
 
-function Menu({ menu, minimoArriba }) {
+function Menu({ menu, minimoArriba, idioma }) {
   return (
     <article className="menu">
       <header className="menu__cabecera">
         <div className="menu__identidad">
-          <p className="menu__tipo">Menú celebración</p>
+          <p className="menu__tipo">{ui('menus.tipo', idioma)}</p>
           <h3>{menu.nombre}</h3>
           {menu.descripcion ? <p className="menu__descripcion">{menu.descripcion}</p> : null}
         </div>
@@ -87,13 +87,15 @@ function Menu({ menu, minimoArriba }) {
             se pierde. */}
         <p className="menu__precio">
           <span className="menu__euros">{formatoPrecio.format(menu.precio)}</span>
-          <span className="menu__unidad">{UNIDAD[menu.unidad_precio] ?? UNIDAD.persona}</span>
+          <span className="menu__unidad">
+            {ui(CLAVE_UNIDAD[menu.unidad_precio] ?? 'unidad.persona', idioma)}
+          </span>
         </p>
       </header>
 
       {/* Solo cuando no cabe en la entradilla de la seccion. Ver minimoComun. */}
       {!minimoArriba && menu.minimo_comensales ? (
-        <p className="menu__minimo">Mínimo {menu.minimo_comensales} comensales</p>
+        <p className="menu__minimo">{ui('menus.minimo', idioma, { n: menu.minimo_comensales })}</p>
       ) : null}
 
       {menu.secciones.map((seccion) => (

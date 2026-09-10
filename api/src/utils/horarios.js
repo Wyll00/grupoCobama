@@ -11,8 +11,10 @@
 
 const ZONA = 'Atlantic/Canary';
 
+// Con tilde: esto sale tal cual en la ficha de cada local. El revisor
+// externo senalo justamente "sabado" escrito sin ella.
 const NOMBRE_DIA = [
-  'domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado',
+  'domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado',
 ];
 
 // Orden de lectura habitual en Espana: la semana empieza el lunes.
@@ -153,6 +155,16 @@ export function resumirHorarios(horarios, hoy = ahoraEnCanarias().dia) {
 
     return {
       dias: etiqueta,
+      // Los numeros de dia, ademas de la etiqueta ya compuesta.
+      //
+      // La etiqueta se arma aqui en castellano y por tanto no se puede
+      // traducir en el navegador: "Lunes a jueves" no hay forma de volverlo
+      // aleman una vez hecha la frase. Con los indices, el cliente compone
+      // "Montag bis Donnerstag" el mismo.
+      //
+      // La etiqueta castellana se queda: la usan el panel y lo que sirve el
+      // prerenderizado a los buscadores, que van en castellano.
+      indices: dias,
       cerrado: firma === 'cerrado',
       es_hoy: dias.includes(hoy),
       horario: firma === 'cerrado'

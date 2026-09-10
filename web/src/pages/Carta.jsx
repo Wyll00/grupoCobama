@@ -4,7 +4,6 @@ import { useApi } from '../hooks/useApi.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import IconoAlergeno from '../components/IconoAlergeno.jsx';
-import Idiomas from '../components/Idiomas.jsx';
 import { useIdioma } from '../hooks/useIdioma.js';
 import { texto, ui, idiomasDisponibles } from '../datos/idioma.js';
 import { Cargando, Error } from '../components/Estado.jsx';
@@ -102,8 +101,14 @@ export default function Carta() {
     Y no se cambia el idioma guardado, solo el que se pinta aqui: al volver a
     una carta que si lo tenga, sigue en ingles. Cambiarlo de verdad seria
     quitarle al usuario una eleccion que hizo el, sin decirselo.
+
+    Lo que si se hace es DECIRLO. El selector vive ahora en la cabecera y
+    ofrece los tres idiomas siempre, porque la interfaz esta traducida entera;
+    la comida no. Quien elige aleman y se encuentra la carta en castellano
+    merece saber por que, en vez de pensar que la web no le hizo caso.
   */
   const idiomaEfectivo = disponibles.includes(idioma) ? idioma : 'es';
+  const avisoSinTraducir = idioma !== idiomaEfectivo ? ui('carta.sinTraducir', idioma) : null;
   const visibles = categoria
     ? todasLasCategorias.filter((c) => c.slug === categoria)
     : todasLasCategorias;
@@ -125,10 +130,15 @@ export default function Carta() {
             </p>
             <h1 style={{ marginBottom: '0.35rem' }}>{ui('carta.titulo', idiomaEfectivo)}</h1>
           </div>
-
-          {/* Las banderas todavia NO traducen: ver el comentario de Idiomas.jsx. */}
-          <Idiomas disponibles={disponibles} />
         </div>
+
+        {avisoSinTraducir && (
+          <div className="contenedor">
+            <p className="carta__sin-traducir" lang={idioma}>
+              {avisoSinTraducir}
+            </p>
+          </div>
+        )}
       </section>
 
       <div className="carta__barra">

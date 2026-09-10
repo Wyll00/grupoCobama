@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { LEGAL, VERSION_POLITICA, camposPendientes } from '../datos/legal.js';
 import { GRUPO } from '../datos/grupo.js';
 import { useMetadatos } from '../hooks/useMetadatos.js';
+import SoloCastellano from '../components/SoloCastellano.jsx';
 
 /**
  * Politica de privacidad.
@@ -22,6 +23,8 @@ export default function Privacidad() {
     <section className="seccion">
       <div className="contenedor legal">
         <h1>Política de privacidad</h1>
+
+        <SoloCastellano />
 
         {/* A la vista y en produccion tambien, a proposito. Un "PENDIENTE" en
             mitad del aviso legal es feo, pero es justo lo que hace que nadie

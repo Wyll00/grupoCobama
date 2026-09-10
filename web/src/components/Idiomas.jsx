@@ -1,7 +1,17 @@
 import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
- * Selector de idioma de la carta.
+ * Selector de idioma de la web.
+ *
+ * Vive en la cabecera, no en la carta. Estaba solo en la carta y por eso al
+ * elegir ingles el resto de la web -la navegacion, la ficha del local, el
+ * formulario de reservas- se quedaba en castellano: quien entraba por la
+ * portada no tenia siquiera donde cambiarlo. La interfaz esta traducida
+ * entera a los tres idiomas, asi que aqui salen los tres siempre.
+ *
+ * Lo que NO esta traducido entero son las cartas, y eso se resuelve donde
+ * ocurre: la carta avisa cuando la suya no esta en el idioma elegido y la
+ * sirve en castellano, en vez de mezclar los dos sin decir nada.
  *
  * Las banderas van DIBUJADAS y no como emoji. Windows no pinta los emoji de
  * bandera: se ven como las letras "ES", "GB" y "DE", asi que en la mitad de
@@ -54,7 +64,7 @@ function BanderaAlemania() {
 }
 
 const BANDERAS = [
-  { codigo: 'es', nombre: 'Espanol', Bandera: BanderaEspana },
+  { codigo: 'es', nombre: 'Español', Bandera: BanderaEspana },
   { codigo: 'en', nombre: 'English', Bandera: BanderaReinoUnido },
   { codigo: 'de', nombre: 'Deutsch', Bandera: BanderaAlemania },
 ];
@@ -63,16 +73,14 @@ export default function Idiomas({ disponibles }) {
   const [idioma, cambiar] = useIdioma();
 
   /*
-    Solo se ensenan los idiomas en los que ESTA carta esta traducida.
+    Sin `disponibles` salen los tres, que es el caso de la cabecera: la
+    interfaz esta traducida entera y no hay nada que esconder.
 
-    Sin esto, en Como en Casa -5 platos traducidos de 32- se pulsaba "EN" y
-    salia un plato en ingles rodeado de castellano. Eso no se lee como una
-    traduccion a medias, se lee como una web rota.
-
-    Con una sola bandera no se ensena nada: un mando de una posicion no es un
-    mando, es un adorno que ocupa sitio en la cabecera.
+    El filtro se queda por si algun dia hace falta recortar la lista en una
+    pantalla concreta. Con una sola bandera no se ensena nada: un mando de una
+    posicion no es un mando, es un adorno que ocupa sitio.
   */
-  const lista = BANDERAS.filter((b) => (disponibles ?? ['es']).includes(b.codigo));
+  const lista = disponibles ? BANDERAS.filter((b) => disponibles.includes(b.codigo)) : BANDERAS;
   if (lista.length < 2) return null;
 
   const indice = Math.max(0, lista.findIndex((b) => b.codigo === idioma));
@@ -108,7 +116,7 @@ export default function Idiomas({ disponibles }) {
       // radiogroup y no un grupo de botones: es elegir UNO de tres, no pulsar
       // tres cosas. Un lector de pantalla dice "1 de 3" y cual esta puesto.
       role="radiogroup"
-      aria-label="Idioma de la carta"
+      aria-label="Idioma de la web"
       onKeyDown={teclas}
       // Cuantas posiciones tiene el mando: lo necesita el CSS para repartir el
       // ancho de la corredera. Va como variable y no en la hoja porque depende

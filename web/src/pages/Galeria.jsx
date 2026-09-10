@@ -5,15 +5,19 @@ import { useMetadatos } from '../hooks/useMetadatos.js';
 import { api } from '../api/client.js';
 import { Cargando, Error } from '../components/Estado.jsx';
 import BarraReserva from '../components/BarraReserva.jsx';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 // El visor solo hace falta cuando alguien pulsa una foto.
 const Visor = lazy(() => import('../components/Visor.jsx'));
 
-const ETIQUETAS = {
-  plato: 'Platos',
-  local: 'El local',
-  equipo: 'El equipo',
-  evento: 'Celebraciones',
+// Las etiquetas salen del diccionario comun: aqui estaban escritas a mano y
+// eran lo unico de esta pagina que no se podia traducir.
+const CLAVE_CATEGORIA = {
+  plato: 'gal.cat.plato',
+  local: 'gal.cat.local',
+  equipo: 'gal.cat.equipo',
+  evento: 'gal.cat.evento',
 };
 
 /**
@@ -25,6 +29,7 @@ export default function Galeria() {
   const [params, setParams] = useSearchParams();
   const categoria = params.get('categoria');
   const [abierta, setAbierta] = useState(null);
+  const [idioma] = useIdioma();
 
   const local = useApi((opts) => (slug ? api.restaurante(slug, opts) : Promise.resolve(null)), [slug]);
   const galeria = useApi((opts) => api.galeria(slug, categoria, opts), [slug, categoria]);
@@ -33,8 +38,8 @@ export default function Galeria() {
 
   useMetadatos({
     descripcion: slug
-      ? `Fotos de ${nombre}: sus platos, el local y sus celebraciones.`
-      : 'Fotos de los cuatro locales del Grupo Cobama: platos, salas y celebraciones.',
+      ? ui('gal.metaLocal', idioma, { local: nombre })
+      : ui('gal.meta', idioma),
   });
 
   const fotos = useMemo(() => galeria.datos?.fotos ?? [], [galeria.datos]);
@@ -51,11 +56,11 @@ export default function Galeria() {
     <>
       <section className="seccion">
         <div className="contenedor">
-          <h1>{slug ? `Fotos de ${nombre}` : 'Galeria'}</h1>
+          <h1>
+            {slug ? ui('gal.fotosDe', idioma, { local: nombre }) : ui('gal.titulo', idioma)}
+          </h1>
           <p className="apagado">
-            {slug
-              ? 'Los platos, la sala y lo que se cuece por aquí.'
-              : 'Las cuatro casas: sus platos, sus salas y sus celebraciones.'}
+            {ui(slug ? 'gal.introLocal' : 'gal.introGrupo', idioma)}
           </p>
 
           {Object.keys(conteos).length > 1 && (
@@ -65,7 +70,7 @@ export default function Galeria() {
                 className={`filtro ${!categoria ? 'filtro--activo' : ''}`}
                 onClick={() => filtrar(null)}
               >
-                Todo
+                {ui('gal.todo', idioma)}
               </button>
               {Object.entries(conteos).map(([clave, total]) => (
                 <button
@@ -74,7 +79,8 @@ export default function Galeria() {
                   className={`filtro ${categoria === clave ? 'filtro--activo' : ''}`}
                   onClick={() => filtrar(clave)}
                 >
-                  {ETIQUETAS[clave] ?? clave} <span className="apagado">{total}</span>
+                  {CLAVE_CATEGORIA[clave] ? ui(CLAVE_CATEGORIA[clave], idioma) : clave}{' '}
+                  <span className="apagado">{total}</span>
                 </button>
               ))}
             </div>
@@ -83,10 +89,10 @@ export default function Galeria() {
           {galeria.error ? (
             <Error error={galeria.error} />
           ) : galeria.cargando ? (
-            <Cargando texto="Cargando fotos..." />
+            <Cargando texto={ui('gal.cargando', idioma)} />
           ) : fotos.length === 0 ? (
             <p className="aviso" style={{ marginTop: '1.5rem' }}>
-              Todavía no hay fotos publicadas aquí.
+              {ui('gal.vacia', idioma)}
             </p>
           ) : (
             <ul className="galeria">
@@ -96,7 +102,9 @@ export default function Galeria() {
                     type="button"
                     className="galeria__foto"
                     onClick={() => setAbierta(i)}
-                    aria-label={`Ampliar: ${foto.alt ?? foto.titulo ?? 'foto'}`}
+                    aria-label={ui('gal.ampliar', idioma, {
+                      que: foto.alt ?? foto.titulo ?? ui('gal.foto', idioma),
+                    })}
                   >
                     <img
                       src={foto.imagen_thumb}
@@ -118,7 +126,7 @@ export default function Galeria() {
 
           {!slug && (
             <p className="apagado" style={{ marginTop: '2rem', fontSize: '0.9rem' }}>
-              Cada casa tiene la suya:{' '}
+              {ui('gal.cadaCasa', idioma)}{' '}
               <Link to="/como-en-casa/galeria">Como en Casa</Link>,{' '}
               <Link to="/la-basilica/galeria">La Basílica</Link>,{' '}
               <Link to="/la-casa-del-mago/galeria">La Casa del Mago</Link> y{' '}

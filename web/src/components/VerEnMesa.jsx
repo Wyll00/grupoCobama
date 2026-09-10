@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
+import { texto, ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
  * Ver el plato encima de la mesa, a tamano real.
@@ -17,8 +19,12 @@ import { api } from '../api/client.js';
  */
 export default function VerEnMesa({ plato, onCerrar }) {
   const [datos, setDatos] = useState(null);
+  // Aqui se guarda la CLAVE del aviso, no el aviso ya escrito: si se guardara
+  // traducido y alguien cambiara de idioma con el mensaje en pantalla, se
+  // quedaria el del idioma anterior.
   const [error, setError] = useState(null);
   const [listo, setListo] = useState(false);
+  const [idioma] = useIdioma();
 
   useEffect(() => {
     let vigente = true;
@@ -30,12 +36,12 @@ export default function VerEnMesa({ plato, onCerrar }) {
       .then(([, respuesta]) => {
         if (!vigente) return;
         if (!respuesta.disponible) {
-          setError('Este plato todavía no se puede ver en la mesa.');
+          setError('mesa.sinModelo');
           return;
         }
         setDatos(respuesta);
       })
-      .catch(() => vigente && setError('No se ha podido cargar la vista.'))
+      .catch(() => vigente && setError('mesa.error'))
       .finally(() => vigente && setListo(true));
 
     return () => {
@@ -60,24 +66,24 @@ export default function VerEnMesa({ plato, onCerrar }) {
       onMouseDown={(e) => e.target === e.currentTarget && onCerrar()}
       role="dialog"
       aria-modal="true"
-      aria-label={`Ver ${plato.nombre} en la mesa`}
+      aria-label={ui('mesa.verPlato', idioma, { plato: plato.nombre })}
     >
       <div className="mesa">
         <header className="mesa__cabecera">
           <div>
-            <h2>{plato.nombre}</h2>
+            <h2>{texto(plato, 'nombre', idioma)}</h2>
             {datos?.ancho_cm && (
-              <p className="mesa__medida">Mide unos {datos.ancho_cm} cm de ancho</p>
+              <p className="mesa__medida">{ui('mesa.ancho', idioma, { n: datos.ancho_cm })}</p>
             )}
           </div>
-          <button type="button" className="mesa__cerrar" onClick={onCerrar} aria-label="Cerrar">
+          <button type="button" className="mesa__cerrar" onClick={onCerrar} aria-label={ui('mesa.cerrar', idioma)}>
             ×
           </button>
         </header>
 
         <div className="mesa__cuerpo">
-          {!listo && <p className="mesa__aviso">Preparando la vista...</p>}
-          {error && <p className="mesa__aviso">{error}</p>}
+          {!listo && <p className="mesa__aviso">{ui('mesa.preparando', idioma)}</p>}
+          {error && <p className="mesa__aviso">{ui(error, idioma)}</p>}
 
           {/*
             loading y reveal en eager: por defecto model-viewer espera a que el

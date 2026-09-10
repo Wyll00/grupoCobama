@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { ui } from '../datos/idioma.js';
+import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
  * Boton de reservar de un local.
@@ -13,7 +15,8 @@ import { Link } from 'react-router-dom';
  * local ha dejado de mirar.
  */
 export default function BotonReservar({ local, className = 'boton boton--principal', children }) {
-  const texto = children ?? 'Reservar mesa';
+  const [idioma] = useIdioma();
+  const texto = children ?? ui('ficha.reservarMesa', idioma);
   const externa = local?.url_reservas;
 
   if (externa) {
