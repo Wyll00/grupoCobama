@@ -33,6 +33,8 @@ export const api = {
   menusCelebracion: (slug, opts) => get(`/restaurantes/${slug}/menus-celebracion`, {}, opts),
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
+  // La tarjeta de socio. Publica: la abre el QR en el movil del cliente.
+  socio: (codigo, opts) => get(`/socios/${encodeURIComponent(codigo)}`, opts),
   ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
   galeria: (slug, categoria, opts) =>
     get(slug ? `/restaurantes/${slug}/galeria` : '/galeria', { categoria }, opts),

@@ -26,6 +26,12 @@ import {
 } from '../esquemas/catalogo.js';
 import { crearUsuarioSchema, actualizarUsuarioSchema } from '../esquemas/usuarios.js';
 import {
+  crearSocioSchema,
+  apuntarVisitaSchema,
+  entregarPremioSchema,
+  buscarSociosSchema,
+} from '../esquemas/socios.js';
+import {
   registrarOcupacionSchema,
   consultaOcupacionSchema,
 } from '../esquemas/ocupacion.js';
@@ -39,6 +45,7 @@ import * as reservasCtrl from '../controllers/reservas.controller.js';
 import * as localesCtrl from '../controllers/admin.locales.controller.js';
 import * as estadoCtrl from '../controllers/admin.estado.controller.js';
 import * as estadisticasReservasCtrl from '../controllers/admin.estadisticasReservas.controller.js';
+import * as sociosCtrl from '../controllers/socios.controller.js';
 import * as galeriaCtrl from '../controllers/admin.galeria.controller.js';
 import * as resumenCtrl from '../controllers/admin.resumen.controller.js';
 import * as alergenosCtrl from '../controllers/admin.alergenos.controller.js';
@@ -81,6 +88,29 @@ adminRouter.get('/estado', soloAdmin, asyncHandler(estadoCtrl.getEstado));
 
 // Cuantas reservas entran y por donde. El alcance lo decide el token.
 adminRouter.get('/reservas/estadisticas', asyncHandler(estadisticasReservasCtrl.getEstadisticasReservas));
+
+// ---------------------------------------------------------------------------
+// Tarjeta de socio
+//
+// Las ve y las apunta cualquiera con sesion, admin o encargado: la tarjeta
+// vale en las cuatro casas y quien atiende la mesa es quien apunta la visita.
+// En que casa se apunta lo decide el TOKEN, no el cuerpo de la peticion -ver
+// el controlador-, para que un encargado no pueda sumar visitas en una casa
+// que no es la suya.
+// ---------------------------------------------------------------------------
+adminRouter.get('/socios', validarConsulta(buscarSociosSchema), asyncHandler(sociosCtrl.getSocios));
+adminRouter.post('/socios', validarCuerpo(crearSocioSchema), asyncHandler(sociosCtrl.postSocio));
+adminRouter.get('/socios/:codigo/qr', asyncHandler(sociosCtrl.getQr));
+adminRouter.post(
+  '/socios/:codigo/visitas',
+  validarCuerpo(apuntarVisitaSchema),
+  asyncHandler(sociosCtrl.postVisita)
+);
+adminRouter.post(
+  '/socios/premios/:premioId/entregar',
+  validarCuerpo(entregarPremioSchema),
+  asyncHandler(sociosCtrl.postEntregarPremio)
+);
 
 // Mapa de alergenos de la carta, para la pagina de estadisticas.
 adminRouter.get('/alergenos/mapa', asyncHandler(alergenosCtrl.mapaAlergenos));

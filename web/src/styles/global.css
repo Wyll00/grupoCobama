@@ -3379,3 +3379,234 @@ button {
     object-position: center 62%;
   }
 }
+
+/* =====================================================================
+   Tarjeta de socio
+
+   Tiene forma de billete, con su muesca arriba, porque es lo que es: algo que
+   se ensena en la puerta. El esquema viene del billete de Luma que trajo el
+   grupo; los colores son los de la casa.
+
+   Va oscura en los dos temas, como el hero: una tarjeta que cambia de color
+   segun el movil de cada uno no parece una tarjeta, parece una pagina.
+   ===================================================================== */
+
+.socio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.tarjeta-socio {
+  position: relative;
+  width: min(100%, 26rem);
+  margin-inline: auto;
+  padding: 2.4rem 1.6rem 1.6rem;
+
+  background: var(--carbon);
+  color: var(--crema);
+  border-radius: 22px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+
+/* La muesca. Un circulo del color del fondo de la pagina mordiendo el borde
+   de arriba: es el detalle que hace que se lea como un billete troquelado y
+   no como una caja. */
+.tarjeta-socio__muesca {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 36px;
+  border-radius: 0 0 64px 64px;
+  background: var(--fondo);
+}
+
+.tarjeta-socio__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.tarjeta-socio__desde {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.tarjeta-socio__desde span {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--ocre-claro);
+}
+
+.tarjeta-socio__desde strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tarjeta-socio__nombre {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.15;
+  color: var(--crema);
+}
+
+/* ---- los sellos ----
+
+   Lo que de verdad se viene a mirar. Un numero -"5 de 8"- se lee; ocho huecos
+   de los que cinco estan llenos se VE, de reojo y mientras uno guarda el
+   movil. Por eso van antes que ningun dato escrito. */
+/* OJO CON EL NOMBRE. Esto se llamo `.sello` a secas y choco con el `.sello`
+   del logotipo, que estaba definido mas arriba en esta misma hoja: al ganar
+   la mia -misma especificidad, va despues- el anillo del sello de la casa se
+   quedo sin su estilo en TODA la web. Se vio contando los elementos, no
+   mirando la pantalla: salian diez sellos donde tenia que haber ocho. */
+.sellos-visita {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.sello-visita {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px solid rgba(224, 169, 79, 0.45);
+  background: transparent;
+}
+
+.sello-visita--lleno {
+  background: var(--ocre-claro);
+  border-color: var(--ocre-claro);
+}
+
+.tarjeta-socio__faltan {
+  margin: 0 0 1.6rem;
+  font-size: 0.9rem;
+  color: #d8cfc4;
+}
+
+.tarjeta-socio__premio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0 0 1.6rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-s, 8px);
+  background: rgba(224, 169, 79, 0.16);
+  border: 1px solid rgba(224, 169, 79, 0.5);
+}
+
+.tarjeta-socio__premio strong {
+  color: var(--ocre-claro);
+}
+
+.tarjeta-socio__premio span {
+  font-size: 0.85rem;
+  color: #d8cfc4;
+}
+
+/* Un borde ocre cuando hay premio: la tarjeta tiene que cantar desde la mano
+   del cliente sin que nadie lea nada. */
+.tarjeta-socio--premiada {
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35), 0 0 0 2px var(--ocre-claro);
+}
+
+/* ---- los datos ---- */
+
+.tarjeta-socio__datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0 0 1.6rem;
+}
+
+.tarjeta-socio__datos dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--ocre-claro);
+  margin-bottom: 0.2rem;
+}
+
+.tarjeta-socio__datos dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Monoespaciada y separada: el codigo se dicta por telefono cuando el movil
+   se queda sin bateria, y asi no se confunde una letra con otra. */
+.tarjeta-socio__codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.12em;
+}
+
+/* ---- el QR ---- */
+
+.tarjeta-socio__qr {
+  background: #fff;
+  border-radius: 14px;
+  padding: 0.8rem;
+  width: min(100%, 15rem);
+  margin-inline: auto;
+}
+
+.tarjeta-socio__qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tarjeta-socio__pie {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #b9afa4;
+}
+
+/* ---- el historial, debajo de la tarjeta ---- */
+
+.socio__historial {
+  max-width: 26rem;
+}
+
+.socio__historial h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.6rem;
+}
+
+.socio__historial ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.socio__historial li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--borde);
+  font-size: 0.9rem;
+}
+
+.socio__historial li:last-child {
+  border-bottom: 0;
+}
+
+.socio__historial-fecha {
+  color: var(--texto-suave);
+}
+
+.socio__historial-local {
+  font-weight: 600;
+}

@@ -111,6 +111,18 @@ export const adminApi = {
   // Cuantas reservas entran y por donde. El alcance -grupo o un local- lo
   // decide el token, no se le pasa.
   estadisticasReservas: (meses = 12) => get(`/admin/reservas/estadisticas?meses=${meses}`),
+
+  // --- socios -------------------------------------------------------------
+  // En que casa se apunta la visita lo decide el SERVIDOR a partir del token
+  // cuando quien la apunta es un encargado. Solo el admin de grupo manda el
+  // local, porque no esta en ninguna sala.
+  socios: (q = '') => get(`/admin/socios?q=${encodeURIComponent(q)}`),
+  crearSocio: (cuerpo) => enviar('POST', '/admin/socios', { cuerpo }),
+  apuntarVisita: (codigo, cuerpo = {}) =>
+    enviar('POST', `/admin/socios/${encodeURIComponent(codigo)}/visitas`, { cuerpo }),
+  entregarPremio: (premioId, cuerpo = {}) =>
+    enviar('POST', `/admin/socios/premios/${premioId}/entregar`, { cuerpo }),
+  qrSocio: (codigo) => get(`/admin/socios/${encodeURIComponent(codigo)}/qr`),
   // Mapa de alergenos de la carta, para la pagina de estadisticas.
   mapaAlergenos: () => get('/admin/alergenos/mapa'),
   categorias: () => get('/categorias'),

@@ -29,6 +29,7 @@ export default function AdminLayout() {
               Inicio
             </NavLink>
             <NavLink to="/admin/reservas">Reservas</NavLink>
+            <NavLink to="/admin/socios">Socios</NavLink>
             <NavLink to="/admin/carta">Cartas</NavLink>
             <NavLink to="/admin/platos">Catálogo</NavLink>
             <NavLink to="/admin/galeria">Galería</NavLink>

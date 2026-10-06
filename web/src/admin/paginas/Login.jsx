@@ -53,7 +53,7 @@ export default function Login() {
           />
         </Campo>
 
-        <Campo etiqueta="Contrasena">
+        <Campo etiqueta="Contraseña">
           <Entrada
             type="password"
             value={password}

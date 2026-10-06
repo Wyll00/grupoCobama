@@ -1764,3 +1764,141 @@
 .barras--anchas .barra {
   grid-template-columns: 4.5rem 1fr 2.2rem;
 }
+
+/* =====================================================================
+   Socios
+
+   Lo de arriba es lo que se hace cincuenta veces por servicio: tecleas el
+   codigo y apuntas. Todo lo demas puede pedir dos pulsaciones mas.
+   ===================================================================== */
+
+.apuntar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--superficie);
+}
+
+.apuntar .campo {
+  margin: 0;
+  flex: 1 1 14rem;
+}
+
+/* El codigo se teclea mirando el movil del cliente: monoespaciado y separado
+   para no confundir una letra con otra al copiarla. */
+.apuntar input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---- lo que sale despues de apuntar ---- */
+
+.resultado {
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+}
+
+/* Con premio, la tarjeta canta: es lo unico de esta pantalla que obliga a
+   hacer algo en ese momento. */
+.resultado--premio {
+  border-color: var(--ocre);
+  box-shadow: 0 0 0 1px var(--ocre);
+  background: color-mix(in srgb, var(--ocre) 10%, var(--superficie));
+}
+
+.resultado__quien {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+
+.resultado__quien strong {
+  font-size: 1.05rem;
+}
+
+.resultado__cuenta {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.resultado__cuenta strong {
+  font-size: 1.6rem;
+  color: var(--ocre-texto);
+}
+
+.resultado__repetida {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.resultado__premio-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--borde);
+}
+
+/* ---- la lista ---- */
+
+.socios {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.socio-fila {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--borde);
+  font-size: 0.925rem;
+}
+
+.socio-fila:last-child {
+  border-bottom: 0;
+}
+
+.socio-fila__codigo {
+  margin-left: 0.6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--texto-suave);
+}
+
+.socio-fila__visitas {
+  font-variant-numeric: tabular-nums;
+}
+
+.socio-fila__premio {
+  font-weight: 700;
+  color: var(--ocre-texto);
+}
+
+@media (max-width: 36rem) {
+  .socio-fila {
+    grid-template-columns: 1fr auto;
+  }
+
+  .socio-fila__premio,
+  .socio-fila__visitas {
+    grid-column: 2;
+  }
+}

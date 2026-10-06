@@ -13,6 +13,7 @@ import {
 import { getCategorias, getAlergenos } from '../controllers/catalogo.controller.js';
 import { getMenusCelebracion } from '../controllers/menus.controller.js';
 import { getAr } from '../controllers/ar.controller.js';
+import { getTarjeta } from '../controllers/socios.controller.js';
 
 export const router = Router();
 
@@ -31,6 +32,10 @@ router.get('/restaurantes/:slug/galeria', validarConsulta(listarGaleriaSchema), 
 
 // Galeria del grupo: todas las fotos, de las cuatro casas y las sueltas.
 router.get('/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGaleria));
+
+// La tarjeta de socio. Publica y de solo lectura: el QR tiene que abrirse en
+// el movil de cualquiera sin instalar ni entrar en nada.
+router.get('/socios/:codigo', asyncHandler(getTarjeta));
 
 router.get('/categorias', asyncHandler(getCategorias));
 router.get('/alergenos', asyncHandler(getAlergenos));

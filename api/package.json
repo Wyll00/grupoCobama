@@ -10,6 +10,7 @@
     "start": "node src/server.js",
     "qr": "node scripts/generar-qr.js",
     "humo": "node scripts/humo.js",
+    "socios": "node scripts/probar-socios.mjs",
     "glb": "node scripts/probar-glb.js",
     "db:migrate": "node scripts/db.js migrate",
     "db:seed": "node scripts/db.js seed",
