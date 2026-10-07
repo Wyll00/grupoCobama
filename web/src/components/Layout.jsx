@@ -3,6 +3,7 @@ import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
 import Logo from './Logo.jsx';
 import Platito from './Platito.jsx';
 import Idiomas from './Idiomas.jsx';
+import BotonPerfil from './BotonPerfil.jsx';
 import { useApi } from '../hooks/useApi.js';
 import { api } from '../api/client.js';
 import { ui } from '../datos/idioma.js';
@@ -61,9 +62,19 @@ export default function Layout() {
             </NavLink>
           </nav>
 
+          {/*
+            El perfil va el ULTIMO y el plato antes, porque en movil el plato
+            no se pinta -no cabian los tres- y asi el perfil queda en el mismo
+            sitio en los dos tamanos: el ultimo mando de la derecha. El dia que
+            alguien pase del telefono al ordenador, el boton no se le ha movido.
+
+            Quien decide eso es el CSS, no este componente: aqui se pintan los
+            tres siempre. Ver `.platito` en el corte de 48rem.
+          */}
           <div className="cabecera__mandos">
             <Idiomas />
             <Platito />
+            <BotonPerfil />
           </div>
         </div>
       </header>

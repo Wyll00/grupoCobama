@@ -110,6 +110,10 @@ const UI = {
   'nav.privacidad': { es: 'Privacidad', en: 'Privacy', de: 'Datenschutz' },
   'nav.avisoLegal': { es: 'Aviso legal', en: 'Legal notice', de: 'Impressum' },
   'nav.reservar': { es: 'Reservar', en: 'Book a table', de: 'Reservieren' },
+  // Dos rotulos para el mismo boton de la cabecera, segun el navegador
+  // recuerde o no un codigo de socio. Ver `BotonPerfil.jsx`.
+  'nav.miTarjeta': { es: 'Mi tarjeta de socio', en: 'My member card', de: 'Meine Mitgliedskarte' },
+  'nav.tarjetaSocio': { es: 'Tarjeta de socio', en: 'Member card', de: 'Mitgliedskarte' },
   'nav.fotosDe': { es: 'Fotos de {local}', en: 'Photos of {local}', de: 'Fotos von {local}' },
   'nav.inicio': {
     es: 'Grupo Cobama, ir al inicio',
@@ -138,6 +142,7 @@ const UI = {
   },
   'home.galeria': { es: 'Galería', en: 'Gallery', de: 'Galerie' },
   'home.proximamente': { es: 'Próximamente', en: 'Coming soon', de: 'Demnächst' },
+  'home.abreEl': { es: 'Abre el {fecha}', en: 'Opens {fecha}', de: 'Eröffnet am {fecha}' },
   'home.quintaCasa': {
     es: 'la quinta casa del grupo',
     en: "the group's fifth restaurant",
@@ -569,6 +574,22 @@ const UI = {
  * hace que alguien lo arregle. Callar dejaria un hueco en blanco que nadie
  * relaciona con un texto que falta.
  */
+/*
+  El locale que le toca a cada idioma, para fechas y numeros.
+
+  Hacia falta en cuanto hubo una fecha que ensenarle a un cliente: el resto
+  del proyecto escribe 'es-ES' a pelo y ahi esta bien, porque todo eso es el
+  panel y el panel es en castellano. Lo que ve el cliente no puede serlo: en
+  aleman "18 de octubre de 2026" no se entiende, y en ingles tampoco.
+
+  Ingles de Reino Unido y no de Estados Unidos a proposito: el turismo de la
+  isla es britanico y aleman, y 'en-US' escribiria "October 18, 2026", que en
+  Europa se lee como una fecha de otro sitio.
+*/
+const LOCALES = { es: 'es-ES', en: 'en-GB', de: 'de-DE' };
+
+export const localeDe = (idioma) => LOCALES[idioma] ?? LOCALES.es;
+
 export function ui(clave, idioma, valores) {
   const entrada = UI[clave];
   if (!entrada) return clave;
