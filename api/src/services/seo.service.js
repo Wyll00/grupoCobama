@@ -180,6 +180,60 @@ export async function metadatosDeRuta(ruta) {
     };
   }
 
+  /*
+    Las pantallas de socio.
+
+    Tienen que resolver aqui por lo mismo que las legales, y en su caso ademas
+    ROMPE COSAS que no se vean venir: cayendo en el comodin respondian 404
+    sirviendo la pagina igual, asi que de puertas afuera parecia que
+    funcionaban. Pero un 404 hacia que:
+
+      - la direccion de arranque del icono guardado en el movil apuntara a una
+        pagina que el servidor da por inexistente, que es parte de por que
+        el icono no abria la tarjeta;
+      - el service worker no guardase nunca la tarjeta, porque solo cachea
+        respuestas correctas, y entonces no abria sin cobertura;
+      - Google tirase /socio y /socio/alta, que son publicas y es donde se
+        explica que existe la tarjeta.
+
+    La tarjeta de cada uno va con `noIndexar`: 200 si, buscador no.
+  */
+  if (limpia === '/socio') {
+    return {
+      titulo: `Tarjeta de socio · ${NOMBRE_GRUPO}`,
+      descripcion:
+        'Una tarjeta para las cuatro casas del Grupo Cobama. Cada visita suma, y a las ocho hay premio.',
+      canonica: `${base()}/socio`,
+      tipo: 'website',
+      jsonLd: null,
+    };
+  }
+
+  if (limpia === '/socio/alta') {
+    return {
+      titulo: `Hazte socio · ${NOMBRE_GRUPO}`,
+      descripcion:
+        'Hazte la tarjeta de socio del Grupo Cobama en un minuto. Es gratis y vale en las cuatro casas.',
+      canonica: `${base()}/socio/alta`,
+      tipo: 'website',
+      jsonLd: null,
+    };
+  }
+
+  // La tarjeta de alguien. No se comprueba contra la base a proposito: seria
+  // una consulta en cada carga para decidir entre 200 y 404, y la propia
+  // pagina ya dice "esa tarjeta no existe" cuando el codigo esta mal.
+  if (/^\/socio\/[A-Za-z0-9]{1,10}$/.test(limpia)) {
+    return {
+      titulo: `Tu tarjeta de socio · ${NOMBRE_GRUPO}`,
+      descripcion: 'Tus visitas y tus premios en el Grupo Cobama.',
+      canonica: `${base()}/socio`,
+      tipo: 'website',
+      jsonLd: null,
+      noIndexar: true,
+    };
+  }
+
   if (limpia === '/galeria') {
     const [[{ fotos }]] = await pool.execute(
       'SELECT COUNT(*) AS fotos FROM galeria WHERE activo = 1'
@@ -294,6 +348,16 @@ export function etiquetas(meta) {
     `<title>${escaparAtributo(NOMBRE_GRUPO)}</title>`,
     `<meta name="description" content="${d}" />`,
 
+    /*
+      Hay paginas que tienen que salir bien y NO estar en Google.
+
+      La tarjeta de un socio es una de ellas: lleva su nombre y sus visitas, y
+      la direccion es adivinable con suficiente paciencia. Que responda 200
+      hace falta -si no, el icono que se guarda en el movil apunta a un 404-,
+      pero que la indexe un buscador no.
+    */
+    ...(meta.noIndexar ? ['<meta name="robots" content="noindex, nofollow" />'] : []),
+
     // Open Graph: lo que leen WhatsApp, Instagram, Facebook y LinkedIn.
     `<meta property="og:type" content="${escaparAtributo(meta.tipo)}" />`,
     `<meta property="og:site_name" content="${NOMBRE_GRUPO}" />`,
@@ -366,6 +430,14 @@ export function robots() {
     'Allow: /',
     // El panel no pinta nada en un buscador.
     'Disallow: /admin',
+    /*
+      Las tarjetas tampoco: llevan el nombre y las visitas de una persona.
+      La barra final es la que marca la diferencia y aqui importa: tapa
+      /socio/LOQUESEA y deja pasar /socio y /socio/alta, que son publicas y
+      son donde se explica que la tarjeta existe.
+    */
+    'Disallow: /socio/',
+    'Allow: /socio/alta',
     '',
     `Sitemap: ${base()}/sitemap.xml`,
   ].join('\n');
