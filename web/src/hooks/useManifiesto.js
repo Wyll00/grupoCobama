@@ -9,19 +9,21 @@ import { useEffect } from 'react';
  * tarjeta, y cual de los dos esta puesto depende de donde este el visitante
  * en ese momento.
  *
- * Por que `/socio` y no `/socio/EL-CODIGO` en el manifiesto de la tarjeta:
- * `/socio` ya sabe redirigir al codigo que recuerda el navegador, y el icono
- * guardado comparte ese recuerdo porque es el mismo origen. Con el codigo
- * metido a fuego, el icono se quedaria apuntando a una tarjeta vieja el dia
- * que alguien pierda la suya y le hagan otra.
- *
  * ---------------------------------------------------------------------------
- * EN iOS ESTO NO HACE NADA, y es importante saberlo antes de depurarlo:
- * Safari no lee el manifiesto para "anadir a pantalla de inicio". Guarda la
- * direccion que esta abierta en ese momento. Que resulta ser justo lo que se
- * quiere -el cliente esta mirando su tarjeta cuando lo hace-, asi que iOS sale
- * bien sin esto. Esto es para Android, que si lo lee y que si no se le dice lo
- * contrario guardaria la portada.
+ * EL MANIFIESTO DE LA TARJETA LLEVA EL CODIGO DENTRO, y lo sirve la API: uno
+ * por socio, en /api/socios/CODIGO/manifiesto.webmanifest.
+ *
+ * Aqui ponia un manifiesto fijo que abria en /socio, contando con que el
+ * navegador recordase el codigo. No funciono: en un iPhone, guardar la web en
+ * la pantalla de inicio y tocar el icono abria la PORTADA. Lo conto el dueno
+ * despues de probarlo en su movil, que es donde se ve esto y no en un
+ * navegador de escritorio.
+ *
+ * Con la direccion metida en el manifiesto da igual quien tenga razon sobre
+ * que hace iOS -si usa `start_url` o la pagina que esta abierta-, porque las
+ * dos llevan al mismo sitio cuando se guarda desde la propia tarjeta. Y de
+ * paso deja de depender de que el icono comparta almacenamiento con el
+ * navegador, que en iOS no esta garantizado.
  * ---------------------------------------------------------------------------
  */
 export function useManifiesto(href) {

@@ -76,14 +76,20 @@ export default function GuardarEnElMovil() {
     return (
       <div className="guardar-movil">
         {explicandoIOS ? (
+          /* Los pasos dicen "desde aqui" a proposito: si se guarda desde la
+             portada, el icono abre la portada. Es lo que le paso al dueno la
+             primera vez. */
           <ol className="guardar-movil__pasos">
             <li>
-              Dale a <strong>Compartir</strong>, el cuadrado con la flecha hacia arriba.
+              Sin salir de esta pantalla, dale a <strong>Compartir</strong>, el cuadrado
+              con la flecha hacia arriba.
             </li>
             <li>
               Baja y elige <strong>Añadir a pantalla de inicio</strong>.
             </li>
-            <li>Te queda el sello de Cobama junto a tus apps.</li>
+            <li>
+              Te queda un icono llamado <strong>Mi tarjeta</strong> que abre esto mismo.
+            </li>
           </ol>
         ) : (
           <button type="button" className="enlace" onClick={() => setExplicandoIOS(true)}>

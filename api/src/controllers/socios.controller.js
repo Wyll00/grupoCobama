@@ -54,6 +54,57 @@ export async function getTarjeta(req, res) {
 }
 
 /**
+ * El manifiesto de UNA tarjeta, para guardarla en la pantalla de inicio.
+ *
+ * Hay uno por socio y no uno para todos porque el icono tiene que abrir SU
+ * tarjeta. Con un manifiesto fijo apuntando a /socio, lo guardado dependia de
+ * que el navegador recordase el codigo, y eso falla por dos sitios:
+ *
+ *   - En iOS, una web guardada en la pantalla de inicio puede tener su propio
+ *     almacenamiento, aparte del de Safari. Lo que recordaba el navegador no
+ *     esta ahi dentro, asi que el icono abria la puerta en vez de la tarjeta.
+ *   - Y si alguien limpia el navegador, el icono deja de saber a quien abrir.
+ *
+ * Con la direccion metida en el manifiesto, el icono apunta a esa tarjeta y
+ * ya esta. No hace falta recordar nada.
+ *
+ * No lleva el nombre del socio: lo que va debajo del icono son dos palabras y
+ * un nombre largo se corta igual, asi que no se gana nada y se evita que el
+ * nombre de alguien acabe escrito en la pantalla de inicio de un movil
+ * prestado.
+ */
+export async function getManifiestoTarjeta(req, res) {
+  // Se pide la tarjeta aunque no se use el contenido: asi un codigo inventado
+  // devuelve 404 en vez de un manifiesto que apunta a una pagina de error.
+  const tarjeta = await socios.porCodigo(req.params.codigo);
+
+  res.type('application/manifest+json').json({
+    id: `/socio/${tarjeta.codigo}`,
+    name: 'Mi tarjeta Cobama',
+    short_name: 'Mi tarjeta',
+    description: 'Tu tarjeta de socio del Grupo Cobama: visitas y premios.',
+
+    start_url: `/socio/${tarjeta.codigo}`,
+    scope: '/',
+
+    display: 'standalone',
+    background_color: '#1f1a17',
+    theme_color: '#1f1a17',
+    lang: 'es',
+    icons: [
+      { src: '/icono/icono-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icono/icono-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      {
+        src: '/icono/icono-enmascarable-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  });
+}
+
+/**
  * Darse de alta uno mismo desde la web.
  *
  * Devuelve la tarjeta YA COMPLETA, con su QR y sin telefono ni email, igual

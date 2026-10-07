@@ -31,13 +31,15 @@
 // Al subir este numero se tiran las caches viejas. Hay que tocarlo cuando
 // cambie la ESTRATEGIA de aqui; para el contenido no hace falta, porque nada
 // que no lleve huella se sirve de cache estando la red.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `cobama-${VERSION}`;
 
 // Lo minimo para que la tarjeta abra sin red. No se precachean los assets
 // porque sus nombres cambian en cada compilacion: se van guardando solos segun
 // se piden.
-const BASICOS = ['/', '/socio', '/manifest-socio.webmanifest', '/icono/icono-192.png'];
+// El manifiesto de la tarjeta ya no es un fichero fijo: lo sirve la API, uno
+// por socio, y precachear el de alguien en concreto no tiene sentido.
+const BASICOS = ['/', '/socio', '/manifest.webmanifest', '/icono/icono-192.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(

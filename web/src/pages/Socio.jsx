@@ -80,7 +80,7 @@ export default function Socio() {
     peticion falle; si alguien guarda la pagina en ese momento, lo que tiene
     que guardarse sigue siendo su tarjeta.
   */
-  useManifiesto('/manifest-socio.webmanifest');
+  useManifiesto(`/api/socios/${encodeURIComponent(codigo)}/manifiesto.webmanifest`);
 
   /*
     Al abrir un perfil que carga bien, se recuerda.

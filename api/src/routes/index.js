@@ -15,7 +15,7 @@ import {
 import { getCategorias, getAlergenos } from '../controllers/catalogo.controller.js';
 import { getMenusCelebracion } from '../controllers/menus.controller.js';
 import { getAr } from '../controllers/ar.controller.js';
-import { getTarjeta, postAlta } from '../controllers/socios.controller.js';
+import { getTarjeta, postAlta, getManifiestoTarjeta } from '../controllers/socios.controller.js';
 import { altaPublicaSchema } from '../esquemas/socios.js';
 
 export const router = Router();
@@ -39,6 +39,10 @@ router.get('/galeria', validarConsulta(listarGaleriaSchema), asyncHandler(getGal
 // La tarjeta de socio. El QR tiene que abrirse en el movil de cualquiera sin
 // instalar ni entrar en nada.
 router.get('/socios/:codigo', asyncHandler(getTarjeta));
+
+// El manifiesto de esa tarjeta, para que el icono de la pantalla de inicio
+// abra SU tarjeta y no la portada. Uno por socio; ver el controlador.
+router.get('/socios/:codigo/manifiesto.webmanifest', asyncHandler(getManifiestoTarjeta));
 
 /*
   Hacerse socio desde la web.
