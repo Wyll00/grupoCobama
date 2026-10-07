@@ -78,6 +78,12 @@ export async function getManifiestoTarjeta(req, res) {
   // devuelve 404 en vez de un manifiesto que apunta a una pagina de error.
   const tarjeta = await socios.porCodigo(req.params.codigo);
 
+  // `no-cache` no es "no lo guardes": es "pregunta antes de usarlo". Un
+  // manifiesto cacheado es de lo mas dificil de depurar que hay, porque el
+  // movil sigue guardando el icono con la direccion vieja y no hay forma de
+  // verlo desde fuera.
+  res.set('Cache-Control', 'no-cache');
+
   res.type('application/manifest+json').json({
     id: `/socio/${tarjeta.codigo}`,
     name: 'Mi tarjeta Cobama',

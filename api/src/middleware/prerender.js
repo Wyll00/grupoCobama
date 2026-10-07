@@ -43,7 +43,18 @@ async function cargarPlantilla() {
   const html = await readFile(join(DIST, 'index.html'), 'utf8');
   plantilla = html
     .replace(/<title>[\s\S]*?<\/title>\s*/i, '')
-    .replace(/<meta\s+name="description"[\s\S]*?\/>\s*/i, '');
+    .replace(/<meta\s+name="description"[\s\S]*?\/>\s*/i, '')
+    /*
+      El manifiesto tambien se quita, y lo pone `etiquetas()` segun la ruta.
+
+      Hace falta porque hay uno por tarjeta de socio y el de la pagina no vale.
+      Cambiarlo desde el navegador al montar React NO sirve: Safari lee el
+      manifiesto al cargar la pagina, antes de eso, asi que guardaba la tarjeta
+      en la pantalla de inicio con la direccion de arranque del sitio y el
+      icono abria la portada. Comprobado mirando el HTML que sale de aqui, que
+      seguia diciendo /manifest.webmanifest en la pagina de una tarjeta.
+    */
+    .replace(/<link\s+rel="manifest"[\s\S]*?\/?>\s*/i, '');
   return plantilla;
 }
 

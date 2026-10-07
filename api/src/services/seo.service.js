@@ -231,6 +231,9 @@ export async function metadatosDeRuta(ruta) {
       tipo: 'website',
       jsonLd: null,
       noIndexar: true,
+      // Su manifiesto, con su codigo dentro. Es lo que hace que el icono
+      // guardado en el movil abra ESTA tarjeta y no la portada.
+      manifiesto: `/api/socios/${encodeURIComponent(limpia.slice('/socio/'.length))}/manifiesto.webmanifest`,
     };
   }
 
@@ -357,6 +360,15 @@ export function etiquetas(meta) {
       pero que la indexe un buscador no.
     */
     ...(meta.noIndexar ? ['<meta name="robots" content="noindex, nofollow" />'] : []),
+
+    /*
+      El manifiesto, ya decidido por la ruta.
+
+      Va aqui y no fijo en el index.html porque la tarjeta de cada socio tiene
+      el suyo, con su direccion dentro. Ponerlo desde el navegador llegaba
+      tarde: Safari lo lee al cargar la pagina.
+    */
+    `<link rel="manifest" href="${escaparAtributo(meta.manifiesto ?? '/manifest.webmanifest')}" />`,
 
     // Open Graph: lo que leen WhatsApp, Instagram, Facebook y LinkedIn.
     `<meta property="og:type" content="${escaparAtributo(meta.tipo)}" />`,
