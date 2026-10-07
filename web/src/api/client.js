@@ -34,7 +34,23 @@ export const api = {
   categorias: (opts) => get('/categorias', {}, opts),
   alergenos: (opts) => get('/alergenos', {}, opts),
   // La tarjeta de socio. Publica: la abre el QR en el movil del cliente.
-  socio: (codigo, opts) => get(`/socios/${encodeURIComponent(codigo)}`, opts),
+  socio: (codigo, opts) => get(`/socios/${encodeURIComponent(codigo)}`, {}, opts),
+
+  // Hacerse socio desde la web. Devuelve la tarjeta ya hecha, con su QR.
+  crearSocio: async (datos) => {
+    const res = await fetch('/api/socios', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(datos),
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok) {
+      const error = new Error(json?.error?.mensaje ?? 'No se ha podido crear la tarjeta');
+      error.detalles = json?.error?.detalles ?? [];
+      throw error;
+    }
+    return json.datos;
+  },
   ar: (platoId, opts) => get(`/platos/${platoId}/ar`, {}, opts),
   galeria: (slug, categoria, opts) =>
     get(slug ? `/restaurantes/${slug}/galeria` : '/galeria', { categoria }, opts),

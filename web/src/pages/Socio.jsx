@@ -1,138 +1,307 @@
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi.js';
+import { useSocio } from '../hooks/useSocio.js';
 import { api } from '../api/client.js';
 import { Cargando, Error } from '../components/Estado.jsx';
-import Logo from '../components/Logo.jsx';
+import TarjetaSocio from '../components/TarjetaSocio.jsx';
+import GuardarEnElMovil from '../components/GuardarEnElMovil.jsx';
+import { useManifiesto } from '../hooks/useManifiesto.js';
 
 /**
- * La tarjeta de socio, tal y como la ve el cliente en su movil.
+ * El perfil del socio: su zona dentro de la web.
  *
- * Tiene forma de billete -con su muesca arriba- porque es lo que es: algo que
- * se ensena en la puerta. El esquema sale del billete de Luma que trajo el
- * grupo como referencia: sello arriba a la izquierda, el dato de cabecera a la
- * derecha, el titulo grande, los campos con su rotulo pequeno y el QR abajo en
- * un recuadro blanco.
+ * Entra escribiendo su codigo de tarjeta y el navegador lo recuerda, asi que a
+ * partir de la segunda vez cae aqui directo. No es una cuenta con contrasena
+ * -ver `useSocio.js` para lo que eso implica y lo que no-, pero se comporta
+ * como una: se entra, se queda y se sale.
  *
- * Lo que se cambia de aquella referencia es lo que aqui tiene otro trabajo:
+ * El orden de la pagina es el de las preguntas que trae quien la abre:
  *
- *  - Los colores son los de la casa, no los de Luma.
- *  - En medio van OCHO SELLOS, que es lo que de verdad se viene a mirar. Un
- *    numero -"5 de 8"- se lee; ocho huecos de los que cinco estan llenos se
- *    ve, y se ve desde lejos y de reojo mientras uno guarda el movil.
+ *   1. Cuanto llevo              -> la cuenta grande, arriba
+ *   2. Que tengo que ensenar     -> la tarjeta
+ *   3. Que he ganado             -> los premios
+ *   4. Cuando he venido          -> las visitas
+ *
+ * La tarjeta no va la primera aunque sea lo mas vistoso: quien abre su perfil
+ * en casa viene a ver cuanto le falta, y quien lo abre en la puerta ya tiene
+ * la tarjeta a un dedo de distancia.
  */
+
+/** Las iniciales, para el circulo de arriba. */
+function iniciales(nombre) {
+  const partes = String(nombre).trim().split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return '?';
+  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+}
+
+/** "sáb 3", para el detalle de cada visita dentro de su mes. */
+const enCortito = (fecha) =>
+  new Date(`${fecha}T12:00:00Z`).toLocaleDateString('es-ES', {
+    weekday: 'short',
+    day: 'numeric',
+  });
+
+/**
+ * Parte el historial en meses, SIN reordenar.
+ *
+ * La API ya lo manda de la mas reciente a la mas vieja; aqui solo se corta.
+ * Con un `Map` y no con un objeto a secas porque el `Map` conserva el orden de
+ * insercion sea cual sea la clave, y un objeto no lo garantiza.
+ */
+function porMeses(historial) {
+  const meses = new Map();
+
+  for (const visita of historial) {
+    const mes = new Date(`${visita.fecha}T12:00:00Z`).toLocaleDateString('es-ES', {
+      month: 'long',
+      year: 'numeric',
+    });
+    if (!meses.has(mes)) meses.set(mes, []);
+    meses.get(mes).push(visita);
+  }
+
+  return [...meses];
+}
 
 export default function Socio() {
   const { codigo } = useParams();
-  const { datos: tarjeta, cargando, error } = useApi(
-    (opts) => api.socio(codigo, opts),
-    [codigo]
-  );
+  const { codigo: recordado, entrar, salir } = useSocio();
+  const navegar = useNavigate();
+
+  const { datos: perfil, cargando, error } = useApi((opts) => api.socio(codigo, opts), [codigo]);
+
+  /*
+    Mientras se mira la tarjeta, el manifiesto es el de la tarjeta.
+
+    Va ANTES de los `return` de error y carga a proposito: los hooks se llaman
+    siempre en el mismo orden o React se queja, y ademas da igual que la
+    peticion falle; si alguien guarda la pagina en ese momento, lo que tiene
+    que guardarse sigue siendo su tarjeta.
+  */
+  useManifiesto('/manifest-socio.webmanifest');
+
+  /*
+    Al abrir un perfil que carga bien, se recuerda.
+
+    Es lo que hace que el QR de la tarjeta sirva de "entrar": el cliente lo
+    escanea una vez y a partir de ahi la web ya sabe quien es. Solo se recuerda
+    si la peticion fue BIEN: un codigo mal escrito no debe quedarse guardado y
+    mandar a un error cada vez que vuelva.
+  */
+  useEffect(() => {
+    if (perfil?.codigo) entrar(perfil.codigo);
+  }, [perfil?.codigo, entrar]);
 
   if (error) return <Error error={error} />;
-  if (cargando) return <Cargando texto="Abriendo la tarjeta..." />;
+  if (cargando) return <Cargando texto="Abriendo tu perfil..." />;
 
-  const sellos = Array.from({ length: tarjeta.visitasParaElPremio }, (_, i) => {
-    // Con un premio pendiente, la fila se ensena ENTERA llena: es la foto de
-    // "lo has conseguido". Si se pintara el resto 0 de 8 por haber empezado
-    // tramo nuevo, parece que se ha perdido lo andado.
-    if (tarjeta.premiosPendientes > 0) return true;
-    return i < tarjeta.enElTramo;
-  });
+  const premiosPendientes = perfil.premios.filter((p) => !p.entregado_en);
+  const premiosEntregados = perfil.premios.filter((p) => p.entregado_en);
 
-  const desde = new Date(tarjeta.socioDesde).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  /*
+    En que casa ha venido mas.
+
+    Dos cautelas, porque las dos dan un dato falso:
+
+      - Con una sola visita no se ensena. "Tu casa favorita" con una visita no
+        es un dato, es una ocurrencia.
+      - Con un EMPATE tampoco. Ordenar y coger el primero siempre devuelve
+        algo, y con 2 y 2 ese algo es el orden en que llegaron las filas, no
+        una preferencia del socio. Solo se ensena si gana de verdad.
+  */
+  const porCasa = perfil.historial.reduce((cuenta, v) => {
+    cuenta[v.local] = (cuenta[v.local] ?? 0) + 1;
+    return cuenta;
+  }, {});
+  const ordenadas = Object.entries(porCasa).sort((a, b) => b[1] - a[1]);
+  const hayGanadora = ordenadas.length === 1 || (ordenadas[1] && ordenadas[0][1] > ordenadas[1][1]);
+  const favorita = hayGanadora ? ordenadas[0] : null;
+
+  const cerrar = () => {
+    salir();
+    navegar('/socio');
+  };
 
   return (
-    <section className="seccion socio">
-      <article className={`tarjeta-socio ${tarjeta.premiosPendientes > 0 ? 'tarjeta-socio--premiada' : ''}`}>
-        {/* La muesca de arriba. Es lo que hace que se lea como un billete y no
-            como una caja de texto; va en el CSS, no en una imagen. */}
-        <span className="tarjeta-socio__muesca" aria-hidden="true" />
-
-        <header className="tarjeta-socio__cabecera">
-          <Logo descriptor="SOCIO" />
-          <p className="tarjeta-socio__desde">
-            <span>SOCIO DESDE</span>
-            <strong>{desde}</strong>
-          </p>
+    <section className="seccion perfil">
+      <div className="contenedor">
+        <header className="perfil__cabecera">
+          <span className="perfil__avatar" aria-hidden="true">
+            {iniciales(perfil.nombre)}
+          </span>
+          <div className="perfil__identidad">
+            <h1>{perfil.nombre}</h1>
+            <p className="apagado">
+              Socio desde{' '}
+              {new Date(perfil.socioDesde).toLocaleDateString('es-ES', {
+                month: 'long',
+                year: 'numeric',
+              })}
+              {perfil.altaEn && ` · ${perfil.altaEn.nombre}`}
+            </p>
+          </div>
+          {recordado && (
+            <button type="button" className="enlace perfil__salir" onClick={cerrar}>
+              Salir
+            </button>
+          )}
         </header>
 
-        <h1 className="tarjeta-socio__nombre">{tarjeta.nombre}</h1>
-
-        {/* Los sellos: lo primero que se mira. */}
-        <div className="sellos-visita" role="img" aria-label={`${tarjeta.visitas % tarjeta.visitasParaElPremio || (tarjeta.premiosPendientes ? tarjeta.visitasParaElPremio : 0)} de ${tarjeta.visitasParaElPremio} visitas en este tramo`}>
-          {sellos.map((lleno, i) => (
-            <span key={i} className={`sello-visita ${lleno ? 'sello-visita--lleno' : ''}`} />
-          ))}
+        {/* Las tres cifras, antes que nada. */}
+        <div className="perfil__cifras">
+          <p className="cifra-perfil">
+            <strong>{perfil.visitas}</strong>
+            <span>{perfil.visitas === 1 ? 'visita' : 'visitas'}</span>
+          </p>
+          <p className="cifra-perfil">
+            <strong>{perfil.premiosGanados}</strong>
+            <span>{perfil.premiosGanados === 1 ? 'premio' : 'premios'}</span>
+          </p>
+          <p className="cifra-perfil">
+            <strong>{perfil.premiosPendientes > 0 ? '¡Ya!' : perfil.faltan}</strong>
+            <span>{perfil.premiosPendientes > 0 ? 'por canjear' : 'para el siguiente'}</span>
+          </p>
         </div>
 
-        {tarjeta.premiosPendientes > 0 ? (
-          <p className="tarjeta-socio__premio">
-            <strong>¡Tienes un premio!</strong>
-            <span>Enséñale esta tarjeta a quien te atienda.</span>
-          </p>
-        ) : (
-          <p className="tarjeta-socio__faltan">
-            {tarjeta.faltan === 1
-              ? 'Te falta 1 visita para tu premio'
-              : `Te faltan ${tarjeta.faltan} visitas para tu premio`}
+        {favorita && favorita[1] > 1 && (
+          <p className="perfil__favorita">
+            Donde más vienes: <strong>{favorita[0]}</strong> ({favorita[1]} visitas)
           </p>
         )}
+      </div>
 
-        <dl className="tarjeta-socio__datos">
-          <div>
-            <dt>TARJETA</dt>
-            <dd className="tarjeta-socio__codigo">{tarjeta.codigo}</dd>
-          </div>
-          <div>
-            <dt>VISITAS</dt>
-            <dd>{tarjeta.visitas}</dd>
-          </div>
-          {tarjeta.altaEn && (
-            <div>
-              <dt>TE HICISTE SOCIO EN</dt>
-              <dd>{tarjeta.altaEn.nombre}</dd>
+      <div className="perfil__tarjeta">
+        <TarjetaSocio tarjeta={perfil} />
+        <GuardarEnElMovil />
+      </div>
+
+      <div className="contenedor perfil__columnas">
+        <section>
+          <h2>Tus premios</h2>
+          {perfil.premios.length === 0 ? (
+            /*
+              Antes aqui habia una frase y nada mas -"todavia ninguno"-, que en
+              pantalla ancha dejaba media pagina vacia al lado de una columna
+              llena. Y sobre todo no decia nada que no se supiera ya.
+
+              Lo que si es informacion nueva: que los premios NO son uno y se
+              acabo, sino uno cada ocho visitas. Eso no lo cuenta la tarjeta de
+              arriba, que solo ensena el tramo en curso.
+            */
+            <div className="siguiente-premio">
+              <p className="siguiente-premio__cuando">
+                A las {perfil.visitasParaElPremio} visitas
+              </p>
+              <p className="siguiente-premio__que">Tu primer premio</p>
+
+              {/* La barra repite el dato de los sellos, pero aqui mide contra
+                  el primer premio y alli contra el tramo: para quien aun no ha
+                  llegado nunca son el mismo numero, y asi esta columna dice
+                  cuanto falta sin tener que subir a mirar. */}
+              <div
+                className="barra-premio"
+                role="img"
+                aria-label={`${perfil.visitas} de ${perfil.visitasParaElPremio} visitas`}
+              >
+                <span
+                  className="barra-premio__hecho"
+                  style={{
+                    inlineSize: `${Math.min(100, (perfil.visitas / perfil.visitasParaElPremio) * 100)}%`,
+                  }}
+                />
+              </div>
+
+              <p className="siguiente-premio__falta">
+                {perfil.visitas === 0
+                  ? 'Enseña tu tarjeta la próxima vez que vengas.'
+                  : perfil.faltan === 1
+                    ? 'Te falta 1 visita.'
+                    : `Te faltan ${perfil.faltan} visitas.`}
+              </p>
+              <p className="siguiente-premio__luego">
+                Y después, uno cada {perfil.visitasParaElPremio}.
+              </p>
             </div>
+          ) : (
+            <ul className="premios">
+              {/* Los de verdad primero: lo que hay que hacer algo con ello va
+                  antes que el historial de lo ya hecho. */}
+              {premiosPendientes.map((p) => (
+                <li key={p.id} className="premio premio--pendiente">
+                  <span className="premio__que">
+                    <strong>Premio sin canjear</strong>
+                    <span className="premio__cuando">Conseguido con {p.visitas} visitas</span>
+                  </span>
+                  <span className="premio__sello">Pídelo en tu próxima visita</span>
+                </li>
+              ))}
+              {premiosEntregados.map((p) => (
+                <li key={p.id} className="premio">
+                  <span className="premio__que">
+                    <strong>Premio canjeado</strong>
+                    <span className="premio__cuando">
+                      Con {p.visitas} visitas
+                      {p.entregado_nota ? ` · ${p.entregado_nota}` : ''}
+                    </span>
+                  </span>
+                  <span className="premio__fecha">
+                    {new Date(p.entregado_en).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
-          {tarjeta.premiosGanados > 0 && (
-            <div>
-              <dt>PREMIOS</dt>
-              <dd>{tarjeta.premiosGanados}</dd>
-            </div>
-          )}
-        </dl>
+        </section>
 
-        {/* El QR, en su recuadro blanco. Va con `dangerouslySetInnerHTML`
-            porque la API lo manda como SVG ya dibujado: lo genera la libreria
-            de códigos del servidor, no es nada escrito por un usuario. */}
-        <div className="tarjeta-socio__qr" dangerouslySetInnerHTML={{ __html: tarjeta.qr }} />
-
-        <p className="tarjeta-socio__pie">
-          Válida en las cuatro casas del grupo
-        </p>
-      </article>
-
-      {tarjeta.historial.length > 0 && (
-        <div className="contenedor socio__historial">
+        <section>
           <h2>Tus visitas</h2>
-          <ul>
-            {tarjeta.historial.map((v) => (
-              <li key={v.id}>
-                <span className="socio__historial-fecha">
-                  {new Date(`${v.fecha}T12:00:00Z`).toLocaleDateString('es-ES', {
-                    day: 'numeric',
-                    month: 'long',
-                  })}
-                </span>
-                <span className="socio__historial-local">{v.local}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+          {perfil.historial.length === 0 ? (
+            <p className="apagado">
+              Aún no hay ninguna apuntada. Enseña tu tarjeta la próxima vez que vengas.
+            </p>
+          ) : (
+            /*
+              Agrupadas por mes.
+
+              Una lista de catorce fechas seguidas no se lee, se escanea sin
+              encontrar nada. Con el mes de titulillo, "este mes he venido
+              tres veces" se ve sin contar, que es la pregunta que trae quien
+              abre esto.
+
+              Y el que manda en cada linea es LA CASA, no la fecha: antes la
+              casa iba subrayada a la derecha, como un enlace suelto, y la
+              fecha en gris a la izquierda; las dos peleando y ninguna
+              ganando. Ahora la casa es el renglon y la fecha su detalle, y lo
+              que se pulsa es la fila entera.
+            */
+            porMeses(perfil.historial).map(([mes, visitas]) => (
+              <div key={mes} className="mes-visitas">
+                <h3 className="mes-visitas__titulo">
+                  {mes}
+                  <span className="mes-visitas__cuantas">
+                    {visitas.length} {visitas.length === 1 ? 'visita' : 'visitas'}
+                  </span>
+                </h3>
+                <ul className="visitas">
+                  {visitas.map((v) => (
+                    <li key={v.id}>
+                      <Link className="visita" to={`/${v.slug}`}>
+                        <span className="visita__local">{v.local}</span>
+                        <span className="visita__dia">{enCortito(v.fecha)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+        </section>
+      </div>
     </section>
   );
 }
