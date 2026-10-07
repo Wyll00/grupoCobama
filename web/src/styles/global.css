@@ -2935,7 +2935,7 @@ button {
 }
 
 /* --tinta y no --crema: la banda ya no vive dentro del hero, que es oscuro
-   en los dos temas. Con --crema, "El Baifo" quedaba en crema sobre crema y no
+   en los dos temas. Con --crema, "El Gincho" quedaba en crema sobre crema y no
    se leia de dia. Los tres colores de aqui siguen el tema. */
 .proxima__nombre {
   font-family: var(--fuente-titulo);
@@ -2943,6 +2943,19 @@ button {
   font-weight: 700;
   color: var(--tinta);
   line-height: 1.2;
+}
+
+/* La fecha va entre el nombre y la coletilla, y pesa mas que la coletilla:
+   es el dato que la gente se queda, mas que "la quinta casa del grupo". De
+   ahi el ocre y la seminegrita. No se pone del tamano del nombre porque
+   entonces el cartel tendria dos titulares y ninguno mandaria. */
+.proxima__fecha {
+  margin-top: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  /* El mismo --ocre-texto del rotulo de arriba, que ya esta medido contra
+     este fondo. El --ocre a secas no llega en claro. */
+  color: var(--ocre-texto);
 }
 
 .proxima__nota {
@@ -3609,4 +3622,602 @@ button {
 
 .socio__historial-local {
   font-weight: 600;
+}
+
+/* =====================================================================
+   Perfil del socio
+
+   Su zona: la cuenta grande arriba, la tarjeta en medio y el detalle debajo.
+   El orden es el de las preguntas que trae quien abre la pagina -cuanto
+   llevo, que enseno, que he ganado, cuando he venido-.
+   ===================================================================== */
+
+.perfil__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Las iniciales en un circulo. No hay foto de perfil y no va a haberla: nadie
+   sube una foto para una tarjeta de restaurante, y un hueco gris con la
+   silueta de una persona se ve como una cuenta a medio hacer. */
+.perfil__avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--carbon);
+  color: var(--crema);
+  font-family: var(--fuente-titulo);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.perfil__identidad {
+  min-width: 0;
+  flex: 1;
+}
+
+.perfil__identidad h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  line-height: 1.15;
+}
+
+.perfil__identidad p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+}
+
+.perfil__salir {
+  flex: none;
+  align-self: flex-start;
+}
+
+/* ---- las tres cifras ---- */
+
+.perfil__cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.cifra-perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 1rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--superficie);
+  text-align: center;
+}
+
+.cifra-perfil strong {
+  font-family: var(--fuente-titulo);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  line-height: 1;
+  color: var(--ocre-texto);
+}
+
+.cifra-perfil span {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.perfil__favorita {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* ---- la tarjeta, centrada y con aire ---- */
+
+.perfil__tarjeta {
+  display: flex;
+  justify-content: center;
+  padding-block: 2.25rem;
+}
+
+/* ---- premios y visitas, a dos columnas en pantalla ancha ---- */
+
+.perfil__columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 2rem;
+}
+
+.perfil__columnas h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.premios,
+.visitas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- las visitas, agrupadas por mes ---- */
+
+.mes-visitas + .mes-visitas {
+  margin-top: 1.5rem;
+}
+
+/* El mes y la cuenta, en una linea fina sobre su grupo. En versalitas
+   pequenas y no como otro titulo: es una division, no una seccion. */
+.mes-visitas__titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.25rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--borde);
+  font-family: var(--fuente-texto);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ocre-texto);
+}
+
+.mes-visitas__cuantas {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--texto-suave);
+}
+
+/*
+  Cada visita es una fila pulsable entera, no un texto con un enlace al lado.
+
+  Antes el nombre del local iba subrayado, suelto a la derecha, y el area
+  pulsable eran esas pocas letras. Ahora se pulsa toda la fila -48 px de alto,
+  por encima de los 44 que pide un dedo- y el subrayado sobra: una lista donde
+  todas las filas llevan a algun sitio no necesita decirlo catorce veces.
+*/
+.visita {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 48px;
+  padding: 0.5rem 0.6rem;
+  margin-inline: -0.6rem;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.visita:hover {
+  background: color-mix(in srgb, var(--ocre) 9%, transparent);
+}
+
+.visita:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: -2px;
+}
+
+/* La casa es el renglon; la fecha, su detalle. */
+.visita__local {
+  font-weight: 600;
+}
+
+.visita__dia {
+  flex: none;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visita {
+    transition: none;
+  }
+}
+
+/* ---- el premio que viene ---- */
+
+.siguiente-premio {
+  padding: 1.1rem 1.2rem 1.2rem;
+  /* Radios concentricos: 14 fuera, y la barra de dentro con su propio radio
+     pequeno. El borde discontinuo es el mismo lenguaje que el cartel de la
+     casa que esta por abrir: lo que todavia no existe no se dibuja con la
+     linea firme de lo que ya se puede usar. */
+  border: 1px dashed var(--borde);
+  border-radius: 14px;
+}
+
+.siguiente-premio__cuando {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ocre-texto);
+}
+
+.siguiente-premio__que {
+  margin: 0.2rem 0 0;
+  font-family: var(--fuente-titulo);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--tinta);
+}
+
+.barra-premio {
+  margin: 0.9rem 0 0.7rem;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tinta) 12%, transparent);
+  overflow: hidden;
+}
+
+.barra-premio__hecho {
+  display: block;
+  block-size: 100%;
+  border-radius: 999px;
+  /*
+    --ocre-texto y no --ocre: una barra de progreso es un elemento grafico y
+    tiene que llegar a 3.0 contra lo que tiene detras. El ocre normal sobre
+    esta pista se queda en 2.39 de dia; el de texto sube a 3.73, y de noche a
+    10.36. Medido contra la pista compuesta, no contra el fondo de la pagina.
+
+    Y no se arregla oscureciendo la pista, que es lo primero que uno prueba:
+    con la pista al 22% baja a 1.86, porque se acerca a la luminosidad del
+    ocre en vez de alejarse.
+  */
+  background: var(--ocre-texto);
+}
+
+.siguiente-premio__falta {
+  margin: 0;
+  font-size: 0.925rem;
+  font-weight: 600;
+}
+
+.siguiente-premio__luego {
+  margin: 0.2rem 0 0;
+  font-size: 0.825rem;
+  color: var(--texto-suave);
+}
+
+/* ---- los premios ya conseguidos ---- */
+
+.premio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--borde);
+  font-size: 0.9rem;
+}
+
+.premio:last-child {
+  border-bottom: 0;
+}
+
+.premio__que {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.premio__cuando {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.premio__fecha {
+  flex: none;
+  font-size: 0.825rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-suave);
+}
+
+/* El que queda por canjear se marca; los ya canjeados son historial. */
+.premio--pendiente {
+  padding: 0.85rem;
+  border: 1px solid var(--ocre);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ocre) 10%, transparent);
+  margin-bottom: 0.6rem;
+}
+
+.premio__sello {
+  flex: none;
+  max-inline-size: 7.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: right;
+  color: var(--ocre-texto);
+}
+
+@media (max-width: 30rem) {
+  /* En el movil la coletilla debajo, que al lado deja el titulo en dos
+     palabras por linea. */
+  .premio--pendiente {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .premio__sello {
+    max-inline-size: none;
+    text-align: left;
+  }
+}
+
+/* ---- la puerta ---- */
+
+.socio-entrar {
+  max-width: 28rem;
+}
+
+.socio-entrar form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 1.5rem;
+}
+
+.socio-entrar__codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.socio-entrar__nota {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+}
+
+/* -------------------------------- el perfil en la cabecera --- */
+
+/*
+  El boton del perfil es el mismo circulo que el plato del modo oscuro: misma
+  medida, mismo borde, mismo hueco. Son dos mandos de la misma fila y tienen
+  que leerse como pareja, no como dos cosas pegadas.
+
+  No comparte clase con `.platito` a proposito. Tendrian la misma
+  especificidad y el fichero ya tiene tres sitios donde se le ajusta el
+  tamano al plato: cualquiera de ellos pisaria al otro segun quien quedase
+  mas abajo, que es exactamente el lio que este fichero documenta dos veces
+  mas arriba. Mejor dos clases y los tamanos agrupados a mano.
+*/
+.mando-perfil {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.mando-perfil:hover {
+  border-color: var(--ocre);
+}
+
+.mando-perfil:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+/* Trazo y no relleno: al lado del plato, que es un disco macizo, un monigote
+   relleno pesa el doble y desequilibra la pareja. */
+.mando-perfil__trazo {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+@media (max-width: 600px) {
+  .mando-perfil {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .mando-perfil {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/*
+  En el telefono el plato se va y deja su sitio al perfil.
+
+  Los tres mandos no caben: medido en 375 px, la fila gasta 343 de 375 con
+  solo dos, y un boton que se pueda pulsar con el pulgar pide 44. Habia que
+  quitar uno, y el que sale es el del modo oscuro: sin el, la web sigue el
+  ajuste del propio telefono -ver `Platito.jsx`, que solo deja de escuchar al
+  sistema cuando alguien elige a mano-, asi que quien tenga el movil en modo
+  noche sigue viendo la carta en oscuro. No se pierde la funcion, se pierde
+  el mando.
+
+  El corte es el mismo 48rem con el que la cabecera esconde los locales: la
+  cabecera tiene UNA idea de lo que es un movil, no dos.
+
+  Y va al final del fichero por lo de siempre aqui: la regla base de
+  `.platito` esta en la linea 1673 y las de tamano mas abajo todavia. Con la
+  misma especificidad gana la ultima, asi que puesta antes esto no haria nada.
+*/
+@media (max-width: 48rem) {
+  .platito {
+    display: none;
+  }
+}
+
+/*
+  En los telefonos estrechos la cabecera se sale, y se salia ya antes de que
+  hubiera un boton de perfil.
+
+  Medido en 375 px: la fila necesita 391 y tiene 375, asi que el ultimo mando
+  de la derecha se corta por la mitad. Antes el cortado era el plato del modo
+  oscuro y no lo vio nadie; ahora seria el acceso a la tarjeta, que es justo
+  lo que hay que poder pulsar en la puerta del local.
+
+  Hacen falta 32 px y salen de tres sitios, todos medidos en 375 px contra el
+  margen que le queda al boton por la derecha:
+
+    hueco de la fila   1rem   -> 0.5rem    se acaba el desbordamiento
+    hueco de los dos
+    mandos redondos    0.75   -> 0.5rem    quedan 4 px
+    nombre de la marca 1.3rem -> 1.15rem   quedan 16
+
+  Y 16 es justo el margen que tiene el logo por la izquierda, asi que la
+  cabecera vuelve a quedar simetrica en vez de con el boton pegado al canto.
+
+  Lo que NO se toca, habiendolo probado: la flecha del selector de idioma
+  -quitarla daba los 16 px de una vez, pero es lo unico que avisa de que
+  aquello despliega- y la pastilla de "Reservar", que estrecha deja de
+  parecer un boton. Encoger el nombre de la marca es lo que menos se nota:
+  ya se encogio una vez por esto mismo, dos reglas mas arriba.
+
+  Afecta a 360, 375 y 390 px -los anchos de telefono mas comunes-; de 400
+  para arriba la cabecera ya cabia y se queda con sus medidas de siempre.
+*/
+@media (max-width: 25rem) {
+  .cabecera__fila {
+    gap: 0.5rem;
+  }
+
+  .cabecera__mandos {
+    gap: 0.5rem;
+  }
+
+  .logo__nombre {
+    font-size: 1.15rem;
+  }
+}
+
+/*
+  Un escalon mas para los 360 px, que es medio Android.
+
+  Con las medidas de arriba alli el boton se queda a 1 px del canto: cabe,
+  pero parece caido por el borde. Bajando el nombre a 1rem quedan 13, que
+  contra los 16 de la izquierda no se distingue a ojo -y bajarlo hasta
+  cuadrar los 16 clavados deja la marca en 0.95rem, que ya es otra cosa.
+
+  Por debajo de 360 no se persigue nada: a 320 px ningun reparto de cuatro
+  mandos cuadra, y ese telefono ya no se fabrica.
+*/
+@media (max-width: 22.5rem) {
+  .logo__nombre {
+    font-size: 1rem;
+  }
+}
+
+/* ---- la puerta, ahora con alta ---- */
+
+.socio-entrar__alta {
+  margin-top: 1.5rem;
+}
+
+.socio-entrar__gratis {
+  margin-top: 0.7rem;
+  font-size: 0.875rem;
+}
+
+.socio-entrar__raya {
+  margin: 2.2rem 0 1.6rem;
+  border: 0;
+  border-top: 1px solid var(--borde);
+}
+
+.socio-entrar__ya {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* ---- hacerse socio ---- */
+
+.socio-alta {
+  max-width: 30rem;
+}
+
+.socio-alta form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+/*
+  El aviso de "hace falta uno de los dos".
+
+  En gris mientras no hay ninguno y en verde en cuanto hay uno: es el unico
+  requisito del formulario que no se ve mirando los campos, porque los dos
+  parecen opcionales por separado. Sale antes de enviar y no despues de
+  fallar, que es la diferencia entre una indicacion y una trampa.
+*/
+.socio-alta__contacto {
+  margin: -0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.socio-alta__contacto--ok {
+  /* --mojo-verde es el verde de la paleta y ya cambia solo con el tema:
+     #4f6b43 de dia y #7e9d6d de noche, que es justo lo que hace falta aqui.
+     Contraste medido abajo, sobre el fondo de cada tema. */
+  color: var(--mojo-verde);
+}
+
+.socio-alta .consentimiento {
+  margin-top: 0.4rem;
+}
+
+/* ---- guardar la tarjeta en el movil ---- */
+
+.guardar-movil {
+  margin: 1.4rem auto 0;
+  max-width: 24rem;
+  padding-inline: 1rem;
+  text-align: center;
+}
+
+.guardar-movil__nota {
+  margin-top: 0.5rem;
+  font-size: 0.825rem;
+}
+
+/* Las instrucciones de iPhone. Numeradas y no un parrafo: son tres gestos en
+   un orden, y un parrafo obliga a releerlo para saber por donde iba uno. */
+.guardar-movil__pasos {
+  margin: 0;
+  padding-left: 1.2rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--texto-suave);
+}
+
+.guardar-movil__pasos li {
+  margin-bottom: 0.35rem;
+}
+
+.guardar-movil__pasos strong {
+  color: var(--texto);
 }

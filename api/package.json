@@ -25,7 +25,9 @@
     "purgar": "node scripts/purgar-reservas.js",
     "cm": "node scripts/probar-covermanager.js",
     "cm-check": "node scripts/cm-diagnostico.js",
-    "carta-real": "node scripts/importar-carta-basilica.js"
+    "carta-real": "node scripts/importar-carta-basilica.js",
+    "socios:demo": "node scripts/sembrar-socios.mjs",
+    "iconos-app": "node scripts/iconos-app.mjs"
   },
   "engines": {
     "node": ">=20"

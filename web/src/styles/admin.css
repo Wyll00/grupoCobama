@@ -1902,3 +1902,170 @@
     grid-column: 2;
   }
 }
+
+/* ---- las pestanas de estado ---- */
+
+.grupos-socios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 1.2rem;
+}
+
+.grupo-socios {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.grupo-socios:hover {
+  border-color: var(--ocre);
+}
+
+.grupo-socios--puesto {
+  border-color: var(--ocre);
+  background: var(--ocre);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Un grupo sin nadie sigue pulsandose: entrar y leer "ninguno con premio
+   pendiente" es una respuesta. Solo se apaga para que no llame la atencion. */
+.grupo-socios--vacio:not(.grupo-socios--puesto) {
+  color: var(--texto-suave);
+}
+
+.grupo-socios__cuenta {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.grupo-socios--puesto .grupo-socios__cuenta {
+  color: #fff;
+}
+
+/* ---- la fila, ahora pulsable ---- */
+
+/*
+  La fila paso de <li> a <button> dentro del <li> para poder abrir la ficha.
+  Eso rompio dos cosas que hay que devolver a mano:
+
+    - El boton trae fondo, borde y fuente propios del navegador.
+    - `.socio-fila:last-child` ya no quita la ultima raya: el boton SIEMPRE es
+      el ultimo hijo de su <li>, asi que la regla acertaba en todas las filas
+      y en ninguna a la vez. Ahora el ultimo que cuenta es el <li>.
+*/
+.socio-fila--abrible {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--borde);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.925rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.socio-fila--abrible:hover {
+  background: var(--fondo-suave, rgba(0, 0, 0, 0.03));
+}
+
+.socio-fila--abrible:focus-visible {
+  outline: 2px solid var(--ocre);
+  outline-offset: -2px;
+}
+
+.socios li:last-child .socio-fila {
+  border-bottom: 0;
+}
+
+/* ---- la ficha ---- */
+
+.ficha-socio__codigo {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  color: var(--texto-suave);
+}
+
+.ficha-socio__cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.ficha-socio__cifras div {
+  padding: 0.7rem 0.5rem;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.ficha-socio__cifras dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-suave);
+}
+
+.ficha-socio__cifras dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ocre-texto);
+}
+
+.ficha-socio__desde {
+  margin: 0 0 1.1rem;
+  font-size: 0.85rem;
+}
+
+.ficha-socio__premios {
+  margin-top: 1rem;
+}
+
+.ficha-socio__titulo {
+  margin: 1.6rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.ficha-socio__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.ficha-socio__lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.ficha-socio__lista li:last-child {
+  border-bottom: 0;
+}
+
+@media (max-width: 36rem) {
+  .ficha-socio__cifras {
+    gap: 0.4rem;
+  }
+
+  .ficha-socio__cifras dd {
+    font-size: 1.25rem;
+  }
+}

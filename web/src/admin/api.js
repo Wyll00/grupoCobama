@@ -116,7 +116,8 @@ export const adminApi = {
   // En que casa se apunta la visita lo decide el SERVIDOR a partir del token
   // cuando quien la apunta es un encargado. Solo el admin de grupo manda el
   // local, porque no esta en ninguna sala.
-  socios: (q = '') => get(`/admin/socios?q=${encodeURIComponent(q)}`),
+  socios: (q = '', limite = 200) =>
+    get(`/admin/socios?q=${encodeURIComponent(q)}&limite=${limite}`),
   crearSocio: (cuerpo) => enviar('POST', '/admin/socios', { cuerpo }),
   apuntarVisita: (codigo, cuerpo = {}) =>
     enviar('POST', `/admin/socios/${encodeURIComponent(codigo)}/visitas`, { cuerpo }),
