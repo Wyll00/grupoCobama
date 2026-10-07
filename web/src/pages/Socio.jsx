@@ -187,7 +187,7 @@ export default function Socio() {
               llena. Y sobre todo no decia nada que no se supiera ya.
 
               Lo que si es informacion nueva: que los premios NO son uno y se
-              acabo, sino uno cada ocho visitas. Eso no lo cuenta la tarjeta de
+              acabo, sino uno cada pocas visitas. Eso no lo cuenta la tarjeta de
               arriba, que solo ensena el tramo en curso.
             */
             <div className="siguiente-premio">

@@ -40,7 +40,7 @@ export default function SocioEntrar() {
         <h1>Tarjeta de socio</h1>
         <p className="apagado">
           Una tarjeta para las cuatro casas. Cada vez que vengas te apuntamos la
-          visita, y a las ocho hay premio.
+          visita, y a las cinco hay premio.
         </p>
 
         <Link className="boton boton--principal socio-entrar__alta" to="/socio/alta">

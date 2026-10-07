@@ -202,7 +202,7 @@ export async function metadatosDeRuta(ruta) {
     return {
       titulo: `Tarjeta de socio · ${NOMBRE_GRUPO}`,
       descripcion:
-        'Una tarjeta para las cuatro casas del Grupo Cobama. Cada visita suma, y a las ocho hay premio.',
+        'Una tarjeta para las cuatro casas del Grupo Cobama. Cada visita suma, y a las cinco hay premio.',
       canonica: `${base()}/socio`,
       tipo: 'website',
       jsonLd: null,

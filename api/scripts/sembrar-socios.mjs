@@ -37,8 +37,8 @@ const PERFILES = [
     nombre: 'William Luis Gonzalez',
     telefono: '+34 600 111 222',
     email: 'william@ejemplo.es',
-    // Ya existia de las pruebas de ayer; se queda con las mismas 5 visitas.
-    visitas: 5,
+    // Ya existia de las pruebas de ayer.
+    visitas: VISITAS_POR_PREMIO,
     reparto: 'mezclado',
     ultimaHaceDias: 0,
   },
@@ -49,7 +49,7 @@ const PERFILES = [
     email: 'candelaria.hp@ejemplo.es',
     // El caso que mas importa de toda la pantalla: a UNA visita del premio.
     // Si sala no lo ve venir, se pierde la gracia de decirselo en la mesa.
-    visitas: 7,
+    visitas: VISITAS_POR_PREMIO - 1,
     reparto: 'mezclado',
     ultimaHaceDias: 3,
   },
@@ -60,7 +60,7 @@ const PERFILES = [
     email: null,
     // Premio recien ganado y SIN entregar: es lo que tiene que saltar a la
     // vista en la lista.
-    visitas: 8,
+    visitas: VISITAS_POR_PREMIO,
     reparto: 'mezclado',
     ultimaHaceDias: 1,
   },
@@ -71,7 +71,7 @@ const PERFILES = [
     email: 'nayra.baute@ejemplo.es',
     // Dos premios: el primero ya entregado, el segundo pendiente. Sirve para
     // ver que el historial de premios distingue uno de otro.
-    visitas: 16,
+    visitas: VISITAS_POR_PREMIO * 2,
     reparto: 'mezclado',
     entregarPremios: [VISITAS_POR_PREMIO],
     ultimaHaceDias: 2,
@@ -81,10 +81,11 @@ const PERFILES = [
     nombre: 'Jonay Martín Alonso',
     telefono: null,
     email: null,
-    // Pasa de largo del premio y lo tiene cobrado: el estado "al dia".
-    visitas: 12,
+    // Pasa de largo del premio y lo tiene TODO cobrado: el estado "al dia".
+    // Por eso se entregan los dos escalones y no solo el primero.
+    visitas: VISITAS_POR_PREMIO * 2 + 2,
     reparto: 'mezclado',
-    entregarPremios: [VISITAS_POR_PREMIO],
+    entregarPremios: [VISITAS_POR_PREMIO, VISITAS_POR_PREMIO * 2],
     ultimaHaceDias: 9,
   },
   {
@@ -93,7 +94,7 @@ const PERFILES = [
     telefono: '+34 600 999 000',
     email: 'yurena.rp@ejemplo.es',
     // Solo va a una casa. Deja ver "donde mas viene" con un ganador claro.
-    visitas: 6,
+    visitas: VISITAS_POR_PREMIO + 1,
     reparto: 'una-sola',
     ultimaHaceDias: 5,
   },
@@ -154,7 +155,7 @@ const PERFILES = [
     telefono: '+34 600 787 878',
     email: 'ayoze.pb@ejemplo.es',
     // Dos premios y ninguno recogido: el caso que hay que ir a buscar.
-    visitas: 17,
+    visitas: VISITAS_POR_PREMIO * 2 + 1,
     reparto: 'mezclado',
     ultimaHaceDias: 4,
   },

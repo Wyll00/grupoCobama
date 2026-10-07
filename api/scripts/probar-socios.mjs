@@ -5,7 +5,7 @@
 
     1. Una visita apuntada dos veces el mismo dia en la misma casa cuenta UNA.
     2. El mismo dia en dos casas distintas cuentan DOS.
-    3. A las 8 aparece el premio, ni antes ni dos veces.
+    3. Al llegar al umbral aparece el premio, ni antes ni dos veces.
     4. Entregarlo lo quita de pendientes sin borrar que se gano.
 
   Las visitas de dias pasados se meten por SQL: por la API solo se puede
@@ -69,46 +69,78 @@ const otra = await apuntar({ restaurante_id: 2 });
 comprobar(otra.datos.visitas === 2, 'otra casa el mismo dia SI cuenta', `visitas ${otra.datos.visitas}`);
 comprobar(otra.datos.repetida === false, 'y no se marca como repetida');
 
-// --- 3. hasta 7, por dias pasados ---
-for (let i = 1; i <= 5; i += 1) {
-  await pool.execute(
+/*
+  El umbral se le PREGUNTA a la API, no se escribe aqui.
+
+  Estaba puesto a 8 a mano, y el dia que el grupo lo bajo a 5 la prueba fallo
+  entera aunque el codigo estaba perfecto: comprobaba el numero en vez de la
+  regla. Asi vale para cualquier umbral que decidan manana.
+*/
+let t = await (await fetch(`${BASE}/api/socios/${codigo}`)).json();
+const UMBRAL = t.datos.visitasParaElPremio;
+console.log(`  (el premio esta en ${UMBRAL} visitas)
+`);
+
+// Dias pasados, por SQL: por la API solo se puede apuntar la de hoy.
+const visitaVieja = (dia) =>
+  pool.execute(
     `INSERT INTO socio_visitas (socio_id, restaurante_id, fecha)
      VALUES (?, 1, DATE_SUB(CURDATE(), INTERVAL ? DAY))`,
-    [socio.id, i]
+    [socio.id, dia]
   );
+
+// --- 3. hasta una menos de las que hacen falta ---
+let dia = 1;
+while (t.datos.visitas < UMBRAL - 1) {
+  await visitaVieja(dia);
+  dia += 1;
+  t = await (await fetch(`${BASE}/api/socios/${codigo}`)).json();
 }
-let t = await (await fetch(`${BASE}/api/socios/${codigo}`)).json();
-comprobar(t.datos.visitas === 7, 'con 7 visitas', `visitas ${t.datos.visitas}`);
+comprobar(t.datos.visitas === UMBRAL - 1, `con ${UMBRAL - 1} visitas`, `visitas ${t.datos.visitas}`);
 comprobar(t.datos.premiosGanados === 0, 'todavia NO hay premio');
 comprobar(t.datos.faltan === 1, 'y dice que falta 1', `faltan ${t.datos.faltan}`);
 
-// --- 4. la octava ---
-const octava = await apuntar({ restaurante_id: 3 });
-comprobar(octava.datos.visitas === 8, 'la octava entra', `visitas ${octava.datos.visitas}`);
-comprobar(octava.datos.premiosGanados === 1, 'y salta el premio');
-comprobar(octava.datos.premiosPendientes === 1, 'pendiente de entregar');
-comprobar(octava.datos.faltan === 0, 'no pide otras ocho para cobrarlo', `faltan ${octava.datos.faltan}`);
+// --- 4. la que lo desencadena ---
+const justa = await apuntar({ restaurante_id: 3 });
+comprobar(justa.datos.visitas === UMBRAL, `la ${UMBRAL} entra`, `visitas ${justa.datos.visitas}`);
+comprobar(justa.datos.premiosGanados === 1, 'y salta el premio');
+comprobar(justa.datos.premiosPendientes === 1, 'pendiente de entregar');
+comprobar(justa.datos.faltan === 0, 'no pide otro tramo entero para cobrarlo', `faltan ${justa.datos.faltan}`);
 
 // --- 5. que no se duplique el premio al recontar ---
 await apuntar({ restaurante_id: 4 });
 t = await (await fetch(`${BASE}/api/socios/${codigo}`)).json();
-comprobar(t.datos.visitas === 9, 'novena visita', `visitas ${t.datos.visitas}`);
+comprobar(t.datos.visitas === UMBRAL + 1, 'una visita mas', `visitas ${t.datos.visitas}`);
 comprobar(t.datos.premiosGanados === 1, 'el premio sigue siendo UNO, no dos');
 
-// --- 6. el escalon 16 ---
-for (let i = 6; i <= 12; i += 1) {
-  await pool.execute(
-    `INSERT INTO socio_visitas (socio_id, restaurante_id, fecha)
-     VALUES (?, 1, DATE_SUB(CURDATE(), INTERVAL ? DAY))`,
-    [socio.id, i]
-  );
+/*
+  --- 6. el segundo escalon ---
+
+  Aqui se llega al doble SOLO con visitas de dias pasados, y despues se pulsa
+  una que ya estaba apuntada. Suena raro y tiene su motivo:
+
+    - A estas alturas las cuatro casas ya tienen visita de HOY, asi que
+      cualquier `apuntar` choca con la regla de una por casa y dia y no suma.
+    - Pero los premios se otorgan al apuntar, no al consultar. Metiendo las
+      visitas por SQL nadie recalcula, y el premio del segundo escalon no
+      llegaria a existir.
+
+  Asi que la pulsacion repetida no esta para sumar: esta para disparar el
+  recuento. Que ademas comprueba de paso algo que importa: que una visita
+  repetida recalcule los premios sin duplicar la visita.
+*/
+while (t.datos.visitas < UMBRAL * 2) {
+  await visitaVieja(dia);
+  dia += 1;
+  t = await (await fetch(`${BASE}/api/socios/${codigo}`)).json();
 }
-const decimosexta = await apuntar({ restaurante_id: 2, nota: 'la 16' });
-comprobar(decimosexta.datos.visitas === 16, 'con 16 visitas', `visitas ${decimosexta.datos.visitas}`);
-comprobar(decimosexta.datos.premiosGanados === 2, 'hay DOS premios ganados');
+const doble = await apuntar({ restaurante_id: 2, nota: 'el segundo escalon' });
+comprobar(doble.datos.repetida === true, 'la pulsacion repetida no suma visita');
+comprobar(doble.datos.visitas === UMBRAL * 2, `con ${UMBRAL * 2} visitas`, `visitas ${doble.datos.visitas}`);
+comprobar(doble.datos.premiosGanados === 2, 'hay DOS premios ganados');
 
 // --- 7. entregar uno ---
-const pendiente = decimosexta.datos.premios.find((p) => !p.entregado_en);
+const pendiente = doble.datos.premios.find((p) => !p.entregado_en);
 const entregado = await (
   await fetch(`${BASE}/api/admin/socios/premios/${pendiente.id}/entregar`, {
     method: 'POST',

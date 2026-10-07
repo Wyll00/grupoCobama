@@ -78,7 +78,7 @@ export default function SocioAlta() {
       <div className="contenedor socio-alta">
         <h1>Hazte socio</h1>
         <p className="apagado">
-          Te hacemos la tarjeta ahora mismo. Vale en las cuatro casas, y a las ocho
+          Te hacemos la tarjeta ahora mismo. Vale en las cuatro casas, y a las cinco
           visitas hay premio.
         </p>
 

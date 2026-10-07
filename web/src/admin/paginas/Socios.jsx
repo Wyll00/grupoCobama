@@ -170,8 +170,8 @@ export default function Socios() {
         <div>
           <h1>Socios</h1>
           <p className="apagado">
-            Apunta la visita y, a las 8, entrégale el premio. La tarjeta vale en las
-            cuatro casas.
+            Apunta la visita y, al llegar al premio, entrégaselo. La tarjeta vale en
+            las cuatro casas.
           </p>
         </div>
         <Boton variante="principal" onClick={() => setDandoDeAlta(true)}>
@@ -234,7 +234,7 @@ export default function Socios() {
         {/* Las pestañas de estado. Las que no tienen a nadie se enseñan
             igualmente, en gris y sin número: "ninguno con premio pendiente"
             es una respuesta, y esconderlas haría que la fila bailara cada vez
-            que alguien llega a ocho visitas. */}
+            que alguien llega al premio. */}
         <div className="grupos-socios" role="tablist" aria-label="Filtrar socios por estado">
           {GRUPOS.map((g) => (
             <button

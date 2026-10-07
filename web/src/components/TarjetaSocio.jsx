@@ -9,9 +9,10 @@ import Logo from './Logo.jsx';
  * los de la casa.
  *
  * Lo que se cambia de aquella referencia es lo que aqui tiene otro trabajo: en
- * medio van OCHO SELLOS. Un numero -"5 de 8"- se lee; ocho huecos de los que
- * cinco estan llenos se ve, y se ve desde lejos y de reojo mientras uno guarda
- * el movil.
+ * medio va UN SELLO POR VISITA, tantos como pida el premio. Un numero -"3 de
+ * 5"- se lee; cinco huecos de los que tres estan llenos se ve, y se ve desde
+ * lejos y de reojo mientras uno guarda el movil. El cuantos sale de la API, no
+ * de aqui: el umbral lo decide el grupo y ha cambiado ya una vez.
  *
  * Esta separada del perfil porque es lo unico que se ensena en la puerta: el
  * dia que haya que poderla guardar en la cartera del movil, lo que se exporta

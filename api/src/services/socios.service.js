@@ -16,7 +16,24 @@ import { hoyEnCanarias } from '../utils/horarios.js';
  * `contarVisitas`; la tabla ya lo guarda.
  */
 
-export const VISITAS_POR_PREMIO = 8;
+/*
+  Cuantas visitas hacen falta para un premio.
+
+  Empezo en 8 y bajo a 5 el 2026-10-07, por decision del grupo. El motivo es
+  que ocho visitas en un restaurante son muchas: si el cliente fiel viene una
+  vez al mes, el primer premio cae a los ocho meses y para entonces ya no
+  motiva nada. Cinco pone el premio a la vista.
+
+  Se puede volver a cambiar, pero OJO con quien ya tiene visitas: los premios
+  se recalculan por escalones sobre el total, asi que bajar el umbral le
+  regala premios atrasados a quien ya venia. El 2026-10-07 se pudo hacer sin
+  consecuencias porque en produccion habia un socio con dos visitas. Con
+  cientos de socios, bajarlo hay que decidirlo sabiendo que eso pasa.
+
+  Los premios ya ganados NO se tocan: la tabla guarda con cuantas visitas se
+  gano cada uno -ver `028_tarjeta_de_socio.sql`- precisamente para esto.
+*/
+export const VISITAS_POR_PREMIO = 5;
 
 // Mismo alfabeto que los codigos de reserva: sin 0/O ni 1/I/L, que al
 // dictarlos por telefono se confunden. La tarjeta se dicta cuando el movil se
