@@ -4,7 +4,12 @@
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "web"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "web"
+      ],
       "port": 5180,
       "autoPort": false
     },
@@ -12,6 +17,22 @@
       "name": "api",
       "url": "http://localhost:4100",
       "port": 4100,
+      "autoPort": false
+    },
+    {
+      "name": "web-compilada",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--prefix",
+        "web",
+        "--",
+        "--port",
+        "5181",
+        "--strictPort"
+      ],
+      "port": 5181,
       "autoPort": false
     }
   ]

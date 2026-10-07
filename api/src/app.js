@@ -23,8 +23,61 @@ app.disable('x-powered-by');
 // Detras de un reverse proxy, para que req.ip y el rate limit vean la IP real.
 if (env.isProd) app.set('trust proxy', 1);
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(compression());
+/*
+  `workerSrc` hay que decirlo a mano.
+
+  La politica que trae helmet de serie no lo incluye, y sin el el navegador se
+  niega a registrar el service worker de la web -el que hace que la tarjeta de
+  socio se pueda guardar en la pantalla de inicio y abrir sin cobertura-. El
+  error que da no ayuda nada: "an unknown error occurred when fetching the
+  script", con el fichero sirviendose correctamente en 200 y con su tipo bien
+  puesto. Se ve comparando con Vite, que no manda ninguna politica y ahi si
+  registra.
+
+  'self' y nada mas: el unico worker que puede correr aqui es el de esta casa.
+*/
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    // Igual que arriba: en produccion se queda, y en local no, que ahi no hay
+    // TLS y lo unico que consigue es que el navegador intente ir por https a
+    // un puerto donde no escucha nadie.
+    strictTransportSecurity: env.isProd,
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        workerSrc: ["'self'"],
+        /*
+          `upgrade-insecure-requests` fuera en desarrollo.
+
+          En produccion se queda, que es donde sirve: la web va por HTTPS y esa
+          directiva obliga a que todo lo de dentro vaya igual. Pero en local no
+          hay TLS, y con ella puesta el navegador pide el service worker por
+          https://localhost:4100, donde no hay nada escuchando. El error que
+          devuelve no menciona nada de esto -"an unknown error occurred when
+          fetching the script"- con el fichero sirviendose en 200, asi que se
+          tarda un rato en dar con ello.
+
+          `null` en helmet significa quitar la directiva, no ponerla vacia.
+        */
+        upgradeInsecureRequests: env.isProd ? [] : null,
+      },
+    },
+  })
+);
+/*
+  El service worker se sirve SIN comprimir.
+
+  Son 4 KB: lo que se ahorra comprimiendolo no se nota, y a cambio la peticion
+  especial con la que el navegador se baja el script del worker es mas tiquis-
+  miquis que una peticion normal. Se saca del medio y deja de ser una variable.
+*/
+app.use(
+  compression({
+    filter: (req, res) =>
+      req.path !== '/sw.js' && compression.filter(req, res),
+  })
+);
 
 // credentials: la cookie de refresco viaja entre origenes en desarrollo
 // (5180 -> 4100), asi que CORS tiene que permitirlo explicitamente.

@@ -24,6 +24,18 @@ const GENERICO = {
  * Lee el index.html construido y le quita el titulo y la descripcion, que se
  * sustituyen por los de cada ruta. En desarrollo se relee en cada peticion
  * para no tener que reiniciar la API despues de cada build.
+ *
+ * CUIDADO CON LO QUE SE ESCRIBE EN EL <head> DE index.html: estas dos
+ * expresiones buscan la PRIMERA aparicion en todo el fichero, y no saben
+ * distinguir una etiqueta de verdad de un texto que la mencione. Un comentario
+ * que nombre la etiqueta de titulo entre signos de menor y mayor hace que el
+ * recorte empiece dentro del comentario y acabe en el titulo real, borrando el
+ * cierre del comentario por el camino. A partir de ahi el navegador se traga
+ * como comentario todo lo que viene detras -el script de la aplicacion
+ * incluido- y la pagina sale en blanco.
+ *
+ * Y no se ve venir: en desarrollo Vite sirve el index.html sin pasar por aqui,
+ * asi que la web se ve perfecta hasta que se compila. Paso una vez.
  */
 async function cargarPlantilla() {
   if (plantilla && env.isProd) return plantilla;

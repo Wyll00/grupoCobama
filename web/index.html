@@ -7,6 +7,34 @@
     <!-- SVG y no PNG: el sello se ve nitido en la pestana a cualquier densidad
          de pantalla y son 400 bytes en vez de tres ficheros. -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!--
+      Para poder guardarse la web en la pantalla de inicio.
+
+      El manifiesto que va aqui es el del sitio entero. En las pantallas de
+      socio se cambia por otro en marcha -ver `useManifiesto.js`-, para que lo
+      que quede en el movil sea la tarjeta y no la portada.
+
+      Las dos etiquetas de Apple son necesarias aparte: iOS no lee el
+      manifiesto. El icono tiene que ser PNG y sin transparencia, y
+      apple-mobile-web-app-title es lo que sale debajo del icono; sin ella iOS
+      coge el titulo de la pestana, "Grupo Cobama", y lo corta.
+
+      OJO: aqui no se puede escribir la etiqueta de titulo entre signos de
+      menor y mayor, ni siquiera dentro de un comentario como este. La API
+      quita el titulo de la plantilla con una expresion regular que busca el
+      primero que aparezca -ver `api/src/middleware/prerender.js`-, y si lo
+      encuentra aqui se lleva por delante el cierre de este comentario. El
+      resultado es una pagina en blanco EN PRODUCCION que en desarrollo se ve
+      perfecta, porque Vite sirve el fichero sin pasar por esa expresion.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icono/icono-apple-180.png" />
+    <meta name="apple-mobile-web-app-title" content="Cobama" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <title>Grupo Cobama</title>
     <meta
       name="description"
