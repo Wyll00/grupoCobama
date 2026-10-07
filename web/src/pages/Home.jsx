@@ -5,7 +5,7 @@ import TarjetaLocal from '../components/TarjetaLocal.jsx';
 import MosaicoPortada from '../components/MosaicoPortada.jsx';
 import { Cargando, Error } from '../components/Estado.jsx';
 import { GRUPO, enlaceWhatsApp } from '../datos/grupo.js';
-import { ui } from '../datos/idioma.js';
+import { ui, localeDe } from '../datos/idioma.js';
 import { useIdioma } from '../hooks/useIdioma.js';
 
 /**
@@ -39,9 +39,50 @@ function RelojAbierto() {
   );
 }
 
+/*
+  La apertura de la quinta casa.
+
+  En ISO y no "18/10/2026" porque 18/10 y 10/18 son la misma fecha escrita por
+  dos sitios distintos, y esto lo va a leer tambien quien tenga la web en
+  ingles. Se escribe una vez aqui y cada idioma la pinta a su manera.
+
+  El mediodia en vez de la medianoche es para que no se corra de dia: a las
+  00:00 de Canarias, en horario de verano, en UTC ya es el dia anterior, y el
+  cartel anunciaria el 17.
+*/
+const APERTURA = '2026-10-18';
+
+/**
+ * La fecha de apertura, ya escrita, o null si ya paso.
+ *
+ * Lo de null importa: el dia 19 un cartel que diga "Próximamente, abre el 18
+ * de octubre" no se lee como una web desactualizada, se lee como una web
+ * rota. Sin fecha el cartel vuelve a decir solo el nombre, que es como estaba
+ * y aguanta sin que nadie lo toque.
+ *
+ * Lo que NO se arregla solo es el cartel entero: el dia que El Gincho abra,
+ * deja de ser "proximamente" y pasa a ser la quinta ficha de la portada, y
+ * eso lo tiene que hacer una persona.
+ */
+function fechaDeApertura(idioma) {
+  const dia = new Date(`${APERTURA}T12:00:00Z`);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  if (dia < hoy) return null;
+
+  return ui('home.abreEl', idioma, {
+    fecha: dia.toLocaleDateString(localeDe(idioma), {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }),
+  });
+}
+
 export default function Home() {
   const { datos: locales, cargando, error } = useApi((opts) => api.restaurantes(opts), []);
   const [idioma] = useIdioma();
+  const apertura = fechaDeApertura(idioma);
   if (error) return <Error error={error} />;
 
   return (
@@ -113,14 +154,20 @@ export default function Home() {
         forma de boton se acaba pulsando: la gente pulsa, no pasa nada, y se
         queda pensando que la web esta rota.
 
-        Dice el nombre y ya. Ni donde ni cuando: en cuanto se pone una fecha,
-        esa fecha es una promesa que alguien tiene que cumplir, y las
-        aperturas se mueven.
+        Lleva fecha de apertura porque la casa la ha dado. Aqui ponia que no,
+        y el motivo sigue siendo verdad -una fecha es una promesa que alguien
+        tiene que cumplir, y las aperturas se mueven-, asi que la decision es
+        del grupo y no de esta pagina. Lo unico que hace el codigo es no
+        dejarla mentir: ver `APERTURA`.
+
+        Sigue sin ser un boton: esquinas de panel y no de pastilla, y borde
+        discontinuo.
       */}
       <aside className="proxima-banda">
         <p className="contenedor proxima">
           <span className="proxima__aviso">{ui('home.proximamente', idioma)}</span>
-          <span className="proxima__nombre">El Baifo</span>
+          <span className="proxima__nombre">El Gincho</span>
+          {apertura && <span className="proxima__fecha">{apertura}</span>}
           <span className="proxima__nota">{ui('home.quintaCasa', idioma)}</span>
         </p>
       </aside>
