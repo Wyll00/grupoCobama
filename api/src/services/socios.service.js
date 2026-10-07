@@ -154,14 +154,46 @@ export async function porId(id) {
  * y el error que daria -una clave duplicada en la cara del cliente mientras
  * cena- no es el que uno quiere depurar en sala.
  */
-export async function crear({ nombre, telefono = null, email = null }, { restauranteId = null } = {}) {
+export async function crear(
+  {
+    nombre,
+    telefono = null,
+    email = null,
+    politica_version: politicaVersion = null,
+    marketing = false,
+  },
+  { restauranteId = null, via = 'sala' } = {}
+) {
+  /*
+    La fecha del consentimiento la pone el SERVIDOR, no el cliente.
+
+    Es la prueba de cuando se acepto (art. 7.1). Si viniera en el cuerpo de la
+    peticion, cualquiera podria mandar la fecha que quisiera y la prueba no
+    probaria nada. Lo unico que se acepta de fuera es QUE version se enseno,
+    porque eso el servidor no lo sabe.
+  */
+  const ahora = politicaVersion ? new Date() : null;
+
   for (let intento = 0; intento < 5; intento += 1) {
     const codigo = generarCodigo();
     try {
       const [res] = await pool.execute(
-        `INSERT INTO socios (codigo, nombre, telefono, email, alta_restaurante_id)
-         VALUES (?, ?, ?, ?, ?)`,
-        [codigo, nombre, telefono, email, restauranteId]
+        `INSERT INTO socios
+           (codigo, nombre, telefono, email, alta_restaurante_id,
+            politica_version, politica_aceptada_en, marketing, marketing_en, via)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          codigo,
+          nombre,
+          telefono,
+          email,
+          restauranteId,
+          politicaVersion,
+          ahora,
+          marketing ? 1 : 0,
+          marketing ? new Date() : null,
+          via,
+        ]
       );
       return porId(res.insertId);
     } catch (e) {

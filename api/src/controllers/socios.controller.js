@@ -6,9 +6,15 @@ import { ApiError } from '../utils/ApiError.js';
 /**
  * Tarjeta de socio.
  *
- * La parte publica es solo de LECTURA y va sin sesion: el QR de la tarjeta
- * tiene que abrirse en el movil de cualquiera sin instalar ni entrar en nada.
- * Apuntar visitas y entregar premios va por el panel, con sesion.
+ * La parte publica es casi toda de LECTURA y va sin sesion: el QR de la
+ * tarjeta tiene que abrirse en el movil de cualquiera sin instalar ni entrar
+ * en nada. Apuntar visitas y entregar premios va por el panel, con sesion.
+ *
+ * La unica excepcion es darse de alta uno mismo, que escribe. Se puede dejar
+ * abierta porque una tarjeta recien hecha no vale nada: nace con cero visitas
+ * y las visitas solo las apunta el personal desde el panel. Lo peor que puede
+ * hacer alguien con esto es ensuciar la tabla, y para eso esta el limite por
+ * IP de `routes/index.js`.
  */
 
 const urlTarjeta = (codigo) => `${env.webBaseUrl.replace(/\/$/, '')}/socio/${codigo}`;
@@ -47,10 +53,42 @@ export async function getTarjeta(req, res) {
   res.json({ datos: { ...publico, qr } });
 }
 
+/**
+ * Darse de alta uno mismo desde la web.
+ *
+ * Devuelve la tarjeta YA COMPLETA, con su QR y sin telefono ni email, igual
+ * que `getTarjeta`. Es lo que permite que el navegador salte directo a la
+ * tarjeta recien hecha sin una segunda peticion, y de paso evita que el
+ * cliente se quede mirando una pantalla de "listo" sin su codigo delante,
+ * que es justo lo que no puede perder.
+ */
+export async function postAlta(req, res) {
+  const socio = await socios.crear(req.body, { via: 'web' });
+  const { telefono, email, ...publico } = socio;
+
+  const qr = await QRCode.toString(urlTarjeta(socio.codigo), {
+    type: 'svg',
+    errorCorrectionLevel: 'M',
+    margin: 2,
+    color: { dark: '#1f1a17', light: '#ffffff' },
+  });
+
+  res.status(201).json({ datos: { ...publico, qr } });
+}
+
 // ------------------------------------------------------------------ panel
 
 export async function getSocios(req, res) {
-  res.json({ datos: await socios.buscar({ q: req.query.q ?? '' }) });
+  /*
+    `req.consulta` y NO `req.query`.
+
+    El validador deja ahi el resultado ya convertido, porque en Express 5
+    `req.query` es de solo lectura -ver `middleware/validar.js`-. Leyendo el
+    crudo, `limite` llegaba como la cadena "200" y acababa en el SQL como
+    LIMIT '200', que MySQL rechaza. Con `q` no se noto nunca porque una cadena
+    cruda y una validada se parecen demasiado.
+  */
+  res.json({ datos: await socios.buscar(req.consulta) });
 }
 
 export async function postSocio(req, res) {
